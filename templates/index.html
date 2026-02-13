@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tulshi shop - Login</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="background-overlay"></div>
+
+    <div class="container">
+        <div class="login-card">
+            <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Logo" class="logo">
+            <h2 class="title">Welcome Back</h2>
+            <p class="subtitle">Log in to continue your fresh shopping</p>
+
+            <form action="/login" method="POST" class="sign-in-form" id="login-form">
+                <div class="input-field">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" name="email" placeholder="Email Address" required />
+                </div>
+
+                <div class="input-field">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Password" id="password-input" required />
+                    <i class="fas fa-eye-slash toggle-password" id="toggle-password"></i>
+                </div>
+
+                <div class="options">
+                    <label class="remember-me">
+                        <input type="checkbox"> Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <input type="submit" value="Login" class="btn solid" />
+
+                <p class="social-text">Or Sign in with social platforms</p>
+                <div class="social-media">
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-google"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-icon">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>

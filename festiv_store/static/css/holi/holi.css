@@ -1,0 +1,331 @@
+/* Holi Dashboard - Elite "Purple, White, Black" Architecture */
+
+:root {
+    --elite-purple: #8E2DE2;
+    --elite-purple-dark: #6a1bbd;
+    --elite-black: #0f172a;
+    --elite-black-light: #1e293b;
+    --elite-white: #ffffff;
+    --elite-grey-light: #f8fafc;
+    --elite-border: rgba(142, 45, 226, 0.1);
+    --elite-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.holi-dashboard {
+    padding: 40px;
+    animation: slideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Sidebar Integrated Luxury */
+.holi-sidebar {
+    background: var(--elite-black) !important;
+    border: none !important;
+}
+
+.holi-sidebar .logo span {
+    color: var(--elite-white) !important;
+    font-weight: 800;
+}
+
+.active-link {
+    background: var(--elite-purple) !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(142, 45, 226, 0.4);
+}
+
+/* Top Hero Grid */
+.elite-hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    margin-bottom: 50px;
+}
+
+.elite-stat-card {
+    background: var(--elite-white);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid var(--elite-grey-light);
+    box-shadow: var(--elite-shadow);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.4s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.elite-stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--elite-purple);
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.elite-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+    border-color: var(--elite-purple);
+}
+
+.elite-stat-card:hover::after {
+    opacity: 1;
+}
+
+.elite-stat-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--elite-black-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.elite-stat-value {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--elite-black);
+    letter-spacing: -1px;
+}
+
+.elite-stat-icon {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2.5rem;
+    color: rgba(142, 45, 226, 0.05);
+    transition: 0.4s;
+}
+
+.elite-stat-card:hover .elite-stat-icon {
+    color: rgba(142, 45, 226, 0.15);
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Elite Table Layout */
+.elite-content-row {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr;
+    gap: 30px;
+}
+
+.elite-card {
+    background: var(--elite-white);
+    border-radius: 24px;
+    padding: 35px;
+    box-shadow: var(--elite-shadow);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.elite-card-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--elite-black);
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.elite-card-title i {
+    color: var(--elite-purple);
+}
+
+.elite-table-wrapper {
+    overflow-x: auto;
+}
+
+.elite-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.elite-table th {
+    text-align: left;
+    padding: 15px 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.elite-table td {
+    padding: 20px;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--elite-black-light);
+}
+
+.elite-table tr:hover td {
+    background: #fafafa;
+}
+
+.elite-status-pill {
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    background: rgba(142, 45, 226, 0.08);
+    color: var(--elite-purple);
+    border: 1px solid rgba(142, 45, 226, 0.1);
+}
+
+/* Control Area Black Premium */
+.elite-control-card {
+    background: var(--elite-black) !important;
+    color: var(--elite-white);
+    border: none;
+}
+
+.elite-control-card .elite-card-title {
+    color: var(--elite-white);
+}
+
+.elite-action-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 12px;
+}
+
+.elite-action-btn:hover {
+    background: var(--elite-purple);
+    border-color: var(--elite-purple);
+    transform: scale(1.02);
+}
+
+.elite-action-btn i {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+/* Luxury Header Area */
+.elite-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+}
+
+.mobile-nav-toggle {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--elite-black);
+    margin-bottom: 15px;
+    width: 45px;
+    height: 45px;
+    background: var(--elite-grey-light);
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.mobile-nav-toggle:hover {
+    background: var(--elite-purple);
+    color: white;
+}
+
+.elite-status-badge {
+    background: #000;
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+.elite-header-group h1 {
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: var(--elite-black);
+    letter-spacing: -1.5px;
+}
+
+.elite-header-group p {
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Responsive Master */
+@media (max-width: 1280px) {
+    .elite-hero-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .elite-content-row {
+        grid-template-columns: 1fr;
+    }
+
+    .holi-dashboard {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .elite-header-group h1 {
+        font-size: 2.2rem;
+    }
+
+    .elite-stat-value {
+        font-size: 1.8rem;
+    }
+
+    .elite-card {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 640px) {
+    .elite-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .elite-header-group h1 {
+        font-size: 1.8rem;
+    }
+
+    .elite-dashboard-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 15px;
+    }
+
+    .mobile-nav-toggle {
+        display: flex;
+    }
+}

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Holi Hub - Elite Architecture{% endblock %}
+
+{% block sidebar %}
+{% include 'holi/sidemenu.html' %}
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('festiv_store.static', filename='css/holi/holi.css') }}">
+<style>
+    body {
+        background-color: #ffffff !important;
+    }
+
+    .page-title {
+        display: none;
+    }
+
+    .content-wrapper {
+        background: transparent !important;
+        padding: 0 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="holi-dashboard">
+    <!-- Elite Header Section -->
+    <header class="elite-dashboard-header">
+        <div class="mobile-nav-toggle" id="toggle-sidebar">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="elite-header-group">
+            <h1>Holi Festival Hub</h1>
+            <p>High-contrast administrative dashboard for elite store management.</p>
+        </div>
+        <div class="elite-status-badge">
+            SYSTEM ACTIVE
+        </div>
+    </header>
+
+    <!-- Elite Hero Stats -->
+    <div class="elite-hero-grid">
+        <div class="elite-stat-card">
+            <div class="elite-stat-label">Stock Inventory</div>
+            <div class="elite-stat-value">124</div>
+            <i class="fas fa-box elite-stat-icon"></i>
+        </div>
+        <div class="elite-stat-card">
+            <div class="elite-stat-label">Live Sales</div>
+            <div class="elite-stat-value">48</div>
+            <i class="fas fa-shopping-cart elite-stat-icon"></i>
+        </div>
+        <div class="elite-stat-card">
+            <div class="elite-stat-label">Elite Reach</div>
+            <div class="elite-stat-value">1,240</div>
+            <i class="fas fa-crosshairs elite-stat-icon"></i>
+        </div>
+        <div class="elite-stat-card">
+            <div class="elite-stat-label">Total GTV</div>
+            <div class="elite-stat-value">₹84K</div>
+            <i class="fas fa-crown elite-stat-icon"></i>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="elite-content-row">
+        <!-- Performance Table -->
+        <div class="elite-card">
+            <h2 class="elite-card-title"><i class="fas fa-chart-line"></i> Premium Performance</h2>
+            <div class="elite-table-wrapper">
+                <table class="elite-table">
+                    <thead>
+                        <tr>
+                            <th>Product Identifier</th>
+                            <th>Tier</th>
+                            <th>Velocity</th>
+                            <th>Deployment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight: 700;">Organic Herbal Gulal Set</td>
+                            <td>Elite Tier</td>
+                            <td style="color: #22c55e; font-weight: 800;">+12% ↑</td>
+                            <td><span class="elite-status-pill">ACTIVE</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">Royal Brass Collection</td>
+                            <td>Luxury Tier</td>
+                            <td style="color: #64748b; font-weight: 800;">Stable</td>
+                            <td><span class="elite-status-pill">ACTIVE</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: 700;">Artisan Water Blasters</td>
+                            <td>Standard</td>
+                            <td style="color: #ef4444; font-weight: 800;">-2% ↓</td>
+                            <td><span class="elite-status-pill">PENDING</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Global Controllers -->
+        <div class="elite-card elite-control-card">
+            <h2 class="elite-card-title"><i class="fas fa-sliders"></i> Master Logic</h2>
+            <div style="margin-top: 10px;">
+                <button class="elite-action-btn">
+                    <i class="fas fa-bolt"></i> Global Flash Toggle
+                </button>
+                <button class="elite-action-btn">
+                    <i class="fas fa-bullhorn"></i> Broadcast Campaign
+                </button>
+                <button class="elite-action-btn">
+                    <i class="fas fa-shield-halved"></i> Security Protocol
+                </button>
+
+                <div
+                    style="margin-top: 40px; padding: 25px; border-radius: 18px; border: 1px dashed rgba(255,255,255,0.2); text-align: center;">
+                    <div
+                        style="font-size: 0.7rem; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 10px;">
+                        Cloud Integration</div>
+                    <div style="font-weight: 800; font-size: 1.1rem; color: #8E2DE2;">VERIFIED</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

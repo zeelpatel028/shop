@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block content %}
+<div class="recent-orders">
+    <div class="card-header">
+        <h2>General Settings</h2>
+    </div>
+    <form style="padding: 20px;">
+        <label>Site Name</label><br>
+        <input type="text" value="Tulshi Shop"
+            style="padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;"><br>
+        <label>Admin Email</label><br>
+        <input type="email" value="zeelptl028@gmail.com"
+            style="padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;"><br>
+        <button
+            style="padding: 10px 20px; background: var(--primary-purple); color: white; border: none; border-radius: 4px;">Save
+            Changes</button>
+    </form>
+</div>
+{% endblock %}
