@@ -8,3 +8,7 @@ def index():
 @festiv_store_bp.route('/holi')
 def holi_dashboard():
     return render_template('holi/holi.html')
+
+@festiv_store_bp.route('/holi-premium')
+def holi_premium():
+    return render_template('holi/premium.html')
