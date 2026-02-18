@@ -1,89 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Festiv Store - Premium Collection</title>
-    <!-- Google Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% block title %}Festiv Store - Premium Collection{% endblock %}
+{% block page_title %}Festiv Store{% endblock %}
 
-    <!-- Base Styles from Home -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
-    <!-- Unique Festiv Styles -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/festiv_store.css') }}">
-</head>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/festiv_store.css') }}">
+{% endblock %}
 
-<body>
-    <div class="dashboard-container">
-        <!-- Sidebar (Reused) -->
-        {% include 'sidemenu.html' %}
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Navbar (Reused) -->
-            <!-- Top Left Title and Toggle -->
-            <div class="store-header"
-                style="padding: 20px; display: flex; align-items: center; gap: 20px; position: relative; z-index: 100;">
-                <div class="toggle-menu" id="toggle-sidebar">
-                    <i class="fas fa-bars" style="font-size: 1.5rem; cursor: pointer;"></i>
-                </div>
-                <div class="festiv-brand-wrapper">
-                    <i class="fas fa-wand-magic-sparkles festiv-icon"></i>
-                    <h1 class="festiv-store-title">Festiv Store</h1>
-                </div>
+{% block content %}
+<!-- Festiv Content -->
+<div class="festiv-content-wrapper" style="padding-top: 20px;">
+    <!-- Product Grid -->
+    <div class="products-container">
+        <!-- Holi Special Premium Card -->
+        <div class="tour-card">
+            <div class="card-image-wrapper">
+                <img src="{{ url_for('static', filename='images/festiv_store/Holi colours.jpg') }}"
+                    alt="Holi Celebration" class="card-image">
             </div>
+            <div class="card-content">
+                <h4 class="card-title">Holi Store</h4>
 
-            <!-- Festiv Content -->
-            <div class="festiv-content-wrapper" style="padding-top: 20px;">
-                <!-- Product Grid -->
-                <div class="products-container">
-                    <!-- Holi Special Premium Card -->
-                    <div class="tour-card">
-                        <div class="card-image-wrapper">
-                            <img src="{{ url_for('static', filename='images/festiv_store/Holi colours.jpg') }}"
-                                alt="Holi Celebration" class="card-image">
-                        </div>
-                        <div class="card-content">
-                            <div class="card-meta">
-                                <span class="badge upcoming">LIVE NOW</span>
-                                <span class="badge timeline" style="background: #fff0f6; color: #ff007c;">FESTIVE
-                                    SPECIAL</span>
-                                <button class="more-options"><i class="fas fa-ellipsis-h"></i></button>
-                            </div>
-                            <h4 class="card-title">Holi Store</h4>
-
-
-
-                            <a href="{{ url_for('festiv_store.holi_dashboard') }}" class="btn-start-store">
-                                <span>Start Store</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
+                <a href="{{ url_for('festiv_store.holi_dashboard') }}" class="btn-start-store">
+                    <span>Start Store</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
-        </main>
+        </div>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Reusing Home JS for sidebar toggling -->
-    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
-    <script>
-        // Simple category filtering animation
-        const pills = document.querySelectorAll('.category-pill');
-        pills.forEach(pill => {
-            pill.addEventListener('click', () => {
-                pills.forEach(p => p.classList.remove('active'));
-                pill.classList.add('active');
-            });
+{% block extra_js %}
+<script>
+    // Simple category filtering animation
+    const pills = document.querySelectorAll('.category-pill');
+    pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            pills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
         });
-    </script>
-</body>
-
-</html>
+    });
+</script>
+{% endblock %}

@@ -18,6 +18,7 @@
 </head>
 
 <body>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
     <div class="dashboard-container">
         <!-- Sidebar -->
         {% block sidebar %}
@@ -26,22 +27,21 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            {% block navbar %}
             <!-- Navbar -->
             <header class="top-navbar" style="justify-content: flex-start;">
-                <div class="toggle-menu" id="toggle-sidebar">
+                <div id="mobile-toggle" class="toggle-menu" style="display: none; margin-right: 20px;">
                     <i class="fas fa-bars"></i>
                 </div>
 
-                <div class="brand-container">
-                    <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Tulshi Shop Logo"
-                        class="brand-logo">
-                    <span class="brand-name">Tulshi Shop</span>
+                <div class="brand-container" id="toggle-sidebar" style="cursor: pointer;">
+                    <div
+                        style="width: 35px; height: 35px; border-radius: 10px; overflow: hidden; margin-right: 15px; box-shadow: 0 0 15px rgba(142, 45, 226, 0.4); border: 2px solid white;">
+                        <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Logo"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <span class="brand-name" style="font-weight: 900; letter-spacing: -0.5px;">Tulshi Shop</span>
                 </div>
-
-
             </header>
-            {% endblock %}
 
             <!-- Dashboard Content -->
             <div class="content-wrapper">

@@ -1,0 +1,60 @@
+{% extends 'holi_base.html' %}
+
+{% block title %}Master Stock - Coming Soon{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<style>
+    body {
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+    }
+
+    .main-content {
+        background-color: #ffffff !important;
+    }
+
+    .content-wrapper {
+        background: transparent !important;
+        padding: 0 !important;
+    }
+
+    .elite-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .bill-btn {
+        background: #FFD700;
+        color: #000;
+        padding: 12px 25px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="holi-dashboard" style="display: flex; align-items: center; justify-content: center; min-height: 80vh;">
+    <div class="elite-card" style="text-align: center; max-width: 600px; padding: 60px;">
+        <div style="font-size: 4rem; color: #FFD700; margin-bottom: 20px;">
+            <i class="fas fa-cubes"></i>
+        </div>
+        <h1 style="color: #1a1a1a; font-size: 3rem; font-weight: 900; margin-bottom: 15px;">COMING SOON</h1>
+        <p style="color: #64748b; font-size: 1.1rem; line-height: 1.6;">
+            The Master Stock inventory system is currently being revamped.
+            <br>Check back later for updates.
+        </p>
+        <div style="margin-top: 40px;">
+            <a href="{{ url_for('festiv_store.index') }}" class="bill-btn" style="display: inline-block;">Return to
+                Festival Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

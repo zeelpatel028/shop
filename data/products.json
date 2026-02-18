@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "name": "Organic Herbal Gulal Set",
+        "category": "Elite Tier",
+        "price": 1200,
+        "stock": 45,
+        "image": "Holi colours.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Royal Brass Collection",
+        "category": "Luxury Tier",
+        "price": 3500,
+        "stock": 20,
+        "image": "Holi colours.jpg"
+    }
+]

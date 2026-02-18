@@ -67,7 +67,7 @@ body {
 }
 
 .sidebar.mobile-active {
-    left: 0;
+    left: 0 !important;
 }
 
 .sidebar-header {
@@ -166,6 +166,22 @@ body {
     width: calc(100% - 80px);
 }
 
+/* Sidebar Overlay for Mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
 /* Top Navbar */
 .top-navbar {
     height: 70px;
@@ -205,6 +221,21 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 0.5px;
+}
+
+/* Hide Navbar Brand when Sidebar is OPEN */
+.sidebar:not(.active)~.main-content .brand-container {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .sidebar.mobile-active~.main-content .brand-container {
+        display: none;
+    }
+
+    .sidebar:not(.mobile-active)~.main-content .brand-container {
+        display: flex;
+    }
 }
 
 .toggle-menu {
@@ -563,6 +594,7 @@ table td {
         justify-content: space-between;
         width: 100% !important;
         left: 0 !important;
+        position: fixed;
     }
 
     .toggle-menu {
@@ -617,6 +649,15 @@ table td {
     /* Hide less important table columns on mobile */
     .hide-on-mobile {
         display: none;
+    }
+
+    .brand-name {
+        font-size: 1.2rem !important;
+    }
+
+    .brand-logo {
+        height: 35px;
+        width: 35px;
     }
 }
 

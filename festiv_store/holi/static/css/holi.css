@@ -1,14 +1,15 @@
 /* Holi Dashboard - Elite "Purple, White, Black" Architecture */
 
 :root {
-    --elite-purple: #8E2DE2;
-    --elite-purple-dark: #6a1bbd;
-    --elite-black: #0f172a;
-    --elite-black-light: #1e293b;
+    --elite-primary: #FFD700;
+    /* Gold/Yellow */
+    --elite-primary-dark: #b89b00;
+    --elite-black: #1a1a1a;
+    --elite-black-light: #2d2d2d;
     --elite-white: #ffffff;
-    --elite-grey-light: #f8fafc;
-    --elite-border: rgba(142, 45, 226, 0.1);
-    --elite-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    --elite-grey-light: #444444;
+    --elite-border: rgba(255, 215, 0, 0.1);
+    --elite-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .holi-dashboard {
@@ -54,11 +55,11 @@
 }
 
 .elite-stat-card {
-    background: var(--elite-white);
+    background: var(--elite-black-light);
     padding: 30px;
     border-radius: 20px;
-    border: 1px solid var(--elite-grey-light);
-    box-shadow: var(--elite-shadow);
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -74,15 +75,15 @@
     left: 0;
     width: 4px;
     height: 100%;
-    background: var(--elite-purple);
+    background: var(--elite-primary);
     opacity: 0;
     transition: 0.3s;
 }
 
 .elite-stat-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
-    border-color: var(--elite-purple);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    border-color: var(--elite-primary);
 }
 
 .elite-stat-card:hover::after {
@@ -92,7 +93,7 @@
 .elite-stat-label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--elite-black-light);
+    color: #888;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
@@ -101,7 +102,7 @@
 .elite-stat-value {
     font-size: 2.2rem;
     font-weight: 900;
-    color: var(--elite-black);
+    color: var(--elite-white);
     letter-spacing: -1px;
 }
 
@@ -128,17 +129,17 @@
 }
 
 .elite-card {
-    background: var(--elite-white);
+    background: var(--elite-black-light);
     border-radius: 24px;
     padding: 35px;
     box-shadow: var(--elite-shadow);
-    border: 1px solid rgba(0, 0, 0, 0.02);
+    border: 1px solid #333;
 }
 
 .elite-card-title {
     font-size: 1.4rem;
     font-weight: 800;
-    color: var(--elite-black);
+    color: var(--elite-white);
     margin-bottom: 30px;
     display: flex;
     align-items: center;
@@ -146,7 +147,7 @@
 }
 
 .elite-card-title i {
-    color: var(--elite-purple);
+    color: var(--elite-primary);
 }
 
 .elite-table-wrapper {
@@ -166,18 +167,18 @@
     color: #64748b;
     text-transform: uppercase;
     letter-spacing: 1px;
-    border-bottom: 2px solid #f1f5f9;
+    border-bottom: 2px solid #333;
 }
 
 .elite-table td {
     padding: 20px;
     font-size: 0.95rem;
-    border-bottom: 1px solid #f1f5f9;
-    color: var(--elite-black-light);
+    border-bottom: 1px solid #222;
+    color: #eee;
 }
 
 .elite-table tr:hover td {
-    background: #fafafa;
+    background: #222;
 }
 
 .elite-status-pill {
@@ -185,9 +186,9 @@
     border-radius: 50px;
     font-size: 0.7rem;
     font-weight: 800;
-    background: rgba(142, 45, 226, 0.08);
-    color: var(--elite-purple);
-    border: 1px solid rgba(142, 45, 226, 0.1);
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--elite-primary);
+    border: 1px solid rgba(255, 215, 0, 0.2);
 }
 
 /* Control Area Black Premium */
@@ -218,8 +219,9 @@
 }
 
 .elite-action-btn:hover {
-    background: var(--elite-purple);
-    border-color: var(--elite-purple);
+    background: var(--elite-primary);
+    border-color: var(--elite-primary);
+    color: #000;
     transform: scale(1.02);
 }
 
@@ -240,7 +242,7 @@
     display: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: var(--elite-black);
+    color: var(--elite-white);
     margin-bottom: 15px;
     width: 45px;
     height: 45px;
@@ -269,7 +271,7 @@
 .elite-header-group h1 {
     font-size: 2.8rem;
     font-weight: 900;
-    color: var(--elite-black);
+    color: var(--elite-white);
     letter-spacing: -1.5px;
 }
 
@@ -278,14 +280,40 @@
     font-weight: 500;
 }
 
+/* Sidebar Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+    }
+
+    .sidebar.mobile-active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .holi-dashboard {
+        padding: 20px 15px;
+    }
+}
+
 /* Responsive Master */
 @media (max-width: 1280px) {
     .elite-hero-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (max-width: 1024px) {
+    .elite-hero-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .elite-content-row {
         grid-template-columns: 1fr;
     }

@@ -1,64 +1,86 @@
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Logo"
-                style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px;">
-            <span>Tulshi Shop</span>
+<aside class="sidebar holi-sidebar" id="sidebar">
+    <div class="sidebar-header"
+        style="background: #000; border-bottom: 2px solid #FFD700; display: flex; align-items: center; justify-content: space-between;">
+        <div class="logo toggle-sidebar-btn" id="toggle-sidebar-alt"
+            style="cursor: pointer; display: flex; align-items: center;">
+            <div
+                style="width: 35px; height: 35px; border-radius: 10px; overflow: hidden; margin-right: 15px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); flex-shrink: 0;">
+                <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Logo"
+                    style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <span class="brand-name"
+                style="font-size: 1.2rem; font-weight: 900; white-space: nowrap; color: #fff !important;">Tulshi
+                Shop</span>
         </div>
-        <button id="close-sidebar" class="close-sidebar-btn"><i class="fas fa-times"></i></button>
+        <div id="close-sidebar" style="cursor: pointer; color: #fff; display: none; padding: 5px;">
+            <i class="fas fa-times" style="font-size: 1.4rem;"></i>
+        </div>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" style="padding: 25px 0;">
+        <style>
+            .sidebar-nav ul li a {
+                border-left: 4px solid transparent;
+                margin-bottom: 8px;
+                border-radius: 0 50px 50px 0;
+                transition: 0.3s;
+                color: rgba(255, 255, 255, 0.7) !important;
+                display: flex;
+                align-items: center;
+                padding: 12px 25px;
+                text-decoration: none;
+            }
+
+            .sidebar-nav ul li.active a,
+            .sidebar-nav ul li a.active-link {
+                border-left: 4px solid #FFD700 !important;
+                background: #2d2d2d !important;
+                color: #fff !important;
+                box-shadow: none !important;
+                font-weight: 700;
+            }
+
+            .sidebar-nav ul li a:hover {
+                background: #222 !important;
+                color: #fff !important;
+            }
+
+            .sidebar-nav ul li a i {
+                margin-right: 15px;
+                width: 20px;
+                text-align: center;
+                font-size: 1.1rem;
+            }
+
+            @media (max-width: 768px) {
+                #close-sidebar {
+                    display: block !important;
+                }
+            }
+        </style>
         <ul>
-            <li class="active">
-                <a href="{{ url_for('home') }}">
-                    <i class="fas fa-home"></i>
+            <!-- Standard App Links -->
+            <li class="{% if request.endpoint == 'home' %}active{% endif %}">
+                <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active-link{% endif %}">
+                    <i class="fas fa-crown"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
-            <li>
-                <a href="{{ url_for('products') }}">
-                    <i class="fas fa-box-open"></i>
-                    <span>Products</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('festiv_store.index') }}">
-                    <i class="fas fa-gifts"></i>
+            <li class="{% if request.endpoint == 'festiv_store.index' %}active{% endif %}">
+                <a href="{{ url_for('festiv_store.index') }}"
+                    class="{% if request.endpoint == 'festiv_store.index' %}active-link{% endif %}">
+                    <i class="fas fa-store"></i>
                     <span>Festiv Store</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('orders') }}">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Orders</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('customers') }}">
-                    <i class="fas fa-users"></i>
-                    <span>Customers</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('analytics') }}">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ url_for('settings') }}">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
                 </a>
             </li>
         </ul>
     </nav>
 
-    <div class="sidebar-footer">
-        <a href="{{ url_for('logout') }}" class="logout-link">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
+    <div class="sidebar-footer" style="padding: 30px; border-top: 1px solid rgba(255,255,255,0.03);">
+        <a href="{{ url_for('logout') }}" class="logout-link"
+            style="display: flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 700; color: #ef4444 !important;">
+            <i class="fas fa-power-off"></i>
+            <span>TERMINATE</span>
         </a>
     </div>
 </aside>
