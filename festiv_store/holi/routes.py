@@ -1,5 +1,6 @@
 import os
 import json
+import collections
 from flask import render_template, request, redirect, url_for, flash
 from .. import festiv_store_bp
 
@@ -30,7 +31,33 @@ def holi_dashboard():
 @festiv_store_bp.route('/holi/master-stock')
 def master_stock():
     products = load_data(PRODUCTS_FILE)
-    return render_template('master_stock.html', products=products)
+    bills = load_data(BILLS_FILE)
+    
+    # Calculate sales count for Most Sold
+    product_sales = collections.defaultdict(int)
+    for bill in bills:
+        product_sales[bill['product_name']] += bill['quantity']
+        
+    # Attach sales to products for sorting (temporary attribute for template)
+    for p in products:
+        p['sales'] = product_sales.get(p['name'], 0)
+        
+    most_sold = sorted(products, key=lambda x: x['sales'], reverse=True)
+    low_stock = [p for p in products if p['stock'] <= 20]
+    
+    return render_template('master_stock.html', 
+                         products=products, 
+                         most_sold=most_sold,
+                         low_stock=low_stock)
+
+@festiv_store_bp.route('/holi/delete-product/<int:product_id>', methods=['POST'])
+def delete_product(product_id):
+    products = load_data(PRODUCTS_FILE)
+    # Filter out product with matching ID
+    products = [p for p in products if p['id'] != product_id]
+    save_data(PRODUCTS_FILE, products)
+    flash('Product deleted successfully!', 'success')
+    return redirect(url_for('festiv_store.master_stock'))
 
 @festiv_store_bp.route('/holi/add-product', methods=['GET', 'POST'])
 def add_product():
