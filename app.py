@@ -7,6 +7,10 @@ app.secret_key = 'supersecretkey'  # Required for flashing messages
 # Register Blueprints
 app.register_blueprint(festiv_store_bp, url_prefix='/festiv_store')
 
+# Initialize DB (Supabase)
+from database.db import init_db
+init_db(app)
+
 # Authorized Phone Numbers
 AUTHORIZED_PHONES = ["6353807407", "9913887677"]
 AUTHORIZED_PASSWORD = "tulshi"

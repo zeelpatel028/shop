@@ -1,0 +1,363 @@
+    :root {
+        --bg-dark: #ffffff;
+        --card-bg: #ffffff;
+        --input-bg: #f8f9fa;
+        --border-color: #e0e0e0;
+        --text-main: #333333;
+        --text-muted: #666666;
+        --accent-purple: #6C5DD3;
+        --accent-orange: #FFD700;
+        --accent-white: #ffffff;
+        --danger: #ff4d4d;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-top: 20px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+        background: var(--border-color);
+    }
+
+    .btn-primary {
+        background: var(--accent-purple);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #5b4db8;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(108, 93, 211, 0.4);
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+        padding-bottom: 50px;
+    }
+
+    .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-sm);
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .card-header {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: var(--text-main);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 12px 15px;
+        color: var(--text-main);
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--accent-purple);
+    }
+
+    .rich-text-editor {
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        min-height: 150px;
+        padding: 15px;
+    }
+
+    .editor-toolbar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+    }
+
+    .editor-btn {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+    }
+
+    .editor-btn:hover {
+        color: var(--text-main);
+    }
+
+    .upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: 15px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: rgba(108, 93, 211, 0.05);
+    }
+
+    .upload-area:hover {
+        border-color: var(--accent-purple);
+        background: rgba(108, 93, 211, 0.1);
+    }
+
+    .upload-icon {
+        font-size: 32px;
+        color: var(--accent-purple);
+        margin-bottom: 15px;
+    }
+
+    .upload-text {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .upload-text strong {
+        color: var(--accent-purple);
+    }
+
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .variant-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: var(--input-bg);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border-color);
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--input-bg);
+        transition: .4s;
+        border-radius: 34px;
+        border: 1px solid var(--border-color);
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 2px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked+.slider {
+        background-color: var(--accent-purple);
+        border-color: var(--accent-purple);
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(18px);
+    }
+
+    .category-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        background-size: 15px;
+    }
+
+    .tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .tag {
+        background: rgba(255, 215, 0, 0.15);
+        color: #d35400;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .tag i {
+        cursor: pointer;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        background: rgba(46, 204, 113, 0.15);
+        color: #218c53;
+    }
+
+    @media (max-width: 992px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .header-actions {
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        /* Fix for fixed navbar on mobile */
+        .page-header {
+            margin-top: 90px;
+            flex-direction: column;
+            gap: 15px;
+            padding-top: 0;
+        }
+
+        .page-title {
+            font-size: 20px;
+        }
+
+        .header-actions {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .card {
+            padding: 15px;
+        }
+
+        .pricing-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .editor-toolbar {
+            flex-wrap: wrap;
+        }
+
+        .upload-area {
+            padding: 20px;
+        }
+
+        .variant-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .variant-item>div {
+            width: 100%;
+        }
+
+        .variant-item button {
+            align-self: flex-end;
+        }
+    }

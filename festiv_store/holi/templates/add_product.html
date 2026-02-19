@@ -5,385 +5,17 @@
 {% block extra_css %}
 {{ super() }}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<style>
-    :root {
-        --bg-dark: #ffffff;
-        --card-bg: #ffffff;
-        --input-bg: #f8f9fa;
-        --border-color: #e0e0e0;
-        --text-main: #333333;
-        --text-muted: #666666;
-        --accent-purple: #6C5DD3;
-        --accent-orange: #FFD700;
-        --accent-white: #ffffff;
-        --danger: #ff4d4d;
-        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    body {
-        background-color: var(--bg-dark);
-        color: var(--text-main);
-        font-family: 'Inter', sans-serif;
-    }
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        padding-top: 20px;
-    }
-
-    .page-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--text-main);
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 15px;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        border-radius: 12px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-    }
-
-    .btn-secondary {
-        background: transparent;
-        border: 1px solid var(--border-color);
-        color: var(--text-main);
-    }
-
-    .btn-secondary:hover {
-        background: var(--border-color);
-    }
-
-    .btn-primary {
-        background: var(--accent-purple);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #5b4db8;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(108, 93, 211, 0.4);
-    }
-
-    .main-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 30px;
-        padding-bottom: 50px;
-    }
-
-    .card {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        box-shadow: var(--shadow-sm);
-        border-radius: 20px;
-        padding: 25px;
-        margin-bottom: 25px;
-    }
-
-    .card-header {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: var(--text-main);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        display: block;
-        color: var(--text-muted);
-        margin-bottom: 8px;
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .form-control {
-        width: 100%;
-        background: var(--input-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
-        padding: 12px 15px;
-        color: var(--text-main);
-        font-size: 14px;
-        transition: border-color 0.3s;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: var(--accent-purple);
-    }
-
-    .rich-text-editor {
-        background: var(--input-bg);
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
-        min-height: 150px;
-        padding: 15px;
-    }
-
-    .editor-toolbar {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 15px;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 10px;
-    }
-
-    .editor-btn {
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-    }
-
-    .editor-btn:hover {
-        color: var(--text-main);
-    }
-
-    .upload-area {
-        border: 2px dashed var(--border-color);
-        border-radius: 15px;
-        padding: 40px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s;
-        background: rgba(108, 93, 211, 0.05);
-    }
-
-    .upload-area:hover {
-        border-color: var(--accent-purple);
-        background: rgba(108, 93, 211, 0.1);
-    }
-
-    .upload-icon {
-        font-size: 32px;
-        color: var(--accent-purple);
-        margin-bottom: 15px;
-    }
-
-    .upload-text {
-        font-size: 14px;
-        color: var(--text-muted);
-    }
-
-    .upload-text strong {
-        color: var(--accent-purple);
-    }
-
-    .pricing-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-
-    .variant-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px;
-        background: var(--input-bg);
-        border-radius: 10px;
-        margin-bottom: 10px;
-        border: 1px solid var(--border-color);
-    }
-
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 40px;
-        height: 20px;
-    }
-
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: var(--input-bg);
-        transition: .4s;
-        border-radius: 34px;
-        border: 1px solid var(--border-color);
-    }
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 14px;
-        width: 14px;
-        left: 3px;
-        bottom: 2px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
-
-    input:checked+.slider {
-        background-color: var(--accent-purple);
-        border-color: var(--accent-purple);
-    }
-
-    input:checked+.slider:before {
-        transform: translateX(18px);
-    }
-
-    .category-select {
-        appearance: none;
-        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 15px center;
-        background-size: 15px;
-    }
-
-    .tag-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .tag {
-        background: rgba(255, 215, 0, 0.15);
-        color: #d35400;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        border: 1px solid rgba(255, 215, 0, 0.3);
-    }
-
-    .tag i {
-        cursor: pointer;
-    }
-
-    /* Status Badge */
-    .status-badge {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        background: rgba(46, 204, 113, 0.15);
-        color: #218c53;
-    }
-
-    @media (max-width: 992px) {
-        .main-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 20px;
-        }
-
-        .header-actions {
-            width: 100%;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-        }
-    }
-
-    @media (max-width: 768px) {
-
-        /* Fix for fixed navbar on mobile */
-        .page-header {
-            margin-top: 90px;
-            flex-direction: column;
-            gap: 15px;
-            padding-top: 0;
-        }
-
-        .page-title {
-            font-size: 20px;
-        }
-
-        .header-actions {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .card {
-            padding: 15px;
-        }
-
-        .pricing-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .editor-toolbar {
-            flex-wrap: wrap;
-        }
-
-        .upload-area {
-            padding: 20px;
-        }
-
-        .variant-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 15px;
-        }
-
-        .variant-item>div {
-            width: 100%;
-        }
-
-        .variant-item button {
-            align-self: flex-end;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('festiv_store.static', filename='css/add_product.css') }}">
 {% endblock %}
 
 {% block page_title %}{% endblock %}
 
 {% block content %}
-<form action="{{ url_for('festiv_store.add_product') }}" method="POST">
+<form action="{{ url_for('festiv_store.add_product') }}" method="POST" enctype="multipart/form-data">
     <div class="page-header">
         <h1 class="page-title">Add Product</h1>
         <div class="header-actions">
             <a href="{{ url_for('festiv_store.master_stock') }}" class="btn btn-secondary">Discard</a>
-            <button type="button" class="btn btn-secondary"
-                style="color: var(--accent-orange); border-color: var(--accent-orange);">
-                <i class="far fa-calendar-alt"></i> Schedule
-            </button>
             <button type="submit" class="btn btn-primary">Add Product</button>
         </div>
     </div>
@@ -396,153 +28,107 @@
                 <div class="card-header">General Information</div>
                 <div class="form-group">
                     <label class="form-label">Product Name</label>
-                    <input type="text" name="name" class="form-control" placeholder="e.g. Organic Holi Colors Pack"
-                        required>
+                    <input type="text" name="product_name" class="form-control"
+                        placeholder="e.g. Organic Holi Colors Pack" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Description (Optional)</label>
-                    <div class="rich-text-editor">
-                        <div class="editor-toolbar">
-                            <button type="button" class="editor-btn"><i class="fas fa-bold"></i></button>
-                            <button type="button" class="editor-btn"><i class="fas fa-italic"></i></button>
-                            <button type="button" class="editor-btn"><i class="fas fa-underline"></i></button>
-                            <button type="button" class="editor-btn"><i class="fas fa-list-ul"></i></button>
-                            <button type="button" class="editor-btn"><i class="fas fa-link"></i></button>
-                        </div>
-                        <div style="color: #666; font-size: 14px;">Type product description here...</div>
-                    </div>
+                    <label class="form-label">Brand</label>
+                    <input type="text" name="product_brand" class="form-control" placeholder="e.g. Festiv Brand">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Store Name (Vendor)</label>
+                    <input type="text" name="store_name" class="form-control" placeholder="e.g. Festiv Stores">
                 </div>
             </div>
 
-            <!-- Media -->
-            <div class="card">
-                <div class="card-header">Media</div>
-                <div class="upload-area">
-                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                    <p class="upload-text"><strong>Click to upload</strong> or drag and drop</p>
-                    <p class="upload-text" style="font-size: 12px; margin-top: 5px;">SVG, PNG, JPG or GIF (max.
-                        800x400px)</p>
-                </div>
-            </div>
 
-            <!-- Pricing -->
-            <div class="card">
-                <div class="card-header">Pricing</div>
-                <div class="pricing-grid">
-                    <div class="form-group">
-                        <label class="form-label">Base Price</label>
-                        <input type="number" name="price" step="0.01" class="form-control" placeholder="0.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Discount Price</label>
-                        <input type="number" class="form-control" placeholder="0.00">
-                    </div>
-                </div>
-                <!-- Toggle for tax -->
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                    <label class="switch">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
-                    <span style="font-size: 14px; color: var(--text-muted);">Charge tax on this product</span>
-                </div>
-            </div>
+        </div>
 
-            <!-- Inventory -->
-            <div class="card">
-                <div class="card-header">Inventory</div>
-                <div class="pricing-grid">
-                    <div class="form-group">
-                        <label class="form-label">SKU (Stock Keeping Unit)</label>
-                        <input type="text" class="form-control" placeholder="e.g. HOLI-001">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Barcode (ISBN, UPC, GTIN, etc.)</label>
-                        <input type="text" class="form-control" placeholder="e.g. 123456789">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Quantity</label>
-                        <input type="number" name="stock" class="form-control" placeholder="0" required>
-                    </div>
+        <!-- Pricing -->
+        <div class="card">
+            <div class="card-header">Pricing & Tax</div>
+            <div class="pricing-grid">
+                <div class="form-group">
+                    <label class="form-label">Base Price</label>
+                    <input type="number" name="base_price" step="0.01" class="form-control" placeholder="0.00" required>
                 </div>
-            </div>
-
-            <!-- Variants Section (Visual Only) -->
-            <div class="card">
-                <div class="card-header">
-                    <span>Variants</span>
-                    <button type="button" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">+ Add
-                        Variant</button>
+                <div class="form-group">
+                    <label class="form-label">Offer Price</label>
+                    <input type="number" name="offer_price" step="0.01" class="form-control" placeholder="0.00">
                 </div>
-                <div class="variant-item">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-grip-vertical" style="color: var(--text-muted); cursor: grab;"></i>
-                        <div>
-                            <div style="font-weight: 500;">Size</div>
-                            <div style="font-size: 12px; color: var(--text-muted);">Small, Medium, Large</div>
-                        </div>
-                    </div>
-                    <button type="button" style="background: none; border: none; color: var(--text-muted);"><i
-                            class="fas fa-pencil-alt"></i></button>
+                <div class="form-group">
+                    <label class="form-label">Tax Percent (%)</label>
+                    <input type="number" name="tax_percent" step="0.01" class="form-control" placeholder="0">
                 </div>
-                <div class="variant-item">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-grip-vertical" style="color: var(--text-muted); cursor: grab;"></i>
-                        <div>
-                            <div style="font-weight: 500;">Color</div>
-                            <div style="font-size: 12px; color: var(--text-muted);">Red, Green, Blue, Yellow</div>
-                        </div>
-                    </div>
-                    <button type="button" style="background: none; border: none; color: var(--text-muted);"><i
-                            class="fas fa-pencil-alt"></i></button>
+                <div class="form-group">
+                    <label class="form-label">Cost Price</label>
+                    <input type="number" name="cost_price" step="0.01" class="form-control" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Profit Margin</label>
+                    <input type="number" name="profit_margin" step="0.01" class="form-control" placeholder="0.00">
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Right Column (Sidebar) -->
-        <div class="right-column">
-            <!-- Checkbox -->
-            <div class="card">
-                <div class="card-header">Organize</div>
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select name="category" class="form-control category-select">
-                        <option value="Colors">Colors</option>
-                        <option value="Water Guns">Water Guns</option>
-                        <option value="Sweets">Sweets</option>
-                        <option value="Accessories">Accessories</option>
-                        <option value="Kits">Kits</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Vendor</label>
-                    <input type="text" class="form-control" placeholder="e.g. Festiv Stores">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Collection</label>
-                    <input type="text" class="form-control" placeholder="e.g. Summer 2026">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select class="form-control category-select">
-                        <option value="published">Published</option>
-                        <option value="draft">Draft</option>
-                        <option value="scheduled">Scheduled</option>
-                    </select>
-                </div>
+    <!-- Right Column (Sidebar) -->
+    <div class="right-column">
+        <!-- Inventory -->
+        <div class="card">
+            <div class="card-header">Inventory</div>
+            <div class="form-group">
+                <label class="form-label">Stock Quantity</label>
+                <input type="number" name="stock" class="form-control" placeholder="0" required>
             </div>
-
-            <!-- Tags -->
-            <div class="card">
-                <div class="card-header">Tags</div>
-                <input type="text" class="form-control" placeholder="Enter tags...">
-                <div class="tag-container">
-                    <span class="tag">Holi <i class="fas fa-times"></i></span>
-                    <span class="tag">Funny <i class="fas fa-times"></i></span>
-                    <span class="tag">Organic <i class="fas fa-times"></i></span>
-                </div>
+            <div class="form-group">
+                <label class="form-label">Weight</label>
+                <input type="number" name="product_weight" step="0.01" class="form-control" placeholder="0.0">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Unit</label>
+                <select name="product_unit" class="form-control category-select">
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="ltr">ltr</option>
+                    <option value="pcs">pcs</option>
+                    <option value="box">box</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Product Quantity (Pack Size)</label>
+                <input type="number" name="product_quantity" class="form-control" placeholder="1">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Price Quantity (e.g. per kg)</label>
+                <input type="text" name="price_quantity" class="form-control" placeholder="e.g. 1 kg">
             </div>
         </div>
+
+        <!-- Organization -->
+        <div class="card">
+            <div class="card-header">Organize</div>
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select name="product_category" class="form-control category-select">
+                    <option value="Colors">Colors</option>
+                    <option value="Water Guns">Water Guns</option>
+                    <option value="Sweets">Sweets</option>
+                    <option value="Accessories">Accessories</option>
+                    <option value="Kits">Kits</option>
+                    <option value="Clothing">Clothing</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="product_status" class="form-control category-select">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Draft">Draft</option>
+                </select>
+            </div>
+        </div>
+    </div>
     </div>
 </form>
 {% endblock %}
