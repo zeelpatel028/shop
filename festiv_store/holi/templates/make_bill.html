@@ -5,14 +5,35 @@
 {% block extra_css %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('festiv_store.static', filename='css/make_bill.css') }}">
+<style>
+    .content-wrapper {
+        background: #F8F9FC !important;
+        padding: 0 !important;
+    }
+
+    .bill-container {
+        padding: 24px;
+        animation: fadeUp 0.5s ease;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 {% endblock %}
 
 {% block page_title %}
 <div style="display: flex; align-items: center; gap: 10px;">
-    <i class="fas fa-file-invoice" style="color: #6C5DD3;"></i>
-    <span
-        style="background: linear-gradient(135deg, #6C5DD3 0%, #4a3b89 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">Current
-        Bill</span>
+    <i class="fas fa-file-invoice" style="color: var(--elite-purple);"></i>
+    <span style="color: var(--elite-black); font-weight: 800;">Billing Centre</span>
 </div>
 {% endblock %}
 
@@ -39,14 +60,19 @@
         <div class="product-grid-wrapper">
             <div class="product-grid" id="productGrid">
                 {% for product in products %}
-                <div class="product-card" onclick="addToCart('{{ product.id }}')"
-                    data-name="{{ product.product_name or product.name }}"
-                    data-category="{{ product.product_category or product.category }}">
-                    <div class="product-name" title="{{ product.product_name or product.name }}">{{ product.product_name
-                        or product.name }}</div>
+                <div class="product-card" onclick="addToCart('{{ product.product_id }}')"
+                    data-id="{{ product.product_id }}" data-name="{{ product.product_name or product.name }}"
+                    data-brand="{{ product.brand or '-' }}" data-category="{{ product.category or '-' }}"
+                    data-tax="{{ product.tax_percent or 0 }}">
+                    <div class="product-info-column">
+                        <div class="product-name" title="{{ product.product_name or product.name }}">{{
+                            product.product_name or product.name }}</div>
+                        <div class="product-subtext">{{ product.brand or '-' }} | {{ product.category or '-' }}</div>
+                    </div>
 
                     <div class="product-meta">
-                        <span class="product-price">₹{{ product.final_price or product.price }}</span>
+                        <span class="product-price">₹{{ product.sell_price or product.final_price or product.price
+                            }}</span>
                         <span class="product-stock {% if product.stock <= 5 %}stock-low{% endif %}">
                             Stock: {{ product.stock }}
                         </span>
@@ -79,10 +105,9 @@
                 style="margin-bottom: 10px;">
             <div class="form-row">
                 <input type="tel" id="customerPhone" class="form-control" placeholder="Phone Number">
-                <select class="form-control" style="width: 40%;">
-                    <option>Cash</option>
-                    <option>UPI</option>
-                    <option>Card</option>
+                <select id="paymentMethod" class="form-control" style="width: 40%;">
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
                 </select>
             </div>
         </div>
@@ -106,8 +131,8 @@
             </div>
 
             <div class="summary-total">
-                <span>Total Amount</span>
-                <span id="grandTotal" style="color: var(--accent-purple);">₹0.00</span>
+                <span>Grand Total</span>
+                <span id="grandTotal" style="color: var(--elite-purple);">₹0.00</span>
             </div>
 
             <button class="checkout-btn" onclick="processCheckout()" id="checkoutBtn">
@@ -128,6 +153,70 @@
     const MAKE_BILL_URL = "{{ url_for('festiv_store.make_bill') }}";
     const LEDGER_URL = "{{ url_for('festiv_store.ledger') }}";
 </script>
+
+<!-- UPI QR Modal -->
+<div id="upiModal" class="elite-modal" style="display: none;">
+    <div class="elite-modal-content">
+        <div class="elite-modal-header">
+            <h3>UPI Payment</h3>
+            <span class="close-modal" onclick="closeUpiModal()">&times;</span>
+        </div>
+        <div class="elite-modal-body">
+            <div class="qr-container">
+                <img id="upiQrImg" src="" alt="UPI QR Code">
+                <div class="qr-overlay" id="qrLoading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+
+            <div id="paymentStatusContainer" style="text-align: center; margin: 15px 0;">
+                <div id="paymentStatusText" class="status-text info">Waiting for Payment...</div>
+            </div>
+
+            <div class="payment-details">
+                <p class="amount-text">Amount: <span id="modalAmount">₹0.00</span></p>
+                <p class="upi-id-text">To: <span style="color: var(--elite-purple);">zeelptl028@okaxis</span></p>
+            </div>
+            <div class="payment-steps">
+                <div class="step"><i class="fas fa-qrcode"></i> 1. Scan QR with any UPI app</div>
+                <div class="step"><i class="fas fa-rupee-sign"></i> 2. Pay <b>Exact Amount</b></div>
+                <div class="step"><i class="fas fa-magic"></i> 3. Status updates automatically</div>
+            </div>
+        </div>
+        <div class="elite-modal-footer">
+            <button class="btn-cancel" onclick="closeUpiModal()">Cancel</button>
+            <button class="btn-confirm" id="manualConfirmBtn" onclick="confirmUpiPayment()">Confirm Payment</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cash Confirmation Modal -->
+<div id="cashModal" class="elite-modal" style="display: none;">
+    <div class="elite-modal-content">
+        <div class="elite-modal-header">
+            <h3>Cash Payment</h3>
+            <span class="close-modal" onclick="closeCashModal()">&times;</span>
+        </div>
+        <div class="elite-modal-body" style="text-align: center; padding: 30px 20px;">
+            <div
+                style="background: var(--input-bg); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fas fa-money-bill-wave" style="font-size: 40px; color: #2ecc71;"></i>
+            </div>
+            <h4 style="margin-bottom: 10px; color: var(--elite-black);">Confirm Cash Receipt</h4>
+            <div class="payment-details">
+                <p class="amount-text" style="font-size: 24px; font-weight: 800; color: var(--elite-purple);">₹<span
+                        id="cashModalAmount">0.00</span></p>
+            </div>
+            <p style="color: var(--text-muted); margin-top: 15px;">Please confirm that you have received the exact cash
+                amount from the customer.</p>
+        </div>
+        <div class="elite-modal-footer">
+            <button class="btn-cancel" onclick="closeCashModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmCashPayment()" style="background: #2ecc71;">Confirm Cash
+                Received</button>
+        </div>
+    </div>
+</div>
 
 <script src="{{ url_for('festiv_store.static', filename='js/make_bill.js') }}"></script>
 {% endblock %}

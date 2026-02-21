@@ -6,13 +6,15 @@
 <link rel="stylesheet" href="{{ url_for('festiv_store.static', filename='css/holi.css') }}">
 {% endblock %}
 
+{% block page_title %}{% endblock %}
+
 {% block sidebar %}
 {% include 'holi_sidemenu.html' %}
 {% endblock %}
 
 {% block navbar %}
 <header class="top-navbar"
-    style="background: #fff; border-bottom: 2px solid #FFD700; color: #000; padding: 0 20px; height: 70px; display: flex; align-items: center; justify-content: space-between;">
+    style="background: #fff; border-bottom: 1px solid var(--elite-border); color: #000; padding: 0 20px; height: 70px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--elite-shadow);">
     <div class="brand-container" id="toggle-sidebar"
         style="display: flex; align-items: center; gap: 15px; cursor: pointer;">
         <div class="mobile-toggle" style="display: none; margin-right: 15px;">

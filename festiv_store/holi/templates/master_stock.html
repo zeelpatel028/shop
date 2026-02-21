@@ -1,134 +1,269 @@
 {% extends 'holi_base.html' %}
 
-{% block title %}Master Stock - Coming Soon{% endblock %}
+{% block title %}Master Stock - Holi Hub{% endblock %}
 
 {% block extra_css %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('festiv_store.static', filename='css/master_stock.css') }}">
+<style>
+    .content-wrapper {
+        background: #F8F9FC !important;
+        padding: 0 !important;
+    }
+
+    .holi-dashboard {
+        padding: 30px;
+        max-width: 1440px;
+        margin: 0 auto;
+        animation: fadeUp 0.6s ease;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Tabs */
+    .tabs-container {
+        background: white;
+        padding: 4px;
+        border-radius: 12px;
+        display: inline-flex;
+        gap: 4px;
+        border: 1px solid #EEF0F6;
+        margin-bottom: 28px;
+        overflow-x: auto;
+        max-width: 100%;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .tabs-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.82rem;
+        border: none;
+        background: transparent;
+        color: #8B95A5;
+        transition: all 0.2s;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .tab-btn:hover {
+        background: #F0EEFF;
+        color: #6C5DD3;
+    }
+
+    .tab-btn.active {
+        background: #6C5DD3;
+        color: white;
+        box-shadow: 0 4px 12px rgba(108, 93, 211, 0.2);
+    }
+
+    /* Badges */
+    .stock-badge {
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .stock-low {
+        background: #FEF2F2;
+        color: #DC2626;
+    }
+
+    .stock-ok {
+        background: #ECFDF5;
+        color: #10B981;
+    }
+
+    .price-tag {
+        font-size: 0.8rem;
+        display: block;
+        line-height: 1.4;
+    }
+
+    /* Status pill classes */
+    .pill-active {
+        background: #ECFDF5;
+        color: #10B981;
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .pill-inactive {
+        background: #FFF4E5;
+        color: #F97316;
+        border-color: rgba(249, 115, 22, 0.2);
+    }
+
+    /* Table cards override */
+    .elite-card {
+        border-radius: 18px !important;
+        border: 1px solid #EEF0F6 !important;
+    }
+
+    @media (max-width: 640px) {
+        .holi-dashboard {
+            padding: 16px;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="holi-dashboard">
     <!-- Header -->
-    <div class="page-header">
-        <div class="header-title">
-            <h1 style="color: #6C5DD3;">Master Stock</h1>
-            <p>Comprehensive inventory management</p>
+    <div class="elite-dashboard-header">
+        <div class="elite-header-group">
+            <h1 class="elite-header-title">Master Stock</h1>
+            <p class="elite-header-subtitle">Inventory management for: <strong>Holi Collection 2026</strong></p>
         </div>
-        <a href="{{ url_for('festiv_store.add_product') }}" class="bill-btn">
-            <i class="fas fa-plus"></i> Add Product
-        </a>
+        <div class="elite-status-badge" style="background: var(--elite-purple); color: white;">
+            Total Products: {{ products|length }}
+        </div>
     </div>
 
     <!-- Tab Navigation -->
     <div class="tabs-container">
         <button class="tab-btn active" onclick="openTab(event, 'all-products')">
-            <i class="fas fa-list"></i> All Inventory
+            <i class="fas fa-boxes"></i> All Inventory
         </button>
         <button class="tab-btn" onclick="openTab(event, 'low-stock')">
-            <i class="fas fa-exclamation-triangle"></i> Low Stock
+            <i class="fas fa-exclamation-circle"></i> Low Stock
             {% if low_stock|length > 0 %}
             <span
-                style="background: #e74c3c; color: white; border-radius: 50%; padding: 2px 6px; font-size: 10px; margin-left: 5px;">{{
+                style="background: #e11d48; color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.65rem; margin-left: 5px;">{{
                 low_stock|length }}</span>
             {% endif %}
         </button>
         <button class="tab-btn" onclick="openTab(event, 'most-sold')">
-            <i class="fas fa-chart-line"></i> Top Selling
+            <i class="fas fa-fire"></i> Top Selling
         </button>
+        <a href="{{ url_for('festiv_store.add_product') }}" class="tab-btn" style="text-decoration: none;">
+            <i class="fas fa-plus-circle"></i> Add New
+        </a>
     </div>
 
     <!-- 1. All Products Table -->
     <div id="all-products" class="tab-content active fade-in">
-        <div class="stock-table-container">
-            <table class="stock-table">
+        <div class="elite-card elite-table-wrapper" style="padding: 0;">
+            <table class="elite-table elite-table-responsive">
                 <thead>
                     <tr>
-                        <th width="5%">ID</th>
-                        <th width="20%">Product Name</th>
-                        <th width="10%">Category</th>
-                        <th width="10%">Brand</th>
-                        <th width="10%">Stock</th>
-                        <th width="10%">Unit</th>
-                        <th width="10%">Base Price</th>
-                        <th width="10%">Offer Price</th>
-                        <th width="10%">Status</th>
-                        <th width="5%">Action</th>
+                        <th>Details</th>
+                        <th>Pricing</th>
+                        <th>Inventory</th>
+                        <th>Tax</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in products %}
                     <tr>
-                        <td class="text-muted">#{{ p.id }}</td>
-                        <td>
-                            <div class="font-bold">{{ p.product_name or p.name }}</div>
-                            <div class="text-muted">{{ p.store_name }}</div>
+                        <td data-label="Product">
+                            <div style="font-weight: 800; color: var(--elite-black); font-size: 1rem;">{{ p.product_name
+                                }}</div>
+                            <div style="color: var(--elite-gray-text); font-size: 0.8rem; font-weight: 600;">{{
+                                p.category }} | {{ p.brand or 'Generic' }}</div>
                         </td>
-                        <td>{{ p.product_category or p.category }}</td>
-                        <td>{{ p.product_brand or '-' }}</td>
-                        <td class="font-bold {% if p.stock <= 20 %}text-danger{% endif %}">{{ p.stock }}</td>
-                        <td>{{ p.product_unit }}</td>
-                        <td>₹{{ p.base_price }}</td>
-                        <td class="text-purple">₹{{ p.offer_price or '-' }}</td>
-                        <td>
+                        <td data-label="Pricing">
+                            <span class="price-tag">Cost: <span style="font-weight: 700;">₹{{ p.cost_price or 0
+                                    }}</span></span>
+                            <span class="price-tag" style="color: var(--elite-purple); font-weight: 800;">Sell: ₹{{
+                                p.sell_price or 0 }}</span>
+                        </td>
+                        <td data-label="Stock">
+                            <div class="stock-badge {% if p.stock <= 20 %}stock-low{% else %}stock-ok{% endif %}">
+                                {{ p.stock }} {{ p.product_unit }}
+                            </div>
+                            <div
+                                style="font-size: 0.75rem; color: var(--elite-gray-text); margin-top: 4px; font-weight: 600;">
+                                Sold: {{ p.sold_stock or 0 }}</div>
+                        </td>
+                        <td data-label="Tax" style="font-weight: 700; color: var(--elite-gray-text);">{{ p.tax_percent
+                            or 0 }}%</td>
+                        <td data-label="Status">
                             <span
-                                class="status-badge {% if p.product_status == 'Active' %}status-active{% else %}status-inactive{% endif %}">
+                                class="elite-status-pill {{ 'pill-active' if p.product_status == 'Active' else 'pill-inactive' }}">
                                 {{ p.product_status or 'Active' }}
                             </span>
                         </td>
-                        <td>
-                            <div style="display: flex; gap: 5px;">
-                                <form action="{{ url_for('festiv_store.delete_product', product_id=p.id) }}"
-                                    method="POST" onsubmit="return confirm('Delete {{ p.product_name }}?');">
-                                    <button type="submit" class="action-btn btn-delete" title="Delete">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </div>
+                        <td data-label="Action" style="text-align: right;">
+                            <form action="{{ url_for('festiv_store.delete_product', product_id=p.product_id) }}"
+                                method="POST" onsubmit="return confirm('Delete {{ p.product_name }}?');"
+                                style="display: inline-block;">
+                                <button type="submit"
+                                    style="background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; padding: 8px; border-radius: 8px; cursor: pointer; transition: 0.2s;">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
             {% if not products %}
-            <div class="empty-state">No products found. Add some inventory!</div>
+            <div style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
+                <i class="fas fa-box-open"
+                    style="font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
+                No products found in inventory.
+            </div>
             {% endif %}
         </div>
     </div>
 
     <!-- 2. Low Stock Table -->
     <div id="low-stock" class="tab-content fade-in" style="display: none;">
-        <div class="stock-table-container">
-            <table class="stock-table">
+        <div class="elite-card elite-table-wrapper" style="padding: 0;">
+            <table class="elite-table elite-table-responsive">
                 <thead>
                     <tr>
-                        <th>Product Name</th>
+                        <th>Product</th>
                         <th>Current Stock</th>
-                        <th>Restock Level</th>
-                        <th>Vendor</th>
+                        <th>Brand</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in low_stock %}
                     <tr>
-                        <td class="font-bold">{{ p.product_name or p.name }}</td>
-                        <td style="color: #e74c3c; font-weight: 700;">{{ p.stock }}</td>
-                        <td>20</td>
-                        <td>{{ p.store_name }}</td>
-                        <td>
-                            <a href="{{ url_for('festiv_store.add_product') }}" class="btn-sm"
-                                style="color: #3498db; text-decoration: none; font-weight: 600;">
-                                Restock Now
+                        <td data-label="Product" style="font-weight: 800; color: var(--elite-black);">{{ p.product_name
+                            or p.name }}</td>
+                        <td data-label="Stock">
+                            <div class="stock-badge stock-low">{{ p.stock }} units</div>
+                        </td>
+                        <td data-label="Brand">{{ p.brand or '-' }}</td>
+                        <td data-label="Action">
+                            <a href="{{ url_for('festiv_store.add_product') }}"
+                                style="color: var(--elite-purple); font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-plus-circle"></i> Restock
                             </a>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 30px; color: #6c757d;">
+                        <td colspan="4" style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
                             <i class="fas fa-check-circle"
-                                style="color: #2ecc71; font-size: 2rem; margin-bottom: 10px; display: block;"></i>
-                            All inventory levels are healthy!
+                                style="color: #16a34a; font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
+                            All inventory levels are healthy.
                         </td>
                     </tr>
                     {% endfor %}
@@ -139,40 +274,55 @@
 
     <!-- 3. Most Sold Table -->
     <div id="most-sold" class="tab-content fade-in" style="display: none;">
-        <div class="stock-table-container">
-            <table class="stock-table">
+        <div class="elite-card elite-table-wrapper" style="padding: 0;">
+            <table class="elite-table elite-table-responsive">
                 <thead>
                     <tr>
                         <th>Rank</th>
-                        <th>Product Name</th>
-                        <th>Total Sold</th>
-                        <th>Revenue Generated (Est.)</th>
-                        <th>Current Stock</th>
+                        <th>Product</th>
+                        <th>Sold</th>
+                        <th>Rev. Est.</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in most_sold[:10] %}
                     <tr>
-                        <td>
-                            {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else
-                            %}#{{ loop.index }}{% endif %}
+                        <td data-label="Rank" style="font-weight: 900; color: var(--elite-purple);">#{{ loop.index }}
                         </td>
-                        <td class="font-bold">{{ p.product_name or p.name }}</td>
-                        <td class="text-purple font-bold">{{ p.sales }} units</td>
-                        <td>₹{{ (p.offer_price or p.base_price or 0) * p.sales }}</td>
-                        <td>{{ p.stock }}</td>
+                        <td data-label="Product" style="font-weight: 800;">{{ p.product_name or p.name }}</td>
+                        <td data-label="Sold" style="font-weight: 800; color: #16a34a;">{{ p.sales }} units</td>
+                        <td data-label="Revenue" style="font-weight: 800;">₹{{ (p.sell_price or p.base_price or 0) *
+                            p.sales }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 30px;">No sales data available yet.</td>
+                        <td colspan="4" style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
+                            No sales data available yet.
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-
 </div>
 
 <script src="{{ url_for('festiv_store.static', filename='js/master_stock.js') }}"></script>
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+</script>
 {% endblock %}
