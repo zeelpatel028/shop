@@ -218,5 +218,33 @@
     </div>
 </div>
 
+<!-- Quantity & Unit Selection Modal -->
+<div id="qtyModal" class="elite-modal" style="display: none;">
+    <div class="elite-modal-content" style="max-width: 350px;">
+        <div class="elite-modal-header">
+            <h3 id="qtyModalTitle">Select Quantity</h3>
+            <span class="close-modal" onclick="closeQtyModal()">&times;</span>
+        </div>
+        <div class="elite-modal-body" style="padding: 20px;">
+            <p id="qtyModalDesc" style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Available:
+                <span id="qtyModalStock" style="font-weight:bold;">0</span></p>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="number" id="qtyInput" class="form-control" placeholder="1" min="0.1" step="0.1"
+                    style="flex: 2; font-size: 16px; font-weight: bold; text-align: center;">
+                <select id="unitSelect" class="form-control" style="flex: 1;">
+                    <!-- Options populated dynamically -->
+                </select>
+            </div>
+
+            <input type="hidden" id="qtyProductId">
+        </div>
+        <div class="elite-modal-footer">
+            <button class="btn-cancel" onclick="closeQtyModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmAddQty()">Add to Cart</button>
+        </div>
+    </div>
+</div>
+
 <script src="{{ url_for('festiv_store.static', filename='js/make_bill.js') }}"></script>
 {% endblock %}

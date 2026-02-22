@@ -101,7 +101,7 @@ def holi_dashboard():
         total_profit = 0
         for item in bill_items:
             p_id = item.get('product_id')
-            qty = safe_int(item.get('quantity'))
+            qty = safe_float(item.get('quantity'))
             margin = product_profits.get(p_id, 0)
             total_profit += (qty * margin)
 
@@ -126,11 +126,11 @@ def holi_dashboard():
         product_sales = Counter()
         for item in bill_items:
             pname = item.get('product_name', 'Unknown')
-            product_sales[pname] += safe_int(item.get('quantity'))
+            product_sales[pname] += safe_float(item.get('quantity'))
         top_products = product_sales.most_common(5)
         
         # Low stock alerts
-        low_stock = [p for p in all_products if safe_int(p.get('stock')) <= 10]
+        low_stock = [p for p in all_products if safe_float(p.get('stock')) <= 10.0]
         
         # Profit margin percentage
         profit_pct = (total_profit / total_revenue * 100) if total_revenue else 0
@@ -216,7 +216,7 @@ def add_product():
         base_price = safe_float(request.form.get('base_price'))
         tax_percent = safe_float(request.form.get('tax_percent'))
         profit_margin = safe_float(request.form.get('profit_margin'))
-        stock_qty = safe_int(request.form.get('stock'))
+        stock_qty = safe_float(request.form.get('stock'))
 
         # 2. Secure Backend Calculations
         cost_price = safe_float(request.form.get('cost_price'))
@@ -245,7 +245,7 @@ def add_product():
             "profit_margin": profit_margin,
             "sell_price": sell_price,
             "stock": stock_qty,
-            "sold_stock": safe_int(request.form.get('sold_stock', 0)),
+            "sold_stock": safe_float(request.form.get('sold_stock', 0)),
             "stock_status": request.form.get('stock_status'),
             "product_status": request.form.get('product_status'),
             "last_updated_quantity": stock_qty,
@@ -311,7 +311,7 @@ def ledger():
             b_profit = 0
             for item in items_by_bill.get(b_id, []):
                 p_id = item.get('product_id')
-                qty = safe_int(item.get('quantity'))
+                qty = safe_float(item.get('quantity'))
                 margin = product_profits.get(p_id, 0)
                 b_profit += (qty * margin)
             
@@ -405,7 +405,7 @@ def make_bill():
             for item in items:
                 try:
                     p_id = item.get('product_id')
-                    p_qty = safe_int(item.get('quantity'))
+                    p_qty = safe_float(item.get('quantity'))
                     
                     if not p_id or p_qty <= 0:
                         continue
@@ -421,10 +421,10 @@ def make_bill():
                     
                     prod = res.data[0]
                     p_name = prod.get('product_name', 'Unknown Item')
-                    p_stock = safe_int(prod.get('stock', 0))
+                    p_stock = safe_float(prod.get('stock', 0))
                     p_sell_price = safe_float(prod.get('sell_price', 0))
                     p_tax_pct = safe_float(prod.get('tax_percent', 0))
-                    p_sold_stock = safe_int(prod.get('sold_stock', 0))
+                    p_sold_stock = safe_float(prod.get('sold_stock', 0))
                     
                     if p_stock < p_qty:
                          return jsonify({'success': False, 'message': f"Insufficient stock for {p_name} (Available: {p_stock})"})
@@ -586,8 +586,6 @@ def make_bill():
                     "received_by": "Counter",
                     "payment_reference": f"CASH-{uuid.uuid4().hex[:6].upper()}",
                     "transaction_id": "CASH-TRANSACTION",
-                    "gateway_txn_id": "CASH-GATEWAY",
-                    "payment_gateway": "Cash",
                     "is_bill_generated": True,
                     "created_at": datetime.now().isoformat(),
                     "updated_at": datetime.now().isoformat()
@@ -611,15 +609,14 @@ def make_bill():
                 }
                 supabase.table('bill_items').insert(item_data).execute()
                 
-                # ATOMIC STOCK UPDATE (Race Condition Fix)
-                # Using RPC to ensure stock >= quantity before decrementing
-                rpc_res = supabase.rpc('decrement_stock_if_enough', {
-                    'p_id': v_item['product_id'],
-                    'p_qty': v_item['quantity']
-                }).execute()
+                # Update stock and sold_stock based on verified quantities
+                update_res = supabase.table('products').update({
+                    'stock': v_item['stock_after'],
+                    'sold_stock': v_item['sold_stock_after']
+                }).eq('product_id', v_item['product_id']).execute()
                 
-                if not rpc_res.data:
-                    print(f"CRITICAL: Stock mismatch during finalization for {v_item['name']}")
+                if not update_res.data:
+                    print(f"CRITICAL: Stock update failed during finalization for {v_item['name']}")
                     # Note: Ideally we should rollback the bill here if stock fails, 
                     # but Supabase Python client doesn't support transactions easily outside RPC.
                     # This check at least detects it.
@@ -708,8 +705,13 @@ def verify_upi_payment(payment_ref):
     """
     Manually marks a payment as Paid. Used as fallback when auto-detection is slow.
     """
-    success = PaymentService.mark_as_paid(supabase, payment_ref, f"MAN-{uuid.uuid4().hex[:10].upper()}")
-    return jsonify({'success': success, 'message': 'Payment confirmed successfully' if success else 'Reference not found'})
+    try:
+        success = PaymentService.mark_as_paid(supabase, payment_ref, f"MAN-{uuid.uuid4().hex[:10].upper()}")
+        return jsonify({'success': success, 'message': 'Payment confirmed successfully' if success else 'Reference not found'})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f"Server error: {str(e)}"})
 
 @festiv_store_bp.route('/holi/payment-data')
 def payment_data():

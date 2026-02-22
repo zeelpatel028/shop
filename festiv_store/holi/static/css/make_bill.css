@@ -100,6 +100,10 @@
         overflow-y: auto;
         padding: 20px;
         background: var(--bg-dark);
+        max-height: 265px;
+        /* Fits approx 3 products */
+        scrollbar-width: thin;
+        scrollbar-color: #ccc transparent;
     }
 
     .product-grid {
@@ -428,11 +432,17 @@
         }
 
         .product-grid-wrapper {
-            max-height: 500px;
+            max-height: 250px;
         }
 
         .cart-items-container {
             max-height: 400px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .product-grid-wrapper {
+            max-height: 230px;
         }
     }
 

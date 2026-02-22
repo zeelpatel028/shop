@@ -11,6 +11,29 @@ app.register_blueprint(festiv_store_bp, url_prefix='/festiv_store')
 from database.db import init_db
 init_db(app)
 
+# --- KEEP-ALIVE MECHANISM ---
+import threading
+import time
+import requests
+
+def keep_alive():
+    """Pings the Render service every 10 seconds to prevent auto-spin down."""
+    while True:
+        try:
+            requests.get('https://shop-d07d.onrender.com')
+            print("Pinged https://shop-d07d.onrender.com successfully.")
+        except Exception as e:
+            print(f"Ping failed: {e}")
+        time.sleep(10)
+
+def start_keep_alive():
+    thread = threading.Thread(target=keep_alive)
+    thread.daemon = True
+    thread.start()
+
+start_keep_alive()
+# ----------------------------
+
 # Authorized Phone Numbers
 AUTHORIZED_PHONES = ["6353807407", "9913887677"]
 AUTHORIZED_PASSWORD = "tulshi"

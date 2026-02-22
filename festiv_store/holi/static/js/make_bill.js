@@ -39,21 +39,80 @@ function addToCart(productId) {
     const product = products.find(p => String(p.product_id) === String(productId));
     if (!product) return;
 
+    if (product.stock <= 0) {
+        showToast("Product is out of stock!", "error");
+        return;
+    }
+
+    // Prepare Modal
+    document.getElementById('qtyProductId').value = productId;
+    document.getElementById('qtyModalTitle').innerText = `Add ${product.product_name || product.name}`;
+    document.getElementById('qtyModalStock').innerText = `${product.stock} ${product.product_unit || 'unit'}`;
+    document.getElementById('qtyInput').value = '1';
+
+    const unitSelect = document.getElementById('unitSelect');
+    const baseUnit = (product.product_unit || '').toLowerCase();
+
+    // Dynamically populate unit options based on product's base unit
+    let options = '';
+    if (baseUnit === 'kg' || baseUnit === 'kilogram') {
+        options = `<option value="kg">kg</option><option value="g">g</option>`;
+    } else if (baseUnit === 'ltr' || baseUnit === 'liter' || baseUnit === 'l') {
+        options = `<option value="ltr">ltr</option><option value="ml">ml</option>`;
+    } else if (baseUnit === 'g' || baseUnit === 'gram') {
+        options = `<option value="g">g</option><option value="kg">kg</option>`;
+    } else {
+        options = `<option value="${baseUnit || 'pcs'}">${baseUnit || 'pcs'}</option>`;
+    }
+
+    unitSelect.innerHTML = options;
+
+    // Show Modal
+    document.getElementById('qtyModal').style.display = 'flex';
+}
+
+function closeQtyModal() {
+    document.getElementById('qtyModal').style.display = 'none';
+}
+
+function confirmAddQty() {
+    const productId = document.getElementById('qtyProductId').value;
+    const qtyInputValue = parseFloat(document.getElementById('qtyInput').value);
+    const selectedUnit = document.getElementById('unitSelect').value;
+
+    if (isNaN(qtyInputValue) || qtyInputValue <= 0) {
+        showToast("Please enter a valid quantity", "warning");
+        return;
+    }
+
+    const product = products.find(p => String(p.product_id) === String(productId));
+    const baseUnit = (product.product_unit || '').toLowerCase();
+
+    // CONVERT TO BASE UNIT QUANTITY
+    let baseQty = qtyInputValue;
+
+    if (baseUnit === 'kg' && selectedUnit === 'g') {
+        baseQty = qtyInputValue / 1000;
+    } else if (baseUnit === 'g' && selectedUnit === 'kg') {
+        baseQty = qtyInputValue * 1000;
+    } else if (baseUnit === 'ltr' && selectedUnit === 'ml') {
+        baseQty = qtyInputValue / 1000;
+    }
+
     // Check if exists in cart
-    const existingItem = cart.find(item => String(item.product_id) === String(productId));
+    let existingItem = cart.find(item => String(item.product_id) === String(productId));
+    let totalQtyRequested = existingItem ? existingItem.quantity + baseQty : baseQty;
+
+    if (totalQtyRequested > product.stock) {
+        showToast(`Insufficient stock! Only ${product.stock} ${baseUnit} available.`, "error");
+        return;
+    }
 
     if (existingItem) {
-        if (existingItem.quantity < product.stock) {
-            existingItem.quantity++;
-        } else {
-            showToast("Insufficient stock!", "error");
-            return;
-        }
+        existingItem.quantity += baseQty;
+        // Optionally store the last display string
+        existingItem.displayQty = `${qtyInputValue} ${selectedUnit}`;
     } else {
-        if (product.stock <= 0) {
-            showToast("Product is out of stock!", "error");
-            return;
-        }
         // Add new item
         cart.push({
             product_id: product.product_id,
@@ -64,29 +123,32 @@ function addToCart(productId) {
             final_price: parseFloat(product.sell_price || product.final_price || product.price || 0),
             tax_percent: parseFloat(product.tax_percent || 0),
             stock: product.stock,
-            quantity: 1
+            quantity: baseQty,
+            displayQty: `${qtyInputValue} ${selectedUnit}`
         });
     }
 
+    closeQtyModal();
     renderCart();
     playBeep();
 }
 
 function updateQty(index, change) {
     const item = cart[index];
+    // Since quantities can be floats (like 0.5), simple +/- 1 might not make sense for fractional things.
+    // However, we'll keep it as +/- 1 for ease of use, but ensure it supports floats properly.
     const newQty = item.quantity + change;
 
     if (newQty > 0) {
         if (newQty <= item.stock) {
             item.quantity = newQty;
+            item.displayQty = `${newQty} ${item.product_unit}`; // Reset display to base units if tweaked via +/-
         } else {
             showToast(`Only ${item.stock} items in stock!`, "warning");
         }
     } else {
-        // Confirm removal if qty goes to 0? Or just stay at 1?
-        // Usually stay at 1 or remove. Let's remove if explicit remove button is used, 
-        // but for minus button, maybe stop at 1.
         item.quantity = 1;
+        item.displayQty = `1 ${item.product_unit}`;
     }
     renderCart();
 }
@@ -121,17 +183,20 @@ function renderCart() {
     let html = '';
     cart.forEach((item, index) => {
         const total = item.final_price * item.quantity;
+        // Clean display formatting for floats
+        const cleanQty = Number.isInteger(item.quantity) ? item.quantity : item.quantity.toFixed(3).replace(/\.?0+$/, '');
+
         html += `
         <div class="cart-item">
             <div class="cart-item-info">
                 <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-subtext">${item.brand}</div>
-                <div class="cart-item-price">₹${item.final_price.toFixed(2)} x ${item.quantity}</div>
+                <div class="cart-item-subtext">${item.brand} | ${item.displayQty || (cleanQty + ' ' + item.product_unit)}</div>
+                <div class="cart-item-price">₹${item.final_price.toFixed(2)}/unit</div>
             </div>
             <div class="cart-controls">
-                <div class="qty-btn" onclick="updateQty(${index}, -1)">-</div>
-                <div class="qty-display">${item.quantity}</div>
-                <div class="qty-btn" onclick="updateQty(${index}, 1)">+</div>
+                <div class="qty-btn" onclick="updateQty(${index}, -1)" title="- 1 Unit">-</div>
+                <div class="qty-display" style="width: auto; min-width: 35px; font-size: 12px;" title="Base Quantity">${cleanQty}</div>
+                <div class="qty-btn" onclick="updateQty(${index}, 1)" title="+ 1 Unit">+</div>
                 <div class="item-total-price">₹${total.toFixed(2)}</div>
                 <i class="fas fa-trash-alt remove-item-btn" onclick="removeFromCart(${index})" title="Remove"></i>
             </div>
@@ -139,10 +204,6 @@ function renderCart() {
     });
 
     container.innerHTML = html;
-
-    // Auto scroll to bottom if new item added?
-    // container.scrollTop = container.scrollHeight;
-
     updateTotals();
 }
 
@@ -313,6 +374,7 @@ function executeCheckout(action = 'finalize') {
 }
 
 // --- UPI QR Logic ---
+let pollingInterval = null;
 let pollFailCount = 0;
 let pollingStartTime = 0;
 const MAX_POLLING_TIME = 5 * 60 * 1000; // 5 minutes in ms
@@ -455,6 +517,8 @@ function confirmUpiPayment() {
             .catch(err => {
                 console.error("Manual confirm error", err);
                 alert("Connection error during confirmation");
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
             });
     }
 }

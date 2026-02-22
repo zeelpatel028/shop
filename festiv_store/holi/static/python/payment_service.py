@@ -59,7 +59,7 @@ class PaymentService:
         now = datetime.now().isoformat()
         try:
             supabase.table('payments')\
-                .update({'payment_status': 'Expired', 'updated_at': now})\
+                .update({'payment_status': 'Failed', 'updated_at': now})\
                 .eq('payment_status', 'Pending')\
                 .lt('payment_expire_at', now)\
                 .execute()
@@ -83,7 +83,6 @@ class PaymentService:
         payment_data.setdefault('payment_type', 'Full')
         payment_data.setdefault('remaining_amount', 0.0)
         payment_data.setdefault('received_by', 'Counter')
-        payment_data.setdefault('payment_gateway', 'UPI')
         payment_data.setdefault('payment_status', 'Pending')
         payment_data.setdefault('is_bill_generated', False)
         
@@ -114,9 +113,9 @@ class PaymentService:
         if status == 'Pending' and expire_at_str:
             expire_at = datetime.fromisoformat(expire_at_str)
             if datetime.now() > expire_at:
-                # Mark as expired in DB
+                # Mark as failed in DB to satisfy check constraint
                 supabase.table('payments').update({
-                    'payment_status': 'Expired',
+                    'payment_status': 'Failed',
                     'updated_at': datetime.now().isoformat()
                 }).eq('payment_reference', payment_reference).execute()
                 return 'Expired'
@@ -130,16 +129,20 @@ class PaymentService:
         Strict verification: must be pending and not expired.
         """
         if not PaymentService.verify_reference_integrity(payment_reference):
+            print(f"DEBUG mark_as_paid: integrity check failed for {payment_reference}")
             return False
 
         # Check current status
         status = PaymentService.check_status(supabase, payment_reference)
+        print(f"DEBUG mark_as_paid: check_status returned {status}")
         if status != 'Pending':
+            print(f"DEBUG mark_as_paid: status is {status}, not Pending")
             return False
 
         # Fetch current record for paid_amount
         res = supabase.table('payments').select('paid_amount').eq('payment_reference', payment_reference).execute()
         if not res.data:
+            print(f"DEBUG mark_as_paid: DB returned no data for {payment_reference}")
             return False
             
         amount = res.data[0].get('paid_amount', 0)
@@ -152,7 +155,6 @@ class PaymentService:
         
         if upi_txn_id:
             update_data['transaction_id'] = upi_txn_id
-            update_data['gateway_txn_id'] = upi_txn_id
         
         if bill_id:
             update_data['bill_id'] = bill_id
