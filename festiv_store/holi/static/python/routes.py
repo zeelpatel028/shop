@@ -8,9 +8,12 @@ from flask import render_template, request, redirect, url_for, flash, jsonify
 from .... import festiv_store_bp
 from database.db import supabase
 import io
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
 
 def safe_float(value, default=0.0):
     try:
@@ -26,54 +29,112 @@ def safe_int(value, default=0):
 
 def generate_bill_pdf(bill_data, items):
     buffer = io.BytesIO()
-    p = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
+    doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Define custom styles
+    title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], fontSize=24, alignment=1, spaceAfter=2, textColor=colors.black)
+    subtitle_style = ParagraphStyle('SubtitleStyle', parent=styles['Normal'], fontSize=12, alignment=1, spaceAfter=10)
+    info_style = ParagraphStyle('InfoStyle', parent=styles['Normal'], fontSize=9)
+    header_style = ParagraphStyle('HeaderStyle', parent=styles['Normal'], fontSize=10, fontName='Helvetica-Bold')
 
     # Header
-    p.setFont("Helvetica-Bold", 20)
-    p.drawString(200, height - 50, "HOLI HUB INVOICE")
+    elements.append(Paragraph("<b>BIG TULSHI SHOP</b>", title_style))
+    elements.append(Paragraph("HOLI STORE", subtitle_style))
     
-    p.setFont("Helvetica", 12)
-    p.drawString(50, height - 80, f"Bill No: {bill_data['bill_no']}")
-    p.drawString(50, height - 100, f"Date: {bill_data['bill_date']} {bill_data['bill_time']}")
-    p.drawString(400, height - 80, f"Customer: {bill_data['customer_name'] or 'Cash'}")
-    p.drawString(400, height - 100, f"Phone: {bill_data['customer_phone'] or '-'}")
+    # Tax Invoice Label
+    elements.append(Paragraph("<b>TAX INVOICE</b>", ParagraphStyle('TaxStyle', parent=styles['Normal'], fontSize=12, alignment=1)))
+    elements.append(Paragraph("Original", ParagraphStyle('OriginalStyle', parent=styles['Normal'], fontSize=8, alignment=1, spaceAfter=10)))
+    
+    elements.append(Spacer(1, 0.1 * inch))
 
-    # Table Header
-    p.line(50, height - 120, 550, height - 120)
-    p.setFont("Helvetica-Bold", 10)
-    p.drawString(50, height - 135, "Product")
-    p.drawString(300, height - 135, "Qty")
-    p.drawString(380, height - 135, "Price")
-    p.drawString(480, height - 135, "Total")
-    p.line(50, height - 140, 550, height - 140)
+    # Bill Info & Customer Info Table
+    info_data = [
+        [Paragraph(f"<b>Bill No:</b> {bill_data['bill_no']}", info_style), Paragraph(f"<b>Customer:</b> {bill_data['customer_name'] or 'Cash'}", info_style)],
+        [Paragraph(f"<b>Date:</b> {bill_data['bill_date']} {bill_data['bill_time']}", info_style), Paragraph(f"<b>Phone:</b> {bill_data['customer_phone'] or '-'}", info_style)],
+        [Paragraph(f"<b>Payment:</b> {bill_data['payment_method']}", info_style), ""]
+    ]
+    info_table = Table(info_data, colWidths=[3 * inch, 3.5 * inch])
+    info_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ]))
+    elements.append(info_table)
+    elements.append(Spacer(1, 0.2 * inch))
 
+    # Items Table Header
+    table_data = [['Sr', 'Description', 'HSN', 'Qty', 'Rate', 'Taxable', 'CGST', 'SGST', 'Amount']]
+    
     # Items
-    y = height - 160
-    p.setFont("Helvetica", 10)
-    for item in items:
-        p.drawString(50, y, item['name'])
-        p.drawString(300, y, str(item['quantity']))
-        p.drawString(380, y, f"Rs.{item['final_price']:.2f}")
-        p.drawString(480, y, f"Rs.{(item['final_price'] * item['quantity']):.2f}")
-        y -= 20
-        if y < 50:
-            p.showPage()
-            y = height - 50
+    for i, item in enumerate(items, 1):
+        # Calculate CGST/SGST (splitting the tax amount by 2)
+        tax_amt = safe_float(item.get('tax_amount', 0))
+        cgst_sgst_amt = tax_amt / 2
+        tax_pct = safe_float(item.get('tax_percent', 0))
+        cgst_sgst_pct = tax_pct / 2
+        
+        row = [
+            str(i),
+            Paragraph(f"{item['name']}", info_style),
+            "0910", # Placeholder HSN
+            str(item['quantity']),
+            f"{item['final_price']:.2f}",
+            f"{item['base_price']:.2f}",
+            f"{cgst_sgst_amt:.2f}",
+            f"{cgst_sgst_amt:.2f}",
+            f"{item['line_total']:.2f}"
+        ]
+        table_data.append(row)
 
-    # Totals
-    p.line(50, y, 550, y)
-    y -= 25
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(380, y, "Grand Total:")
-    p.drawString(480, y, f"Rs.{bill_data['bill_total']:.2f}")
+    # Empty rows to fill space if needed (optional)
+    # for _ in range(max(0, 10 - len(items))):
+    #     table_data.append(["", "", "", "", "", "", "", "", ""])
+
+    # Table Styles
+    items_table = Table(table_data, colWidths=[0.3*inch, 2.2*inch, 0.6*inch, 0.5*inch, 0.7*inch, 0.8*inch, 0.7*inch, 0.7*inch, 0.8*inch])
+    items_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (1, 1), (1, -1), 'LEFT'), # Description left aligned
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    elements.append(items_table)
+    elements.append(Spacer(1, 0.2 * inch))
+
+    # Totals Section
+    totals_data = [
+        ['', '', '', '', '', 'Taxable Amt', f"{bill_data['subtotal_amount']:.2f}"],
+        ['', '', '', '', '', 'CGST Amt', f"{(bill_data['total_tax_amount']/2):.2f}"],
+        ['', '', '', '', '', 'SGST Amt', f"{(bill_data['total_tax_amount']/2):.2f}"],
+        ['', '', '', '', '', Paragraph('<b>Grand Total</b>', header_style), Paragraph(f"<b>₹{bill_data['bill_total']:.2f}</b>", header_style)]
+    ]
     
-    y -= 20
-    p.setFont("Helvetica", 10)
-    p.drawString(380, y, f"Payment: {bill_data['payment_method']}")
-
-    p.showPage()
-    p.save()
+    totals_table = Table(totals_data, colWidths=[0.3*inch, 2.2*inch, 0.6*inch, 0.5*inch, 0.7*inch, 1.5*inch, 1.5*inch])
+    totals_table.setStyle(TableStyle([
+        ('ALIGN', (-2, 0), (-1, -1), 'RIGHT'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (-2, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+    elements.append(totals_table)
+    
+    elements.append(Spacer(1, 0.5 * inch))
+    
+    # Footer
+    footer_text = "Certified that particulars given above are true and correct."
+    elements.append(Paragraph(footer_text, info_style))
+    elements.append(Spacer(1, 0.2 * inch))
+    
+    elements.append(Paragraph(f"For, <b>BIG TULSHI SHOP</b>", ParagraphStyle('FooterStyle', parent=styles['Normal'], fontSize=10, alignment=2)))
+    
+    # Build PDF
+    doc.build(elements)
     
     buffer.seek(0)
     return buffer
@@ -166,44 +227,72 @@ def holi_dashboard():
 def master_stock():
     try:
         products_response = supabase.table('products').select('*').execute()
-        products = products_response.data
+        all_products = products_response.data or []
         
-        # Fetch bill_items instead of bills for accurate sales per product
+        # Fetch bill_items for sales count
         items_response = supabase.table('bill_items').select('product_name, quantity').execute()
         bill_items = items_response.data or []
     except Exception as e:
         print(f"Error fetching master stock data: {e}")
-        products = []
+        all_products = []
         bill_items = []
     
-    # Calculate sales count for Most Sold
+    # Calculate sales count
     product_sales = defaultdict(int)
     for item in bill_items:
         if 'product_name' in item and item['product_name']:
             product_sales[item['product_name']] += item.get('quantity', 0)
         
-    # Attach sales to products for sorting (temporary attribute for template)
-    for p in products:
+    # Attach sales to products
+    for p in all_products:
         p['sales'] = product_sales.get(p.get('product_name'), 0)
         
-    most_sold = sorted(products, key=lambda x: x.get('sales', 0), reverse=True)
-    low_stock = [p for p in products if p.get('stock', 0) <= 10]
+    # Filter products
+    active_products = [p for p in all_products if p.get('product_status', 'Active') == 'Active']
+    inactive_products = [p for p in all_products if p.get('product_status') == 'Inactive']
+        
+    most_sold = sorted(active_products, key=lambda x: x.get('sales', 0), reverse=True)
+    low_stock = [p for p in active_products if p.get('stock', 0) <= 10]
     
     return render_template('master_stock.html', 
-                         products=products, 
+                         products=active_products, 
+                         inactive_products=inactive_products,
                          most_sold=most_sold,
                          low_stock=low_stock)
 
 @festiv_store_bp.route('/holi/delete-product/<int:product_id>', methods=['POST'])
 def delete_product(product_id):
     try:
-        # Assuming product_id is the primary key or 'id' field
-        supabase.table('products').delete().eq('product_id', product_id).execute()
-        flash('Product deleted successfully!', 'success')
-    except Exception as e:
-        print(f"Error deleting product: {e}")
-        flash('Error deleting product!', 'error')
+        # 1. Check if product has any sales (bill_items)
+        items_check = supabase.table('bill_items').select('bill_item_id').eq('product_id', product_id).limit(1).execute()
         
+        if items_check.data:
+            # 2. Has sales: Soft delete (Deactivate)
+            supabase.table('products').update({'product_status': 'Inactive', 'stock_status': 'Out of Stock'}).eq('product_id', product_id).execute()
+            flash('Product moved to Removed list (preserves sales history).', 'info')
+        else:
+            # 3. No sales: Hard delete
+            response = supabase.table('products').delete().eq('product_id', product_id).execute()
+            if response.data:
+                flash('Product deleted successfully!', 'success')
+            else:
+                flash('Product not found or could not be deleted!', 'warning')
+            
+    except Exception as e:
+        print(f"DEBUG: Error in smart delete: {e}")
+        flash(f'Error processing deletion: {str(e)}', 'error')
+        
+    return redirect(url_for('festiv_store.master_stock'))
+
+@festiv_store_bp.route('/holi/restore-product/<int:product_id>', methods=['POST'])
+def restore_product(product_id):
+    try:
+        # Restore product to Active status
+        supabase.table('products').update({'product_status': 'Active', 'stock_status': 'In Stock'}).eq('product_id', product_id).execute()
+        flash('Product restored successfully!', 'success')
+    except Exception as e:
+        print(f"Error restoring product: {e}")
+        flash('Error restoring product!', 'error')
     return redirect(url_for('festiv_store.master_stock'))
 
 @festiv_store_bp.route('/holi/add-product', methods=['GET', 'POST'])
@@ -687,7 +776,8 @@ def make_bill():
 
     # GET Request
     try:
-        products_response = supabase.table('products').select('*').execute()
+        # Filter: Only show products with 'Active' status on the billing page
+        products_response = supabase.table('products').select('*').eq('product_status', 'Active').execute()
         products = products_response.data or []
     except:
         products = []

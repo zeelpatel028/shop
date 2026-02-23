@@ -12,8 +12,7 @@
         padding: 0 !important;
     }
 
-    form {
-        padding: 30px;
+    .add-product-container {
         max-width: 1440px;
         margin: 0 auto;
         animation: fadeUp 0.6s ease;
@@ -72,143 +71,145 @@
 {% block page_title %}{% endblock %}
 
 {% block content %}
-<form action="{{ url_for('festiv_store.add_product') }}" method="POST" enctype="multipart/form-data">
-    <div class="page-header">
-        <h1 class="page-title">Add Product</h1>
-        <div class="header-actions">
-            <a href="{{ url_for('festiv_store.master_stock') }}" class="btn btn-secondary">Discard</a>
-            <button type="submit" class="btn btn-primary">Add Product</button>
-        </div>
-    </div>
-
-    <div class="main-grid">
-        <!-- Main Column -->
-        <div class="main-column">
-            <!-- General Info -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-info-circle"></i> General Information
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Product Name</label>
-                    <input type="text" name="product_name" class="form-control"
-                        placeholder="e.g. Organic Holi Colors Pack" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Brand</label>
-                    <input type="text" name="brand" class="form-control" placeholder="e.g. Festiv Brand">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Store Name</label>
-                    <input type="text" name="store_name" class="form-control" value="Holi Store"
-                        placeholder="e.g. Holi Store">
-                </div>
-            </div>
-
-            <!-- Organization & Status -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-layer-group"></i> Organization & Status
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select name="category" class="form-control category-select">
-                        <option value="Colors">Colors</option>
-                        <option value="Fersan">Fersan</option>
-                        <option value="Pichkari">Pichkari</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Product Status</label>
-                    <select name="product_status" class="form-control category-select">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Draft">Draft</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Stock Status</label>
-                    <select name="stock_status" class="form-control category-select">
-                        <option value="In Stock">In Stock</option>
-                        <option value="Low Stock">Low Stock</option>
-                        <option value="Out of Stock">Out of Stock</option>
-                    </select>
-                </div>
+<div class="add-product-container">
+    <form action="{{ url_for('festiv_store.add_product') }}" method="POST" enctype="multipart/form-data">
+        <div class="page-header">
+            <h1 class="page-title">Add Product</h1>
+            <div class="header-actions">
+                <a href="{{ url_for('festiv_store.master_stock') }}" class="btn btn-secondary">Discard</a>
+                <button type="submit" class="btn btn-primary">Add Product</button>
             </div>
         </div>
 
-        <!-- Details Column -->
-        <div class="details-column">
-            <!-- Pricing -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-hand-holding-usd"></i> Pricing & Tax
+        <div class="main-grid">
+            <!-- Main Column -->
+            <div class="main-column">
+                <!-- General Info -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle"></i> General Information
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" name="product_name" class="form-control"
+                            placeholder="e.g. Organic Holi Colors Pack" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Brand</label>
+                        <input type="text" name="brand" class="form-control" placeholder="e.g. Festiv Brand">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Store Name</label>
+                        <input type="text" name="store_name" class="form-control" value="Holi Store"
+                            placeholder="e.g. Holi Store">
+                    </div>
                 </div>
-                <div class="pricing-grid">
-                    <div class="form-group">
-                        <label class="form-label">Cost Price</label>
-                        <input type="number" name="cost_price" step="0.01" class="form-control" placeholder="0.00"
-                            id="cost_price">
+
+                <!-- Organization & Status -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-layer-group"></i> Organization & Status
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Base Price</label>
-                        <input type="number" name="base_price" step="0.01" class="form-control" placeholder="0.00"
-                            id="base_price" required>
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-control category-select">
+                            <option value="Colors">Colors</option>
+                            <option value="Fersan">Fersan</option>
+                            <option value="Pichkari">Pichkari</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Tax (%)</label>
-                        <input type="number" name="tax_percent" step="0.01" class="form-control" placeholder="0"
-                            id="tax_percent">
+                        <label class="form-label">Product Status</label>
+                        <select name="product_status" class="form-control category-select">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Draft">Draft</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Tax Amount</label>
-                        <input type="number" name="tax_amount" step="0.01" class="form-control" placeholder="0.00"
-                            id="tax_amount" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Profit Margin</label>
-                        <input type="number" name="profit_margin" step="0.01" class="form-control" placeholder="0.00"
-                            id="profit_margin" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Sell Price</label>
-                        <input type="number" name="sell_price" step="0.01" class="form-control" placeholder="0.00"
-                            id="sell_price" required>
+                        <label class="form-label">Stock Status</label>
+                        <select name="stock_status" class="form-control category-select">
+                            <option value="In Stock">In Stock</option>
+                            <option value="Low Stock">Low Stock</option>
+                            <option value="Out of Stock">Out of Stock</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            <!-- Inventory -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-warehouse"></i> Inventory
+            <!-- Details Column -->
+            <div class="details-column">
+                <!-- Pricing -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-hand-holding-usd"></i> Pricing & Tax
+                    </div>
+                    <div class="pricing-grid">
+                        <div class="form-group">
+                            <label class="form-label">Cost Price</label>
+                            <input type="number" name="cost_price" step="0.01" class="form-control" placeholder="0.00"
+                                id="cost_price">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Base Price</label>
+                            <input type="number" name="base_price" step="0.01" class="form-control" placeholder="0.00"
+                                id="base_price" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tax (%)</label>
+                            <input type="number" name="tax_percent" step="0.01" class="form-control" placeholder="0"
+                                id="tax_percent">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tax Amount</label>
+                            <input type="number" name="tax_amount" step="0.01" class="form-control" placeholder="0.00"
+                                id="tax_amount" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Profit Margin</label>
+                            <input type="number" name="profit_margin" step="0.01" class="form-control"
+                                placeholder="0.00" id="profit_margin" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sell Price</label>
+                            <input type="number" name="sell_price" step="0.01" class="form-control" placeholder="0.00"
+                                id="sell_price" required>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Stock Quantity</label>
-                    <input type="number" name="stock" class="form-control" placeholder="0" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Sold Stock</label>
-                    <input type="number" name="sold_stock" class="form-control" placeholder="0" value="0">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Unit</label>
-                    <select name="product_unit" class="form-control category-select">
-                        <option value="kg">kg</option>
-                        <option value="g">g</option>
-                        <option value="ltr">ltr</option>
-                        <option value="pcs">pcs</option>
-                        <option value="box">box</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Price Unit Description</label>
-                    <input type="text" name="price_quantity" class="form-control" placeholder="e.g. per 1 kg">
+
+                <!-- Inventory -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-warehouse"></i> Inventory
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stock Quantity</label>
+                        <input type="number" name="stock" class="form-control" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sold Stock</label>
+                        <input type="number" name="sold_stock" class="form-control" placeholder="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit</label>
+                        <select name="product_unit" class="form-control category-select">
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="ltr">ltr</option>
+                            <option value="pcs">pcs</option>
+                            <option value="box">box</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Price Unit Description</label>
+                        <input type="text" name="price_quantity" class="form-control" placeholder="e.g. per 1 kg">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
 <script>
     const costPrice = document.getElementById('cost_price');

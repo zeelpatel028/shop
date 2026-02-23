@@ -12,9 +12,23 @@
     --elite-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.holi-dashboard {
-    padding: 40px;
+.holi-dashboard,
+.ledger-container,
+.bill-container,
+.add-product-container,
+.payment-data-container {
+    padding: 40px 40px 40px 40px;
     animation: slideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.content-wrapper {
+    padding-top: 30px !important;
+}
+
+.content-wrapper>.page-title {
+    margin-top: 10px !important;
+    margin-bottom: 25px !important;
+    padding-left: 40px !important;
 }
 
 @keyframes slideIn {
@@ -251,7 +265,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: 40px;
     flex-wrap: wrap;
     gap: 15px;
@@ -423,17 +437,23 @@
     border-radius: 12px;
 }
 
-.elite-table-responsive {
-    min-width: 800px;
-    /* Force minimum width to maintain laptop-like layout */
+.elite-table-responsive,
+.pay-table,
+.elite-table {
+    min-width: 900px !important;
+    /* Force "Laptop View" on all screens */
     width: 100%;
     border-collapse: collapse;
 }
 
 .elite-table-responsive td,
-.elite-table-responsive th {
-    white-space: nowrap;
-    /* Prevent text wrapping to keep laptop-like view */
+.elite-table-responsive th,
+.pay-table td,
+.pay-table th,
+.elite-table td,
+.elite-table th {
+    white-space: nowrap !important;
+    /* Prevent text wrapping */
 }
 
 /* Scrollbar styling for better UX */
