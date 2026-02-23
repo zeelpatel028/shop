@@ -23,9 +23,15 @@ def safe_float(value, default=0.0):
 
 def safe_int(value, default=0):
     try:
-        return int(value) if value else default
-    except (ValueError, TypeError):
-        return default
+        if not value:
+            return default
+        # Handle cases like "30.0" by converting to float first
+        return int(float(str(value))) if isinstance(value, (str, bytes)) else int(value)
+    except (ValueError, TypeError, NameError):
+        try:
+            return int(float(value)) if value else default
+        except:
+            return default
 
 def generate_bill_pdf(bill_data, items):
     buffer = io.BytesIO()
@@ -81,8 +87,8 @@ def generate_bill_pdf(bill_data, items):
             str(item['quantity']),
             f"{item['final_price']:.2f}",
             f"{item['base_price']:.2f}",
-            f"{cgst_sgst_amt:.2f}",
-            f"{cgst_sgst_amt:.2f}",
+            f"{cgst_sgst_pct:.2f}%",
+            f"{cgst_sgst_pct:.2f}%",
             f"{item['line_total']:.2f}"
         ]
         table_data.append(row)
@@ -226,15 +232,21 @@ def holi_dashboard():
 @festiv_store_bp.route('/holi/master-stock')
 def master_stock():
     try:
-        products_response = supabase.table('products').select('*').execute()
-        all_products = products_response.data or []
+        # Fetch active products for the main list
+        active_products_response = supabase.table('products').select('*').eq('product_status', 'Active').execute()
+        active_products = active_products_response.data or []
         
-        # Fetch bill_items for sales count
+        # Fetch inactive products for the removed tab
+        inactive_products_response = supabase.table('products').select('*').eq('product_status', 'Inactive').execute()
+        inactive_products = inactive_products_response.data or []
+        
+        # Fetch bill_items for sales count (for all products, active or inactive)
         items_response = supabase.table('bill_items').select('product_name, quantity').execute()
         bill_items = items_response.data or []
     except Exception as e:
         print(f"Error fetching master stock data: {e}")
-        all_products = []
+        active_products = []
+        inactive_products = []
         bill_items = []
     
     # Calculate sales count
@@ -244,12 +256,14 @@ def master_stock():
             product_sales[item['product_name']] += item.get('quantity', 0)
         
     # Attach sales to products
-    for p in all_products:
+    # Attach sales to both active and inactive products
+    combined_products = active_products + inactive_products
+    for p in combined_products:
         p['sales'] = product_sales.get(p.get('product_name'), 0)
         
-    # Filter products
-    active_products = [p for p in all_products if p.get('product_status', 'Active') == 'Active']
-    inactive_products = [p for p in all_products if p.get('product_status') == 'Inactive']
+    # Filter products using combined list with sales attached
+    active_products = [p for p in combined_products if p.get('product_status', 'Active') == 'Active']
+    inactive_products = [p for p in combined_products if p.get('product_status') == 'Inactive']
         
     most_sold = sorted(active_products, key=lambda x: x.get('sales', 0), reverse=True)
     low_stock = [p for p in active_products if p.get('stock', 0) <= 10]
@@ -305,7 +319,8 @@ def add_product():
         base_price = safe_float(request.form.get('base_price'))
         tax_percent = safe_float(request.form.get('tax_percent'))
         profit_margin = safe_float(request.form.get('profit_margin'))
-        stock_qty = safe_float(request.form.get('stock'))
+        stock_qty = safe_int(request.form.get('stock'))
+        sold_stock = safe_int(request.form.get('sold_stock', 0))
 
         # 2. Secure Backend Calculations
         cost_price = safe_float(request.form.get('cost_price'))
@@ -327,16 +342,16 @@ def add_product():
             "category": request.form.get('category'),
             "price_quantity": request.form.get('price_quantity'),
             "product_unit": request.form.get('product_unit'),
-            "cost_price": safe_float(request.form.get('cost_price')),
+            "cost_price": cost_price,
             "base_price": base_price,
             "tax_percent": tax_percent,
             "tax_amount": tax_amount,
             "profit_margin": profit_margin,
             "sell_price": sell_price,
             "stock": stock_qty,
-            "sold_stock": safe_float(request.form.get('sold_stock', 0)),
-            "stock_status": request.form.get('stock_status'),
-            "product_status": request.form.get('product_status'),
+            "sold_stock": sold_stock,
+            "stock_status": request.form.get('stock_status', 'In Stock'),
+            "product_status": request.form.get('product_status', 'Active'),
             "last_updated_quantity": stock_qty,
             "created_at": datetime.now().isoformat()
         }
@@ -349,10 +364,11 @@ def add_product():
         return redirect(url_for('festiv_store.master_stock'))
 
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "message": f"Server error: {str(e)}"
-        }), 500
+        print(f"DEBUG: Error adding product: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        flash(f'Error adding product: {str(e)}', 'error')
+        return redirect(url_for('festiv_store.add_product'))
 
 @festiv_store_bp.route('/holi/ledger')
 def ledger():

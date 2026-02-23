@@ -1,4 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+import datetime
+import os
+import threading
+import time
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 from festiv_store import festiv_store_bp
 
 app = Flask(__name__)
@@ -8,13 +16,10 @@ app.secret_key = 'supersecretkey'  # Required for flashing messages
 app.register_blueprint(festiv_store_bp, url_prefix='/festiv_store')
 
 # Initialize DB (Supabase)
-from database.db import init_db
+from database.db import init_db, supabase
 init_db(app)
 
 # --- KEEP-ALIVE MECHANISM ---
-import threading
-import time
-import requests
 
 def keep_alive():
     """Pings the Render service every 14 minutes to prevent auto-spin down."""
@@ -48,9 +53,13 @@ def start_keep_alive():
 start_keep_alive()
 # ----------------------------
 
-# Authorized Phone Numbers
-AUTHORIZED_PHONES = ["6353807407", "9913887677"]
-AUTHORIZED_PASSWORD = "tulshi"
+# Authorized Phone Numbers (Private)
+# Expects a comma-separated string in environment variable: "6353807407,9913887677"
+AUTH_PHONES_ENV = os.getenv("AUTHORIZED_PHONES", "6353807407,9913887677")
+AUTHORIZED_PHONES = [p.strip() for p in AUTH_PHONES_ENV.split(",")]
+AUTHORIZED_PASSWORD = os.getenv("AUTHORIZED_PASSWORD", "tulshi")
+
+# Temporary storage for OTP removed
 
 @app.route('/')
 def index():
@@ -64,15 +73,22 @@ def home():
 def logout():
     return redirect(url_for('index'))
 
+# send_otp route removed (OTP system disabled)
+
 @app.route('/login', methods=['POST'])
 def login():
     phone = request.form.get('phone')
     password = request.form.get('password')
 
-    if phone in AUTHORIZED_PHONES and password == AUTHORIZED_PASSWORD:
+    if not phone or not password:
+        return "<h1>Missing phone or password! <a href='/'>Try again</a></h1>"
+
+    # Verify authorization (Check hardcoded list in environment variables)
+    is_authorized = phone in AUTHORIZED_PHONES
+
+    if is_authorized and password == AUTHORIZED_PASSWORD:
         return redirect(url_for('home'))
     else:
-        # In a real app, you'd flash a message or return a specific error page
         return "<h1>Login Failed! Invalid Phone Number or Password. <a href='/'>Try again</a></h1>"
 
 if __name__ == '__main__':

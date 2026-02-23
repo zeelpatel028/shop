@@ -2,3 +2,5 @@ flask
 gunicorn
 supabase
 reportlab
+python-dotenv
+requests

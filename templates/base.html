@@ -43,6 +43,19 @@
                 </div>
             </header>
 
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
             <!-- Dashboard Content -->
             <div class="content-wrapper">
                 <h1 class="page-title">{% block page_title %}Dashboard Overview{% endblock %}</h1>
