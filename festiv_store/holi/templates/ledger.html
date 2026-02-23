@@ -67,89 +67,84 @@
         box-shadow: 0 4px 12px rgba(108, 93, 211, 0.2);
     }
 
-    /* Stats Grid */
-    .stats-grid {
+    /* ─── Stat Cards ─── */
+    .pay-stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
         margin-bottom: 28px;
     }
 
-    .stat-card {
+    .pay-stat-card {
         background: #fff;
-        padding: 22px 24px;
         border-radius: 18px;
-        border: 1px solid #EEF0F6;
+        padding: 22px 24px;
         position: relative;
         overflow: hidden;
+        border: 1px solid #EEF0F6;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .stat-card:hover {
+    .pay-stat-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
     }
 
-    .stat-card.purple {
-        border-bottom: 3px solid #6C5DD3;
+    .psc-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        margin-bottom: 16px;
     }
 
-    .stat-card.orange {
-        border-bottom: 3px solid #FF9F00;
-    }
-
-    .stat-info {
-        position: relative;
-        z-index: 2;
-    }
-
-    .stat-label {
+    .psc-label {
         font-size: 0.78rem;
-        color: #8B95A5;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.8px;
-        font-weight: 700;
-        margin-bottom: 8px;
+        color: #8B95A5;
+        margin-bottom: 6px;
     }
 
-    .stat-value {
+    .psc-value {
         font-size: 1.85rem;
         font-weight: 900;
         color: #111827;
         letter-spacing: -1px;
-        margin-bottom: 6px;
         line-height: 1;
     }
 
-    .stat-trend {
+    .psc-sub {
         font-size: 0.78rem;
         font-weight: 600;
+        margin-top: 8px;
         display: flex;
         align-items: center;
         gap: 4px;
+        color: #6B7280;
     }
 
-    .trend-up {
-        color: #10B981;
-    }
-
-    .stat-icon {
+    .psc-glow {
         position: absolute;
-        right: -10px;
-        bottom: -10px;
-        font-size: 4.5rem;
-        opacity: 0.05;
-        transform: rotate(-10deg);
-        transition: all 0.3s ease;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        right: -30px;
+        top: -30px;
+        opacity: 0.08;
+        transition: opacity 0.3s;
     }
 
-    .stat-card:hover .stat-icon {
-        transform: rotate(0deg) scale(1.1);
-        opacity: 0.1;
+    .pay-stat-card:hover .psc-glow {
+        opacity: 0.14;
     }
 
-    /* Chart Card */
-    .chart-container {
+    /* Analytics Chart */
+    .chart-card {
         background: #fff;
         padding: 24px;
         border-radius: 18px;
@@ -173,44 +168,68 @@
         gap: 10px;
     }
 
-    /* Table Section */
-    .table-card {
+    /* ─── Transaction Table Card ─── */
+    .pay-table-card {
         background: #fff;
         border-radius: 18px;
+        padding: 24px;
         border: 1px solid #EEF0F6;
-        overflow: hidden;
     }
 
-    .table-header {
-        padding: 20px 24px;
-        border-bottom: 1px solid #EEF0F6;
+    .ptc-header {
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        align-items: center;
+        margin-bottom: 20px;
     }
 
-    .bill-no {
+    .ptc-title {
+        font-size: 1rem;
         font-weight: 800;
-        color: #6C5DD3;
-    }
-
-    .customer-cell {
+        color: #111827;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
     }
 
-    .customer-avatar {
-        width: 32px;
-        height: 32px;
+    .ptc-count {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 5px 12px;
         border-radius: 8px;
         background: #F0EEFF;
         color: #6C5DD3;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    }
+
+    /* ─── Table ─── */
+    .pay-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .pay-table thead th {
+        text-align: left;
+        padding: 12px 16px;
+        font-size: 0.72rem;
         font-weight: 700;
-        font-size: 0.8rem;
+        color: #8B95A5;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        border-bottom: 2px solid #F0F1F5;
+        white-space: nowrap;
+    }
+
+    .pay-table tbody td {
+        padding: 14px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 1px solid #F3F4F8;
+        white-space: nowrap;
+    }
+
+    .pay-table tbody tr:hover {
+        background: #FAFBFE;
     }
 
     .status-badge {
@@ -230,17 +249,6 @@
         color: #F97316;
     }
 
-    .amount-cell {
-        font-weight: 800;
-        text-align: right;
-    }
-
-    .profit-cell {
-        font-weight: 700;
-        text-align: right;
-        color: #10B981;
-    }
-
     .view-btn {
         color: #6C5DD3;
         text-decoration: none;
@@ -249,22 +257,33 @@
         gap: 5px;
         font-weight: 600;
         font-size: 0.82rem;
-        transition: 0.2s;
     }
 
-    .view-btn:hover {
-        text-decoration: underline;
-        transform: translateX(3px);
+    .td-amount {
+        text-align: right !important;
+        font-weight: 800 !important;
+        color: #111827 !important;
+    }
+
+    .td-profit {
+        text-align: right !important;
+        font-weight: 700 !important;
+        color: #10B981 !important;
+    }
+
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto;
     }
 
     @media (max-width: 1024px) {
-        .stats-grid {
+        .pay-stats {
             grid-template-columns: 1fr 1fr;
         }
     }
 
     @media (max-width: 640px) {
-        .stats-grid {
+        .pay-stats {
             grid-template-columns: 1fr;
         }
 
@@ -272,14 +291,20 @@
             padding: 16px;
         }
 
-        .elite-dashboard-header {
-            flex-direction: column;
-            align-items: flex-start !important;
-        }
-
         .period-filters {
             width: 100%;
-            justify-content: flex-start;
+            padding: 2px;
+        }
+
+        .filter-link {
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            flex: 1;
+            text-align: center;
+        }
+
+        .chart-card {
+            padding: 15px;
         }
     }
 </style>
@@ -310,46 +335,49 @@
     </div>
 
     <!-- Quick Stats -->
-    <div class="stats-grid">
-        <div class="stat-card purple">
-            <div class="stat-info">
-                <div class="stat-label">Total Revenue</div>
-                <div class="stat-value">₹{{ "{:,.0f}".format(total_revenue|default(0)|float) }}</div>
-                <div class="stat-trend trend-up">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>Gross Sales</span>
-                </div>
+    <div class="pay-stats">
+        <div class="pay-stat-card">
+            <div class="psc-glow" style="background: #6C5DD3;"></div>
+            <div class="psc-icon" style="background: #F0EEFF; color: #6C5DD3;">
+                <i class="fas fa-chart-line"></i>
             </div>
-            <i class="fas fa-chart-line stat-icon" style="color: var(--accent-purple);"></i>
+            <div class="psc-label">Total Revenue</div>
+            <div class="psc-value">₹{{ "{:,.0f}".format(total_revenue|default(0)|float) }}</div>
+            <div class="psc-sub">
+                <i class="fas fa-arrow-up" style="font-size: 0.6rem; color: #10B981;"></i>
+                Gross Sales
+            </div>
         </div>
 
-        <div class="stat-card orange">
-            <div class="stat-info">
-                <div class="stat-label">Net Profit</div>
-                <div class="stat-value">₹{{ "{:,.0f}".format(total_profit|default(0)|float) }}</div>
-                <div class="stat-trend trend-up">
-                    <i class="fas fa-check-circle"></i>
-                    <span>After Costs</span>
-                </div>
+        <div class="pay-stat-card">
+            <div class="psc-glow" style="background: #10B981;"></div>
+            <div class="psc-icon" style="background: #ECFDF5; color: #10B981;">
+                <i class="fas fa-wallet"></i>
             </div>
-            <i class="fas fa-wallet stat-icon" style="color: var(--accent-orange);"></i>
+            <div class="psc-label">Net Profit</div>
+            <div class="psc-value" style="color: #10B981;">₹{{ "{:,.0f}".format(total_profit|default(0)|float) }}</div>
+            <div class="psc-sub">
+                <i class="fas fa-check-circle" style="font-size: 0.6rem;"></i>
+                After Costs
+            </div>
         </div>
 
-        <div class="stat-card" style="border-bottom: 4px solid var(--dark-bg);">
-            <div class="stat-info">
-                <div class="stat-label">Transactions</div>
-                <div class="stat-value">{{ total_bills|default(0) }}</div>
-                <div class="stat-trend" style="color: var(--elite-gray-text);">
-                    <i class="fas fa-receipt"></i>
-                    <span>Total Orders</span>
-                </div>
+        <div class="pay-stat-card">
+            <div class="psc-glow" style="background: #111827;"></div>
+            <div class="psc-icon" style="background: #F3F4F6; color: #111827;">
+                <i class="fas fa-receipt"></i>
             </div>
-            <i class="fas fa-shopping-bag stat-icon" style="color: var(--dark-bg);"></i>
+            <div class="psc-label">Transactions</div>
+            <div class="psc-value">{{ total_bills|default(0) }}</div>
+            <div class="psc-sub">
+                <i class="fas fa-shopping-bag" style="font-size: 0.6rem;"></i>
+                Total Orders
+            </div>
         </div>
     </div>
 
     <!-- Analytics Chart -->
-    <div class="chart-container">
+    <div class="chart-card">
         <div class="chart-header">
             <div class="chart-title">
                 <i class="fas fa-chart-area" style="color: var(--accent-purple);"></i>
@@ -369,19 +397,16 @@
     </div>
 
     <!-- Transactions Table -->
-    <div class="table-card">
-        <div class="table-header">
-            <div class="chart-title">
-                <i class="fas fa-list-ul" style="color: var(--accent-orange);"></i>
+    <div class="pay-table-card">
+        <div class="ptc-header">
+            <div class="ptc-title">
+                <i class="fas fa-list-ul" style="color: #FF9F00;"></i>
                 Transaction History
             </div>
-            <div class="elite-status-badge"
-                style="background: var(--accent-purple-light); color: var(--accent-purple); padding: 5px 12px; border-radius: 6px; font-size: 0.75rem;">
-                Showing {{ (bills|default([]))|length }} records
-            </div>
+            <span class="ptc-count">Showing {{ (bills|default([]))|length }} records</span>
         </div>
-        <div class="elite-table-wrapper">
-            <table class="elite-table elite-table-responsive">
+        <div class="table-scroll">
+            <table class="pay-table">
                 <thead>
                     <tr>
                         <th>Bill #</th>
@@ -396,8 +421,8 @@
                 <tbody>
                     {% for bill in bills|default([]) %}
                     <tr>
-                        <td data-label="Bill #" class="bill-no">#{{ bill.bill_no|default('N/A') }}</td>
-                        <td data-label="Customer">
+                        <td class="bill-no">#{{ bill.bill_no|default('N/A') }}</td>
+                        <td>
                             <div class="customer-cell">
                                 <div class="customer-avatar">{{ (bill.customer_name|default('C', true))[:1]|upper }}
                                 </div>
@@ -405,35 +430,35 @@
                                     }}</span>
                             </div>
                         </td>
-                        <td data-label="Date &amp; Time" style="color: var(--elite-gray-text); font-weight: 500;">
+                        <td style="color: #9CA3AF; font-size: 0.75rem;">
                             {{ (bill.created_at|default('', true))[:16] or 'N/A' }}
                         </td>
-                        <td data-label="Status">
+                        <td>
                             <span
                                 class="status-badge {% if bill.bill_status|default('') in ['Completed', 'Success'] %}status-success{% else %}status-pending{% endif %}">
                                 {{ bill.bill_status|default('Completed') }}
                             </span>
                         </td>
-                        <td data-label="Bill URL">
+                        <td>
                             {% if bill.bill_url %}
                             <a href="{{ bill.bill_url }}" target="_blank" class="view-btn">
                                 <i class="fas fa-external-link-alt"></i> View PDF
                             </a>
                             {% else %}
-                            <span style="color: #cbd5e1; font-style: italic;">No URL</span>
+                            <span style="color: #cbd5e1; font-style: italic; font-size: 0.75rem;">No URL</span>
                             {% endif %}
                         </td>
-                        <td data-label="Profit" class="profit-cell">+₹{{
-                            "{:,.2f}".format(bill.bill_profit|default(0)|float) }}</td>
-                        <td data-label="Total Amount" class="amount-cell">₹{{
-                            "{:,.2f}".format(bill.bill_total|default(0)|float) }}</td>
+                        <td class="td-profit">+₹{{ "{:,.2f}".format(bill.bill_profit|default(0)|float) }}</td>
+                        <td class="td-amount">₹{{ "{:,.2f}".format(bill.bill_total|default(0)|float) }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
-                            <i class="fas fa-folder-open"
-                                style="display: block; font-size: 3rem; margin-bottom: 15px; opacity: 0.2;"></i>
-                            No transactions found for this period.
+                        <td colspan="7">
+                            <div style="text-align: center; padding: 60px; color: #9CA3AF;">
+                                <i class="fas fa-folder-open"
+                                    style="display: block; font-size: 3rem; margin-bottom: 15px; opacity: 0.2;"></i>
+                                No transactions found for this period.
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

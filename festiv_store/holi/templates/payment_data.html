@@ -29,6 +29,44 @@
         }
     }
 
+    /* Filter Segmented Control */
+    .period-filters {
+        display: flex;
+        background: white;
+        padding: 4px;
+        border-radius: 12px;
+        border: 1px solid #EEF0F6;
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .period-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .filter-link {
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #8B95A5;
+        font-weight: 600;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .filter-link:hover {
+        color: #6C5DD3;
+        background: #F0EEFF;
+    }
+
+    .filter-link.active {
+        background: #6C5DD3;
+        color: white;
+        box-shadow: 0 4px 12px rgba(108, 93, 211, 0.2);
+    }
+
     /* ─── Stat Cards ─── */
     .pay-stats {
         display: grid;
@@ -383,6 +421,22 @@
             gap: 10px;
             align-items: flex-start;
         }
+
+        .period-filters {
+            width: 100%;
+            padding: 2px;
+        }
+
+        .filter-link {
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            flex: 1;
+            text-align: center;
+        }
+
+        .pay-table-card {
+            padding: 15px;
+        }
     }
 </style>
 {% endblock %}
@@ -394,12 +448,6 @@
 {% set cash_pct = ((cash_total|default(0)|float / total_collected * 100)|round|int) if total_collected > 0 else 0 %}
 {% set upi_pct = (100 - cash_pct) if total_collected > 0 else 0 %}
 {% set pay_count = (payments|default([]))|length %}
-{% set cash_count = 0 %}
-{% set upi_count = 0 %}
-{% for p in payments|default([]) %}
-{% if p.payment_method == 'Cash' %}{% set cash_count = cash_count + 1 %}{% endif %}
-{% if p.payment_method == 'UPI' %}{% set upi_count = upi_count + 1 %}{% endif %}
-{% endfor %}
 
 <div class="pay-dashboard">
 
@@ -407,11 +455,21 @@
     <div class="elite-dashboard-header">
         <div class="elite-header-group">
             <h1 class="elite-header-title">Payment Data</h1>
-            <p class="elite-header-subtitle">Real-time transaction <strong>monitoring & logs</strong></p>
+            <p class="elite-header-subtitle">Overview for <strong>{{ (active_period|default('all'))|capitalize
+                    }}</strong></p>
         </div>
-        <div class="elite-status-badge" style="background: var(--elite-orange); color: white;">
-            <i class="fas fa-receipt" style="margin-right: 6px;"></i>
-            {{ pay_count }} Transaction{{ 's' if pay_count != 1 else '' }}
+
+        <div class="period-filters">
+            <a href="{{ url_for('festiv_store.payment_data', period='all') }}"
+                class="filter-link {% if active_period|default('all') == 'all' %}active{% endif %}">All Time</a>
+            <a href="{{ url_for('festiv_store.payment_data', period='day') }}"
+                class="filter-link {% if active_period|default('') == 'day' %}active{% endif %}">Today</a>
+            <a href="{{ url_for('festiv_store.payment_data', period='week') }}"
+                class="filter-link {% if active_period|default('') == 'week' %}active{% endif %}">This Week</a>
+            <a href="{{ url_for('festiv_store.payment_data', period='month') }}"
+                class="filter-link {% if active_period|default('') == 'month' %}active{% endif %}">This Month</a>
+            <a href="{{ url_for('festiv_store.payment_data', period='year') }}"
+                class="filter-link {% if active_period|default('') == 'year' %}active{% endif %}">This Year</a>
         </div>
     </div>
 
@@ -425,8 +483,8 @@
             <div class="psc-label">Cash Payments</div>
             <div class="psc-value">₹{{ "{:,.0f}".format(cash_total|default(0)|float) }}</div>
             <div class="psc-sub">
-                <i class="fas fa-hashtag" style="font-size: 0.6rem;"></i>
-                {{ cash_pct }}% of total
+                <i class="fas fa-file-invoice" style="font-size: 0.6rem;"></i>
+                {{ cash_count }} Bills · {{ cash_pct }}%
             </div>
         </div>
 
@@ -438,8 +496,8 @@
             <div class="psc-label">UPI Payments</div>
             <div class="psc-value" style="color: #FF9F00;">₹{{ "{:,.0f}".format(upi_total|default(0)|float) }}</div>
             <div class="psc-sub">
-                <i class="fas fa-hashtag" style="font-size: 0.6rem;"></i>
-                {{ upi_pct }}% of total
+                <i class="fas fa-file-invoice" style="font-size: 0.6rem;"></i>
+                {{ upi_count }} Bills · {{ upi_pct }}%
             </div>
         </div>
 

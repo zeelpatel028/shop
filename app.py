@@ -17,14 +17,28 @@ import time
 import requests
 
 def keep_alive():
-    """Pings the Render service every 10 seconds to prevent auto-spin down."""
+    """Pings the Render service every 14 minutes to prevent auto-spin down."""
+    url = 'https://shop-d07d.onrender.com'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    
     while True:
         try:
-            requests.get('https://shop-d07d.onrender.com')
-            print("Pinged https://shop-d07d.onrender.com successfully.")
+            response = requests.get(url, headers=headers, timeout=10)
+            if response.status_code == 200:
+                print(f"Pinged {url} successfully.")
+            else:
+                print(f"Pinged {url}, but got status code: {response.status_code}")
+        except requests.exceptions.Timeout:
+            print(f"Ping to {url} timed out, will retry later.")
+        except requests.exceptions.ConnectionError as e:
+            print(f"Connection error while pinging {url}: {e}")
         except Exception as e:
-            print(f"Ping failed: {e}")
-        time.sleep(10)
+            print(f"Unexpected error during ping: {e}")
+            
+        # Sleep for 14 minutes (14 * 60 = 840 seconds)
+        time.sleep(840)
 
 def start_keep_alive():
     thread = threading.Thread(target=keep_alive)

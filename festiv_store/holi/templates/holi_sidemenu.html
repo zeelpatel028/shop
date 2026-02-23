@@ -12,7 +12,8 @@
                     style="font-size: 1.2rem; font-weight: 900; white-space: nowrap; color: var(--elite-white) !important;">Tulshi
                     Shop</span>
             </div>
-            <div id="close-sidebar" style="cursor: pointer; color: #fff; display: none;">
+            <div id="close-sidebar" onclick="toggleMobileSidebar()"
+                style="cursor: pointer; color: #fff; display: none;">
                 <i class="fas fa-times" style="font-size: 1.5rem;"></i>
             </div>
         </div>
@@ -54,6 +55,18 @@
             }
 
             @media (max-width: 768px) {
+                .sidebar.holi-sidebar {
+                    left: -100% !important;
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    z-index: 1050;
+                    box-shadow: none;
+                }
+
+                .sidebar.holi-sidebar.mobile-open {
+                    left: 0 !important;
+                    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.3);
+                }
+
                 #close-sidebar {
                     display: block !important;
                 }

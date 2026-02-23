@@ -11,20 +11,37 @@
         padding: 0 !important;
     }
 
-    .bill-container {
-        padding: 24px;
-        animation: fadeUp 0.5s ease;
-    }
-
-    @keyframes fadeUp {
-        from {
-            opacity: 0;
-            transform: translateY(12px);
+    @media (max-width: 991px) {
+        .bill-container {
+            flex-direction: column !important;
+            padding: 15px !important;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        .product-section,
+        .cart-section {
+            width: 100% !important;
+            min-height: auto !important;
+        }
+
+        .cart-section {
+            margin-top: 20px;
+            position: relative !important;
+            top: 0 !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .product-grid {
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+            gap: 12px !important;
+        }
+
+        .product-card {
+            padding: 12px !important;
+        }
+
+        .brand-name {
+            display: none;
         }
     }
 </style>
@@ -170,7 +187,7 @@
             </div>
 
             <div id="paymentStatusContainer" style="text-align: center; margin: 15px 0;">
-                <div id="paymentStatusText" class="status-text info">Waiting for Payment...</div>
+                <div id="paymentStatusText" class="status-text info">Please click "Confirm Payment" after paying</div>
             </div>
 
             <div class="payment-details">
@@ -180,7 +197,7 @@
             <div class="payment-steps">
                 <div class="step"><i class="fas fa-qrcode"></i> 1. Scan QR with any UPI app</div>
                 <div class="step"><i class="fas fa-rupee-sign"></i> 2. Pay <b>Exact Amount</b></div>
-                <div class="step"><i class="fas fa-magic"></i> 3. Status updates automatically</div>
+                <div class="step"><i class="fas fa-check-circle"></i> 3. Click <b>Confirm Payment</b> below</div>
             </div>
         </div>
         <div class="elite-modal-footer">
@@ -227,7 +244,8 @@
         </div>
         <div class="elite-modal-body" style="padding: 20px;">
             <p id="qtyModalDesc" style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Available:
-                <span id="qtyModalStock" style="font-weight:bold;">0</span></p>
+                <span id="qtyModalStock" style="font-weight:bold;">0</span>
+            </p>
 
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <input type="number" id="qtyInput" class="form-control" placeholder="1" min="0.1" step="0.1"

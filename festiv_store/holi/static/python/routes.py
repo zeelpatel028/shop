@@ -187,7 +187,7 @@ def master_stock():
         p['sales'] = product_sales.get(p.get('product_name'), 0)
         
     most_sold = sorted(products, key=lambda x: x.get('sales', 0), reverse=True)
-    low_stock = [p for p in products if p.get('stock', 0) <= 20]
+    low_stock = [p for p in products if p.get('stock', 0) <= 10]
     
     return render_template('master_stock.html', 
                          products=products, 
@@ -715,23 +715,51 @@ def verify_upi_payment(payment_ref):
 
 @festiv_store_bp.route('/holi/payment-data')
 def payment_data():
+    period = request.args.get('period', 'all')
     try:
-        # Fetch payments with bill_no for context
-        # In Supabase, we can join if foreign keys are set
-        payments_response = supabase.table('payments').select('*, bills(bill_no)').order('created_at', desc=True).execute()
+        from datetime import timedelta
+        now = datetime.now()
+        
+        query = supabase.table('payments').select('*, bills(bill_no)').order('created_at', desc=True)
+        
+        if period == 'day':
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+            query = query.gte('created_at', start_date)
+        elif period == 'week':
+            start_date = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+            query = query.gte('created_at', start_date)
+        elif period == 'month':
+            start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+            query = query.gte('created_at', start_date)
+        elif period == 'year':
+            start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+            query = query.gte('created_at', start_date)
+            
+        payments_response = query.execute()
         payments = payments_response.data or []
         
         # Calculate summaries
-        cash_total = sum(safe_float(p.get('paid_amount')) for p in payments if p.get('payment_method') == 'Cash')
-        upi_total = sum(safe_float(p.get('paid_amount')) for p in payments if p.get('payment_method') == 'UPI')
+        cash_payments = [p for p in payments if p.get('payment_method') == 'Cash']
+        upi_payments = [p for p in payments if p.get('payment_method') == 'UPI']
+        
+        cash_total = sum(safe_float(p.get('paid_amount')) for p in cash_payments)
+        upi_total = sum(safe_float(p.get('paid_amount')) for p in upi_payments)
+        
+        cash_count = len(cash_payments)
+        upi_count = len(upi_payments)
         
     except Exception as e:
         print(f"Error fetching payment data: {e}")
         payments = []
         cash_total = 0
         upi_total = 0
+        cash_count = 0
+        upi_count = 0
         
     return render_template('payment_data.html', 
                          payments=payments, 
                          cash_total=cash_total, 
-                         upi_total=upi_total)
+                         upi_total=upi_total,
+                         cash_count=cash_count,
+                         upi_count=upi_count,
+                         active_period=period)

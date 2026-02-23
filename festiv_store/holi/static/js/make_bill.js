@@ -401,7 +401,7 @@ function showUpiModal(upiUrl, amount, paymentRef) {
 
     qrImg.onload = () => {
         loading.style.display = 'none';
-        startPaymentPolling(paymentRef);
+        // startPaymentPolling(paymentRef); // Disabled automatic polling for manual method
     };
 
     qrImg.src = qrApiUrl;
@@ -437,7 +437,7 @@ function startPaymentPolling(paymentRef) {
             return;
         }
 
-        fetch(`/holi/api/check-payment-status/${paymentRef}`)
+        fetch(`/festiv_store/holi/api/check-payment-status/${paymentRef}`)
             .then(res => res.json())
             .then(data => {
                 console.log("Payment Status:", data.status);
@@ -504,7 +504,7 @@ function confirmUpiPayment() {
         confirmBtn.disabled = true;
 
         updatePaymentStatusUI("Confirming Receipt...", "warning");
-        fetch(`/holi/api/verify-upi-payment/${window.currentPaymentRef}`, { method: 'POST' })
+        fetch(`/festiv_store/holi/api/verify-upi-payment/${window.currentPaymentRef}`, { method: 'POST' })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {

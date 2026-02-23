@@ -30,6 +30,42 @@
             transform: translateY(0);
         }
     }
+
+    @media (max-width: 991px) {
+        .main-grid {
+            grid-template-columns: 1fr !important;
+            gap: 20px !important;
+        }
+
+        form {
+            padding: 15px !important;
+        }
+
+        .page-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 15px;
+        }
+
+        .header-actions {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-actions .btn {
+            flex: 1;
+            text-align: center;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .pricing-grid {
+            grid-template-columns: 1fr !important;
+            gap: 15px !important;
+        }
+    }
 </style>
 {% endblock %}
 

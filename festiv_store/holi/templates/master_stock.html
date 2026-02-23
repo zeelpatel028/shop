@@ -119,6 +119,24 @@
         border: 1px solid #EEF0F6 !important;
     }
 
+    @media (max-width: 768px) {
+        .elite-dashboard-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 15px;
+        }
+
+        .tabs-container {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .tab-btn {
+            padding: 10px 15px;
+            font-size: 0.75rem;
+        }
+    }
+
     @media (max-width: 640px) {
         .holi-dashboard {
             padding: 16px;
@@ -191,7 +209,7 @@
                                 p.sell_price or 0 }}</span>
                         </td>
                         <td data-label="Stock">
-                            <div class="stock-badge {% if p.stock <= 20 %}stock-low{% else %}stock-ok{% endif %}">
+                            <div class="stock-badge {% if p.stock <= 10 %}stock-low{% else %}stock-ok{% endif %}">
                                 {{ p.stock }} {{ p.product_unit }}
                             </div>
                             <div
