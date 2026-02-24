@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Coming Soon{% endblock %}
-{% block page_title %}Coming Soon...{% endblock %}
+{% block title %}Main Store Dashboard{% endblock %}
+{% block page_title %}Main Store Dashboard{% endblock %}
+
+{% block sidebar %}
+{% include 'sidemenu.html' %}
+{% endblock %}
 
 {% block content %}
 <div
@@ -13,8 +17,7 @@
     <h1 class="brand-name" style="font-size: 3.5rem; font-weight: 900; margin-bottom: 10px; color: var(--dark-black);">
         Coming Soon</h1>
     <p style="font-size: 1.2rem; color: var(--text-grey); max-width: 500px;">We are currently architecturalizing our
-        main
-        dashboard for an elite experience. Stay tuned for the revolution.</p>
+        Main Store features for an elite experience. Stay tuned for the revolution.</p>
 
     <style>
         @keyframes pulse {

@@ -2,26 +2,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-    /* Color Palette */
-    --primary-purple: #6C63FF;
+    /* Color Palette (Standardized to Elite Theme) */
+    --primary-purple: #6C5DD3;
     /* Purple */
-    --secondary-orange: #FF6D00;
+    --secondary-orange: #FF9F00;
     /* Orange */
     --accent-yellow: #FFD600;
-    /* Yellow */
-    --dark-black: #212121;
-    /* Black */
+    /* Yellow (kept for warnings/accents) */
+    --dark-black: #111827;
+    /* Elite Black */
     --light-white: #FFFFFF;
     /* White */
-    --grey-bg: #F4F5F9;
-    --text-grey: #757575;
+    --grey-bg: #F9FAFB;
+    /* Elite Gray Bg */
+    --text-grey: #6B7280;
+    /* Elite Gray Text */
+
+    /* Elite Specific Extensions */
+    --elite-black-light: #1F2937;
+    --elite-border: #E5E7EB;
 
     /* Transitions */
     --transition-speed: 0.3s;
 
     /* Shadows */
-    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    --hover-shadow: 0 8px 30px rgba(108, 99, 255, 0.2);
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    /* Elite Shadow */
+    --hover-shadow: 0 8px 30px rgba(108, 93, 211, 0.2);
 }
 
 * {

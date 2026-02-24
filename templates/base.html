@@ -28,19 +28,27 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Navbar -->
-            <header class="top-navbar" style="justify-content: flex-start;">
-                <div id="mobile-toggle" class="toggle-menu" style="display: none; margin-right: 20px;">
-                    <i class="fas fa-bars"></i>
-                </div>
-
-                <div class="brand-container" id="toggle-sidebar" style="cursor: pointer;">
+            <header class="top-navbar"
+                style="background: #fff; border-bottom: 1px solid var(--elite-border); color: #000; padding: 0 20px; height: 70px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--card-shadow);">
+                <div class="brand-container" id="toggle-sidebar"
+                    style="display: flex; align-items: center; gap: 15px; cursor: pointer;">
                     <div
-                        style="width: 35px; height: 35px; border-radius: 10px; overflow: hidden; margin-right: 15px; box-shadow: 0 0 15px rgba(142, 45, 226, 0.4); border: 2px solid white;">
+                        style="width: 40px; height: 40px; border-radius: 12px; overflow: hidden; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); border: 2px solid #000; flex-shrink: 0;">
                         <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Logo"
                             style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
-                    <span class="brand-name" style="font-weight: 900; letter-spacing: -0.5px;">Tulshi Shop</span>
+                    <span class="brand-name"
+                        style="color: #000; font-weight: 900; letter-spacing: -0.5px; font-size: 1.25rem;">Tulshi
+                        Shop</span>
                 </div>
+
+                <style>
+                    @media (max-width: 768px) {
+                        .brand-name {
+                            font-size: 1.1rem !important;
+                        }
+                    }
+                </style>
             </header>
 
             <!-- Flash Messages -->

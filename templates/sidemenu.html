@@ -9,15 +9,24 @@
                     style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             <span class="brand-name"
-                style="font-size: 1.2rem; font-weight: 900; white-space: nowrap; color: #fff !important;">Tulshi
-                Shop</span>
+                style="font-size: 1.2rem; font-weight: 900; white-space: nowrap; color: #fff !important;">
+                {% if request.blueprint == 'main_store' %}
+                Main Store
+                {% elif request.blueprint == 'festiv_store' %}
+                Tulshi Shop
+                {% else %}
+                Tulshi Shop
+                {% endif %}
+            </span>
         </div>
-        <div id="close-sidebar" style="cursor: pointer; color: #fff; display: none; padding: 5px;">
+        <div id="close-sidebar" style="cursor: pointer; color: #fff; display: none; padding: 5px;"
+            onclick="handleCloseSidebar()">
             <i class="fas fa-times" style="font-size: 1.4rem;"></i>
         </div>
     </div>
 
-    <nav class="sidebar-nav" style="padding: 25px 0;">
+    <nav class="sidebar-nav {% if request.blueprint == 'main_store' or request.blueprint == 'festiv_store' %}store-context{% else %}global-context{% endif %}"
+        style="padding: 25px 0;">
         <style>
             .sidebar-nav ul li a {
                 border-left: 4px solid transparent;
@@ -33,14 +42,33 @@
 
             .sidebar-nav ul li.active a,
             .sidebar-nav ul li a.active-link {
-                border-left: 4px solid #FFD700 !important;
-                background: #2d2d2d !important;
-                color: #fff !important;
                 box-shadow: none !important;
                 font-weight: 700;
             }
 
-            .sidebar-nav ul li a:hover {
+            /* Main and Festiv Store Active Styles */
+            .sidebar-nav.store-context ul li.active a,
+            .sidebar-nav.store-context ul li a.active-link {
+                border-left: 4px solid var(--elite-purple, #8A2BE2) !important;
+                background: rgba(108, 93, 211, 0.1) !important;
+                color: var(--elite-purple, #8A2BE2) !important;
+            }
+
+            /* Global Active Styles */
+            .sidebar-nav.global-context ul li.active a,
+            .sidebar-nav.global-context ul li a.active-link {
+                border-left: 4px solid #FFD700 !important;
+                background: #2d2d2d !important;
+                color: #fff !important;
+            }
+
+            /* Hover states */
+            .sidebar-nav.store-context ul li a:hover {
+                background: rgba(255, 255, 255, 0.03) !important;
+                color: #fff !important;
+            }
+
+            .sidebar-nav.global-context ul li a:hover {
                 background: #222 !important;
                 color: #fff !important;
             }
@@ -56,10 +84,139 @@
                 #close-sidebar {
                     display: block !important;
                 }
+
+                .sidebar.holi-sidebar {
+                    left: -260px !important;
+                    width: 260px !important;
+                    transform: none !important;
+                    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    z-index: 1050;
+                    box-shadow: none;
+                }
+
+                .sidebar.holi-sidebar.mobile-open,
+                .sidebar.holi-sidebar.mobile-active {
+                    left: 0 !important;
+                    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.3) !important;
+                }
             }
         </style>
+
+        <script>
+            function handleCloseSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+
+                if (sidebar) {
+                    sidebar.classList.remove('mobile-active');
+                    sidebar.classList.remove('mobile-open');
+                }
+
+                if (overlay) {
+                    overlay.classList.remove('active');
+                    overlay.style.display = 'none';
+                }
+
+                // If holi_base specific function is present
+                if (typeof window.toggleMobileSidebar === 'function' && sidebar.classList.contains('mobile-open')) {
+                    window.toggleMobileSidebar();
+                }
+            }
+        </script>
+
         <ul>
-            <!-- Standard App Links -->
+            {% if request.blueprint == 'main_store' %}
+            <!-- MAIN STORE LINKS -->
+            <li class="{% if request.endpoint == 'main_store.index' %}active{% endif %}">
+                <a href="{{ url_for('main_store.index') }}"
+                    class="{% if request.endpoint == 'main_store.index' %}active-link{% endif %}">
+                    <i class="fas fa-store"></i>
+                    <span>Main Store</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'main_store.add_product' %}active{% endif %}">
+                <a href="{{ url_for('main_store.add_product') }}"
+                    class="{% if request.endpoint == 'main_store.add_product' %}active-link{% endif %}">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Product</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'main_store.all_product' %}active{% endif %}">
+                <a href="{{ url_for('main_store.all_product') }}"
+                    class="{% if request.endpoint == 'main_store.all_product' %}active-link{% endif %}">
+                    <i class="fas fa-boxes"></i>
+                    <span>All Product</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'main_store.billing' %}active{% endif %}">
+                <a href="{{ url_for('main_store.billing') }}"
+                    class="{% if request.endpoint == 'main_store.billing' %}active-link{% endif %}">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Billing</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'main_store.revenues' %}active{% endif %}">
+                <a href="{{ url_for('main_store.revenues') }}"
+                    class="{% if request.endpoint == 'main_store.revenues' %}active-link{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Revenues</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'main_store.payments' %}active{% endif %}">
+                <a href="{{ url_for('main_store.payments') }}"
+                    class="{% if request.endpoint == 'main_store.payments' %}active-link{% endif %}">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Payments</span>
+                </a>
+            </li>
+
+            {% elif request.blueprint == 'festiv_store' %}
+            <!-- FESTIV STORE LINKS (from holi_sidemenu.html) -->
+            <li class="{% if request.endpoint == 'festiv_store.holi_dashboard' %}active{% endif %}">
+                <a href="{{ url_for('festiv_store.holi_dashboard') }}"
+                    class="{% if request.endpoint == 'festiv_store.holi_dashboard' %}active-link{% endif %}">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'festiv_store.add_product' %}active{% endif %}">
+                <a href="{{ url_for('festiv_store.add_product') }}"
+                    class="{% if request.endpoint == 'festiv_store.add_product' %}active-link{% endif %}">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Product</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'festiv_store.master_stock' %}active{% endif %}">
+                <a href="{{ url_for('festiv_store.master_stock') }}"
+                    class="{% if request.endpoint == 'festiv_store.master_stock' %}active-link{% endif %}">
+                    <i class="fas fa-boxes"></i>
+                    <span>All Product</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'festiv_store.make_bill' %}active{% endif %}">
+                <a href="{{ url_for('festiv_store.make_bill') }}"
+                    class="{% if request.endpoint == 'festiv_store.make_bill' %}active-link{% endif %}">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Make Bill</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'festiv_store.ledger' %}active{% endif %}">
+                <a href="{{ url_for('festiv_store.ledger') }}"
+                    class="{% if request.endpoint == 'festiv_store.ledger' %}active-link{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Revenue</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'festiv_store.payment_data' %}active{% endif %}">
+                <a href="{{ url_for('festiv_store.payment_data') }}"
+                    class="{% if request.endpoint == 'festiv_store.payment_data' %}active-link{% endif %}">
+                    <i class="fas fa-database"></i>
+                    <span>Payment Data</span>
+                </a>
+            </li>
+
+            {% else %}
+            <!-- DEFAULT / GLOBAL DASHBOARD LINKS -->
             <li class="{% if request.endpoint == 'home' %}active{% endif %}">
                 <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active-link{% endif %}">
                     <i class="fas fa-crown"></i>
@@ -73,6 +230,71 @@
                     <span>Festiv Store</span>
                 </a>
             </li>
+            <li class="{% if request.endpoint == 'main_store.index' %}active{% endif %}">
+                <a href="{{ url_for('main_store.index') }}"
+                    class="{% if request.endpoint == 'main_store.index' %}active-link{% endif %}">
+                    <i class="fas fa-store"></i>
+                    <span>Main Store</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'main_store.credit_customer' %}active{% endif %}">
+                <a href="{{ url_for('main_store.credit_customer') }}"
+                    class="{% if request.endpoint == 'main_store.credit_customer' %}active-link{% endif %}">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Credit Customer</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'main_store.seller' %}active{% endif %}">
+                <a href="{{ url_for('main_store.seller') }}"
+                    class="{% if request.endpoint == 'main_store.seller' %}active-link{% endif %}">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Seller</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'main_store.employee' %}active{% endif %}">
+                <a href="{{ url_for('main_store.employee') }}"
+                    class="{% if request.endpoint == 'main_store.employee' %}active-link{% endif %}">
+                    <i class="fas fa-id-badge"></i>
+                    <span>Employee</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+
+        {% if request.blueprint == 'main_store' or request.blueprint == 'festiv_store' %}
+        <div style="padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.03); margin-top: 20px;">
+            <ul>
+                {% if request.blueprint == 'main_store' %}
+                <li>
+                    <a href="{{ url_for('home') }}">
+                        <i class="fas fa-crown"></i>
+                        <span>App Dashboard</span>
+                    </a>
+                </li>
+                <li class="{% if request.endpoint == 'festiv_store.index' %}active{% endif %}">
+                    <a href="{{ url_for('festiv_store.index') }}"
+                        class="{% if request.endpoint == 'festiv_store.index' %}active-link{% endif %}">
+                        <i class="fas fa-th-large"></i>
+                        <span>Festiv Store</span>
+                    </a>
+                </li>
+                {% elif request.blueprint == 'festiv_store' %}
+                <li>
+                    <a href="{{ url_for('home') }}">
+                        <i class="fas fa-shield-heart"></i>
+                        <span>Main Core</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('festiv_store.index') }}">
+                        <i class="fas fa-store"></i>
+                        <span>Public View</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
         </ul>
     </nav>
 

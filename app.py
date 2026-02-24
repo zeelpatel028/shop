@@ -15,6 +15,9 @@ app.secret_key = 'supersecretkey'  # Required for flashing messages
 # Register Blueprints
 app.register_blueprint(festiv_store_bp, url_prefix='/festiv_store')
 
+from main_store import main_store_bp
+app.register_blueprint(main_store_bp, url_prefix='/main_store')
+
 # Initialize DB (Supabase)
 from database.db import init_db, supabase
 init_db(app)
