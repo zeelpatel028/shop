@@ -25,16 +25,17 @@ class DatabaseManager:
                 database_url = os.environ.get("DATABASE_URL")
                 
                 if database_url:
-                    # Fix protocol for SQLAlchemy/psycopg2 compatibility (postgres:// -> postgresql://)
+                    # 1. Fix protocol (postgres:// -> postgresql://)
                     if database_url.startswith("postgres://"):
                         database_url = database_url.replace("postgres://", "postgresql://", 1)
                     
-                    # Ensure sslmode=require if not present in the URL
+                    # 2. FORCE SSL for Render (Required in production)
                     if "sslmode=" not in database_url:
                         separator = "&" if "?" in database_url else "?"
                         database_url += f"{separator}sslmode=require"
 
-                    print("Connecting to Production DB using DATABASE_URL...")
+                    print("--- ENVIRONMENT: PRODUCTION (Render/Cloud) ---")
+                    print("Connecting via DATABASE_URL (SSL: require)")
                     cls._pool = pool.ThreadedConnectionPool(
                         int(os.environ.get("DB_MIN_CONN", 1)),
                         int(os.environ.get("DB_MAX_CONN", 10)),
@@ -44,7 +45,15 @@ class DatabaseManager:
                     # Priority 2: Individual variables (Local Dev)
                     host = os.environ.get('DB_HOST', '127.0.0.1')
                     port = os.environ.get('DB_PORT', '5433')
-                    print(f"Connecting to Local DB at {host}:{port}")
+                    
+                    # FORCE 'disable' for Localhost/127.0.0.1 to avoid common SSL errors on Windows
+                    if host in ['127.0.0.1', 'localhost']:
+                        ssl_mode = "disable"
+                    else:
+                        ssl_mode = os.environ.get("DB_SSL_MODE", "require")
+                    
+                    print("--- ENVIRONMENT: LOCAL DEVELOPMENT ---")
+                    print(f"Connecting to {host}:{port} (Forced SSL: {ssl_mode})")
                     cls._pool = pool.ThreadedConnectionPool(
                         int(os.environ.get("DB_MIN_CONN", 1)),
                         int(os.environ.get("DB_MAX_CONN", 10)),
@@ -53,24 +62,26 @@ class DatabaseManager:
                         user=os.environ.get("DB_USER", "postgres"),
                         password=os.environ.get("DB_PASSWORD", "zeel@123"),
                         port=port,
-                        sslmode=os.environ.get("DB_SSL_MODE", "disable")
+                        sslmode=ssl_mode
                     )
-                print("Database connection pool initialized.")
+                print("Database connection pool successfully initialized.")
             except Exception as e:
-                print(f"CRITICAL: Database connection failed: {e}")
-                # Don't crash immediately, but allow health checks to report failure
-                cls._pool = None
+                print(f"CRITICAL ERROR: Database connection failed: {e}")
+                cls._pool = None  # Ensure it's explicitly None on failure
         return cls._pool
 
     @classmethod
     @contextmanager
     def get_connection(cls):
-        pool = cls.get_pool()
-        conn = pool.getconn()
+        conn_pool = cls.get_pool()
+        if not conn_pool:
+            raise DatabaseConnectionError("Database connection pool is not initialized. Check your environment variables.")
+        
+        conn = conn_pool.getconn()
         try:
             yield conn
         finally:
-            pool.putconn(conn)
+            conn_pool.putconn(conn)
 
     @classmethod
     def close_all_connections(cls):
