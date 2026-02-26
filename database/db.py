@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Environment Variables
-DB_HOST = os.environ.get("DB_HOST", "127.0.0.1")
+# DATABASE CONFIGURATION
+DB_HOST = "localhost"
 DB_NAME = os.environ.get("DB_NAME", "tulshi_db")
 DB_USER = os.environ.get("DB_USER", "postgres")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "postgres")
@@ -47,9 +48,10 @@ class DatabaseManager:
             except Exception as e:
                 print(f"Error initializing connection pool: {e}")
                 # Fallback diagnostic for common local issues
-                if "server closed the connection" in str(e).lower():
-                    print("TIP: Your local PostgreSQL may be refusing SSL or the port is busy.")
-                raise DatabaseConnectionError(f"Could not connect to database: {e}")
+                if "server closed the connection" in str(e).lower() or "connection refused" in str(e).lower():
+                    print(f"TIP: Your local PostgreSQL on port {DB_PORT} may not be running or is rejecting connections from '{DB_HOST}'.")
+                    print(f"Try running 'netstat -ano | findstr :{DB_PORT}' to check if something is listening.")
+                raise DatabaseConnectionError(f"Could not connect to database on {DB_HOST}:{DB_PORT}: {e}")
         return cls._pool
 
     @classmethod
