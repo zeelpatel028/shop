@@ -1,9 +1,6 @@
 flask
-gunicorn
-supabflask
 psycopg2-binary
 python-dotenv
 requests
 gunicorn
 urllib3
-psycopg2-binary
