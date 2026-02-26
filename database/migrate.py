@@ -6,12 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def migrate():
-    db_host = os.environ.get("DB_HOST", "127.0.0.1")
-    db_name = os.environ.get("DB_NAME", "tulshi_db")
-    db_user = os.environ.get("DB_USER", "postgres")
-    db_password = os.environ.get("DB_PASSWORD", "postgres")
-    db_port = os.environ.get("DB_PORT", "5433")
-    db_ssl_mode = os.environ.get("DB_SSL_MODE", "disable")
+    db_host = os.environ.get("DB_HOST", "dpg-d6g1fqlm5p6s7393ra9g-a.singapore-postgres.render.com")
+    db_name = os.environ.get("DB_NAME", "shopdb_w6wu")
+    db_user = os.environ.get("DB_USER", "shopdb")
+    db_password = os.environ.get("DB_PASSWORD", "i8LGMATvuBiZ9qK7FRJT0HuncOmgMQVx")
+    db_port = os.environ.get("DB_PORT", "5432")
+    db_ssl_mode = os.environ.get("DB_SSL_MODE", "require")
 
     print(f"Connecting to {db_name} on {db_host}:{db_port} (SSL: {db_ssl_mode})...")
     
