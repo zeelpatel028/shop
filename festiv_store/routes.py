@@ -1,5 +1,6 @@
 from flask import render_template
-from . import festiv_store_bp
+from festiv_store import festiv_store_bp
+from database.db import supabase
 
 @festiv_store_bp.route('/')
 def index():

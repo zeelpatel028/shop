@@ -25,14 +25,16 @@ init_db(app)
 try:
     from festiv_store import festiv_store_bp
     app.register_blueprint(festiv_store_bp, url_prefix='/festiv_store')
-except ImportError:
-    logger.warning("festiv_store blueprint not found. Skipping registration.")
+    logger.info("Successfully registered festiv_store blueprint")
+except ImportError as e:
+    logger.error(f"Could not import festiv_store blueprint: {e}")
 
 try:
     from main_store import main_store_bp
     app.register_blueprint(main_store_bp, url_prefix='/main_store')
-except ImportError:
-    logger.warning("main_store blueprint not found. Skipping registration.")
+    logger.info("Successfully registered main_store blueprint")
+except ImportError as e:
+    logger.error(f"Could not import main_store blueprint: {e}")
 
 # --- PRODUCTION ENDPOINTS ---
 
@@ -82,6 +84,7 @@ def login():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    # Force use of port 5000 and 0.0.0.0 for Render compatibility locally
+    # Render environment provides PORT variable
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    # host='0.0.0.0' is required for cloud binding
+    app.run(host='0.0.0.0', port=port)

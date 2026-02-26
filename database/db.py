@@ -25,30 +25,41 @@ class DatabaseManager:
                 database_url = os.environ.get("DATABASE_URL")
                 
                 if database_url:
-                    print("Connecting to DB using DATABASE_URL...")
+                    # Fix protocol for SQLAlchemy/psycopg2 compatibility (postgres:// -> postgresql://)
+                    if database_url.startswith("postgres://"):
+                        database_url = database_url.replace("postgres://", "postgresql://", 1)
+                    
+                    # Ensure sslmode=require if not present in the URL
+                    if "sslmode=" not in database_url:
+                        separator = "&" if "?" in database_url else "?"
+                        database_url += f"{separator}sslmode=require"
+
+                    print("Connecting to Production DB using DATABASE_URL...")
                     cls._pool = pool.ThreadedConnectionPool(
                         int(os.environ.get("DB_MIN_CONN", 1)),
                         int(os.environ.get("DB_MAX_CONN", 10)),
-                        database_url,
-                        sslmode=os.environ.get("DB_SSL_MODE", "require")
+                        database_url
                     )
                 else:
                     # Priority 2: Individual variables (Local Dev)
-                    print(f"Connecting to DB using individual variables (Host: {os.environ.get('DB_HOST', '127.0.0.1')})")
+                    host = os.environ.get('DB_HOST', '127.0.0.1')
+                    port = os.environ.get('DB_PORT', '5433')
+                    print(f"Connecting to Local DB at {host}:{port}")
                     cls._pool = pool.ThreadedConnectionPool(
                         int(os.environ.get("DB_MIN_CONN", 1)),
                         int(os.environ.get("DB_MAX_CONN", 10)),
-                        host=os.environ.get("DB_HOST", "127.0.0.1"),
+                        host=host,
                         database=os.environ.get("DB_NAME", "tulshi_db"),
                         user=os.environ.get("DB_USER", "postgres"),
                         password=os.environ.get("DB_PASSWORD", "zeel@123"),
-                        port=os.environ.get("DB_PORT", "5433"),
+                        port=port,
                         sslmode=os.environ.get("DB_SSL_MODE", "disable")
                     )
-                print("Connection pool initialized successfully.")
+                print("Database connection pool initialized.")
             except Exception as e:
                 print(f"CRITICAL: Database connection failed: {e}")
-                raise DatabaseConnectionError(f"Could not connect to database: {e}")
+                # Don't crash immediately, but allow health checks to report failure
+                cls._pool = None
         return cls._pool
 
     @classmethod
