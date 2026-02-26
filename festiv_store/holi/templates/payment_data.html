@@ -422,8 +422,9 @@
 
 {% block content %}
 {% set total_collected = (cash_total|default(0)|float) + (upi_total|default(0)|float) %}
-{% set cash_pct = ((cash_total|default(0)|float / total_collected * 100)|round|int) if total_collected > 0 else 0 %}
-{% set upi_pct = (100 - cash_pct) if total_collected > 0 else 0 %}
+{% set total_count = (cash_count|default(0)|int) + (upi_count|default(0)|int) %}
+{% set cash_count_pct = ((cash_count|default(0)|int / total_count * 100)|round|int) if total_count > 0 else 0 %}
+{% set upi_count_pct = (100 - cash_count_pct) if total_count > 0 else 0 %}
 {% set pay_count = (payments|default([]))|length %}
 
 <div class="payment-data-container">
@@ -495,17 +496,17 @@
     <!-- ── Payment Split Bar ── -->
     <div class="split-bar-wrap">
         <div class="split-bar-header">
-            <div class="split-bar-title">Payment Method Distribution</div>
+            <div class="split-bar-title">Payment Method Distribution (by Bill Count)</div>
             <div class="split-bar-legend">
                 <div class="legend-dot">
-                    <span style="background: #111827;"></span> Cash {{ cash_pct }}%
+                    <span style="background: #111827;"></span> Cash {{ cash_count_pct }}% ({{ cash_count }})
                 </div>
                 <div class="legend-dot">
-                    <span style="background: #FF9F00;"></span> UPI {{ upi_pct }}%
+                    <span style="background: #FF9F00;"></span> UPI {{ upi_count_pct }}% ({{ upi_count }})
                 </div>
             </div>
         </div>
-        <div class="split-bar-track" data-cash="{{ cash_pct }}" data-upi="{{ upi_pct }}">
+        <div class="split-bar-track" data-cash="{{ cash_count_pct }}" data-upi="{{ upi_count_pct }}">
             <div class="split-bar-cash"></div>
             <div class="split-bar-upi"></div>
         </div>

@@ -4,3 +4,4 @@ supabase
 reportlab
 python-dotenv
 requests
+psycopg2-binary
