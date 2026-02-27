@@ -67,6 +67,12 @@ def health_check():
         "database": "connected" if DatabaseManager._pool else "disconnected"
     }), 200
 
+@app.route('/ping')
+def ping():
+    """Lightweight ping endpoint."""
+    return "pong", 200
+
+
 @app.route('/db-test')
 def db_test():
     """Diagnostic endpoint to verify database connectivity."""
@@ -104,8 +110,52 @@ def login():
     flash("Invalid credentials", "danger")
     return redirect(url_for('index'))
 
+# --- KEEP-ALIVE MECHANISM ---
+
+def start_keep_alive():
+    """Starts a background thread to ping the app and keep it alive on Render."""
+    def ping_self():
+        # Wait for the server to spin up
+        logger.info("Keep-alive initialization: Waiting 10s for server startup...")
+        time.sleep(10)
+        
+        # Priority: RENDER_EXTERNAL_URL > local URL
+        url = os.environ.get('RENDER_EXTERNAL_URL')
+        if not url:
+            port = int(os.environ.get("PORT", 5000))
+            url = f"http://localhost:{port}"
+        
+        ping_url = f"{url.rstrip('/')}/ping"
+        logger.info(f"Keep-alive thread active. Target: {ping_url}")
+        
+        headers = {'User-Agent': 'TulshiShop-KeepAlive/1.0'}
+        
+        while True:
+            try:
+                response = requests.get(ping_url, headers=headers, timeout=10)
+                if response.status_code == 200:
+                    # Successful ping
+                    pass
+                else:
+                    logger.warning(f"Keep-alive ping returned status: {response.status_code}")
+            except Exception as e:
+                logger.error(f"Keep-alive ping error: {e}")
+            
+            # Ping every 10 seconds exactly as requested
+            time.sleep(10)
+
+    # Use a daemon thread so it exits when the main process does
+    thread = threading.Thread(target=ping_self, daemon=True)
+    thread.start()
+
+
 if __name__ == '__main__':
+    # Start keep-alive thread if on Render or explicitly requested
+    if os.environ.get('RENDER') or os.environ.get('KEEP_ALIVE'):
+        start_keep_alive()
+
     # Render environment provides PORT variable
     port = int(os.environ.get("PORT", 5000))
     # Enable debug mode for auto-reloading during development
     app.run(host='0.0.0.0', port=port, debug=True)
+
