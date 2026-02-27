@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+
+{% block title %}Master Stock - Holi Hub{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('main_store.static', filename='css/master_stock.css') }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="holi-dashboard">
+    <!-- Header -->
+    <div class="elite-dashboard-header"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 6px solid #6C5DD3; padding-left: 15px; border-radius: 4px;">
+        <div class="elite-header-group">
+            <h1 class="elite-header-title" style="margin: 0; font-size: 2.2rem; font-weight: 900; color: #3A3663;">
+                Master Stock</h1>
+            <p class="elite-header-subtitle" style="margin: 5px 0 0; color: #8B95A5; font-size: 0.9rem;">Inventory
+                management for: <strong style="color: #FF9F00; text-transform: uppercase;">Main Collection 2026</strong>
+            </p>
+        </div>
+        <div class="elite-status-badge"
+            style="background: #6C5DD3; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(108, 93, 211, 0.2);">
+            Total Products: {{ products|length }}
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs-container"
+        style="background: white; padding: 4px; border-radius: 12px; display: inline-flex; gap: 4px; border: 1px solid #EEF0F6; margin-bottom: 28px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+        <button class="tab-btn active" onclick="openTab(event, 'all-products')"
+            style="border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
+            <i class="fas fa-boxes"></i> All Inventory
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'low-stock')"
+            style="border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
+            <i class="fas fa-exclamation-circle"></i> Low Stock
+            {% if low_stock|length > 0 %}
+            <span
+                style="background: #e11d48; color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.65rem; margin-left: 5px;">{{
+                low_stock|length }}</span>
+            {% endif %}
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'most-sold')"
+            style="border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
+            <i class="fas fa-fire"></i> Top Selling
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'removed-products')"
+            style="border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
+            <i class="fas fa-trash-arrow-up"></i> Removed
+            {% if inactive_products|length > 0 %}
+            <span
+                style="background: #8B95A5; color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.65rem; margin-left: 5px;">{{
+                inactive_products|length }}</span>
+            {% endif %}
+        </button>
+        <a href="{{ url_for('main_store.add_product') }}" class="tab-btn"
+            style="text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
+            <i class="fas fa-plus-circle"></i> Add New
+        </a>
+    </div>
+
+    <!-- 1. All Products Table -->
+    <div id="all-products" class="tab-content active fade-in">
+        <div class="elite-card elite-table-wrapper"
+            style="padding: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-radius: 12px; border: none;">
+            <table class="elite-table elite-table-responsive" style="margin-top: 0;">
+                <thead>
+                    <tr style="background: white; color: #6B7280; font-size: 0.75rem; letter-spacing: 1px;">
+                        <th style="border-bottom: 2px solid #111827; padding: 20px;">DETAILS</th>
+                        <th style="border-bottom: 2px solid #111827; padding: 20px;">PRICING</th>
+                        <th style="border-bottom: 2px solid #111827; padding: 20px;">INVENTORY</th>
+                        <th style="border-bottom: 2px solid #111827; padding: 20px;">TAX</th>
+                        <th style="border-bottom: 2px solid #111827; padding: 20px;">STATUS</th>
+                        <th style="border-bottom: 2px solid #111827; padding: 20px; text-align: right;">ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in products %}
+                    <tr>
+                        <td data-label="Product">
+                            <div style="font-weight: 800; color: var(--elite-black); font-size: 1rem;">{{ p.product_name
+                                }}</div>
+                            <div style="color: var(--elite-gray-text); font-size: 0.8rem; font-weight: 600;">{{
+                                p.category }} | {{ p.brand or 'Generic' }}</div>
+                        </td>
+                        <td data-label="Pricing">
+                            <span class="price-tag">Cost: <span style="font-weight: 700;">₹{{ p.cost_price or 0
+                                    }}</span></span>
+                            <span class="price-tag" style="color: var(--elite-purple); font-weight: 800;">Sell: ₹{{
+                                p.sell_price or 0 }}</span>
+                        </td>
+                        <td data-label="Stock">
+                            <div class="stock-badge {% if p.stock <= 10 %}stock-low{% else %}stock-ok{% endif %}">
+                                {{ p.stock }} {{ p.product_unit }}
+                            </div>
+                            <div
+                                style="font-size: 0.75rem; color: var(--elite-gray-text); margin-top: 4px; font-weight: 600;">
+                                Sold: {{ p.sold_stock or 0 }}</div>
+                        </td>
+                        <td data-label="Tax" style="font-weight: 700; color: var(--elite-gray-text);">{{ p.tax_percent
+                            or 0 }}%</td>
+                        <td data-label="Status">
+                            <span
+                                class="elite-status-pill {{ 'pill-active' if p.product_status == 'Active' else 'pill-inactive' }}">
+                                {{ p.product_status or 'Active' }}
+                            </span>
+                        </td>
+                        <td data-label="Action" style="text-align: right;">
+                            <form action="{{ url_for('main_store.delete_product', product_id=p.product_id) }}"
+                                method="POST" onsubmit="return confirm('Delete {{ p.product_name }}?');"
+                                style="display: inline-block;">
+                                <button type="submit"
+                                    style="background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; padding: 8px; border-radius: 8px; cursor: pointer; transition: 0.2s;">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not products %}
+            <div style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
+                <i class="fas fa-box-open"
+                    style="font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
+                No products found in inventory.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 2. Low Stock Table -->
+    <div id="low-stock" class="tab-content fade-in" style="display: none;">
+        <div class="elite-card elite-table-wrapper" style="padding: 0;">
+            <table class="elite-table elite-table-responsive">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Current Stock</th>
+                        <th>Brand</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in low_stock %}
+                    <tr>
+                        <td data-label="Product" style="font-weight: 800; color: var(--elite-black);">{{ p.product_name
+                            or p.name }}</td>
+                        <td data-label="Stock">
+                            <div class="stock-badge stock-low">{{ p.stock }} units</div>
+                        </td>
+                        <td data-label="Brand">{{ p.brand or '-' }}</td>
+                        <td data-label="Action">
+                            <a href="{{ url_for('main_store.add_product') }}"
+                                style="color: var(--elite-purple); font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-plus-circle"></i> Restock
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
+                            <i class="fas fa-check-circle"
+                                style="color: #16a34a; font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
+                            All inventory levels are healthy.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 3. Most Sold Table -->
+    <div id="most-sold" class="tab-content fade-in" style="display: none;">
+        <div class="elite-card elite-table-wrapper" style="padding: 0;">
+            <table class="elite-table elite-table-responsive">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Product</th>
+                        <th>Sold</th>
+                        <th>Rev. Est.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in most_sold[:10] %}
+                    <tr>
+                        <td data-label="Rank" style="font-weight: 900; color: var(--elite-purple);">#{{ loop.index }}
+                        </td>
+                        <td data-label="Product" style="font-weight: 800;">{{ p.product_name or p.name }}</td>
+                        <td data-label="Sold" style="font-weight: 800; color: #16a34a;">{{ p.sales }} units</td>
+                        <td data-label="Revenue" style="font-weight: 800;">₹{{ (p.sell_price or p.base_price or 0) *
+                            p.sales }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
+                            No sales data available yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 4. Removed Products Table -->
+    <div id="removed-products" class="tab-content fade-in" style="display: none;">
+        <div class="elite-card elite-table-wrapper" style="padding: 0;">
+            <table class="elite-table elite-table-responsive">
+                <thead>
+                    <tr>
+                        <th>Details</th>
+                        <th>Inventory</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in inactive_products %}
+                    <tr>
+                        <td data-label="Product">
+                            <div style="font-weight: 800; color: #8B95A5; font-size: 1rem;">{{ p.product_name }}</div>
+                            <div style="color: var(--elite-gray-text); font-size: 0.8rem; font-weight: 600;">{{
+                                p.category }} | {{ p.brand or 'Generic' }}</div>
+                        </td>
+                        <td data-label="Stock">
+                            <div class="stock-badge" style="background: #F3F4F6; color: #6B7280;">
+                                {{ p.stock }} {{ p.product_unit }}
+                            </div>
+                        </td>
+                        <td data-label="Action" style="text-align: right;">
+                            <form action="{{ url_for('main_store.restore_product', product_id=p.product_id) }}"
+                                method="POST" onsubmit="return confirm('Restore {{ p.product_name }} to Active?');"
+                                style="display: inline-block;">
+                                <button type="submit"
+                                    style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 0.8rem;">
+                                    <i class="fas fa-undo"></i> Restore
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if not inactive_products %}
+            <div style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
+                <i class="fas fa-trash-arrow-up"
+                    style="font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
+                No removed products.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('main_store.static', filename='js/master_stock.js') }}"></script>
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName).style.display = "block";
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+</script>
+{% endblock %}

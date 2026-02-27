@@ -156,23 +156,23 @@
                     <span>Add Product</span>
                 </a>
             </li>
-            <li class="{% if request.endpoint == 'main_store.all_product' %}active{% endif %}">
-                <a href="{{ url_for('main_store.all_product') }}"
-                    class="{% if request.endpoint == 'main_store.all_product' %}active-link{% endif %}">
+            <li class="{% if request.endpoint == 'main_store.master_stock' %}active{% endif %}">
+                <a href="{{ url_for('main_store.master_stock') }}"
+                    class="{% if request.endpoint == 'main_store.master_stock' %}active-link{% endif %}">
                     <i class="fas fa-boxes"></i>
                     <span>All Product</span>
                 </a>
             </li>
-            <li class="{% if request.endpoint == 'main_store.billing' %}active{% endif %}">
-                <a href="{{ url_for('main_store.billing') }}"
-                    class="{% if request.endpoint == 'main_store.billing' %}active-link{% endif %}">
+            <li class="{% if request.endpoint == 'main_store.make_bill' %}active{% endif %}">
+                <a href="{{ url_for('main_store.make_bill') }}"
+                    class="{% if request.endpoint == 'main_store.make_bill' %}active-link{% endif %}">
                     <i class="fas fa-file-invoice-dollar"></i>
                     <span>Billing</span>
                 </a>
             </li>
-            <li class="{% if request.endpoint == 'main_store.revenues' %}active{% endif %}">
-                <a href="{{ url_for('main_store.revenues') }}"
-                    class="{% if request.endpoint == 'main_store.revenues' %}active-link{% endif %}">
+            <li class="{% if request.endpoint == 'main_store.ledger' %}active{% endif %}">
+                <a href="{{ url_for('main_store.ledger') }}"
+                    class="{% if request.endpoint == 'main_store.ledger' %}active-link{% endif %}">
                     <i class="fas fa-chart-line"></i>
                     <span>Revenues</span>
                 </a>

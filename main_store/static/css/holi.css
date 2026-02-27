@@ -1,0 +1,471 @@
+/* Holi Dashboard - Elite "Purple, White, Black" Architecture */
+
+:root {
+    --elite-purple: #6C5DD3;
+    --elite-orange: #FF9F00;
+    --elite-black: #111827;
+    --elite-black-light: #1F2937;
+    --elite-white: #FFFFFF;
+    --elite-gray-bg: #F9FAFB;
+    --elite-gray-text: #6B7280;
+    --elite-border: #E5E7EB;
+    --elite-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.holi-dashboard,
+.ledger-container,
+.bill-container,
+.add-product-container,
+.payment-data-container {
+    padding: 40px 40px 40px 40px;
+    animation: slideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.content-wrapper {
+    padding-top: 30px !important;
+}
+
+.content-wrapper>.page-title {
+    margin-top: 10px !important;
+    margin-bottom: 25px !important;
+    padding-left: 40px !important;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Sidebar Integrated Luxury */
+.holi-sidebar {
+    background: var(--elite-black) !important;
+    border: none !important;
+}
+
+.holi-sidebar .logo span {
+    color: var(--elite-white) !important;
+    font-weight: 800;
+}
+
+.active-link {
+    background: var(--elite-purple) !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(142, 45, 226, 0.4);
+}
+
+/* Top Hero Grid */
+.elite-hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 25px;
+    margin-bottom: 50px;
+}
+
+.elite-stat-card {
+    background: var(--elite-black-light);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.4s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.elite-stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--elite-primary);
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.elite-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    border-color: var(--elite-primary);
+}
+
+.elite-stat-card:hover::after {
+    opacity: 1;
+}
+
+.elite-stat-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.elite-stat-value {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--elite-black);
+    letter-spacing: -1px;
+}
+
+.elite-stat-icon {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2.5rem;
+    color: rgba(142, 45, 226, 0.05);
+    transition: 0.4s;
+}
+
+.elite-stat-card:hover .elite-stat-icon {
+    color: rgba(142, 45, 226, 0.15);
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Elite Table Layout */
+.elite-content-row {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr;
+    gap: 30px;
+}
+
+.elite-card {
+    background: var(--elite-white) !important;
+    border-radius: 24px;
+    padding: 35px;
+    box-shadow: var(--elite-shadow);
+    border: 1px solid var(--elite-border);
+}
+
+.elite-card-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--elite-black);
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.elite-card-title i {
+    color: var(--elite-purple);
+}
+
+.elite-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+}
+
+.elite-table-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+
+.elite-table-wrapper::-webkit-scrollbar-track {
+    background: var(--elite-gray-bg);
+}
+
+.elite-table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--elite-purple);
+    border-radius: 10px;
+}
+
+.elite-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.elite-table th {
+    text-align: left;
+    padding: 15px 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #333;
+}
+
+.elite-table td {
+    padding: 20px;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #222;
+    color: #eee;
+}
+
+.elite-table tr:hover td {
+    background: #222;
+}
+
+.elite-status-pill {
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--elite-primary);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+/* Control Area Black Premium */
+.elite-control-card {
+    background: var(--elite-black) !important;
+    color: var(--elite-white);
+    border: none;
+}
+
+.elite-control-card .elite-card-title {
+    color: var(--elite-white);
+}
+
+.elite-action-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 12px;
+}
+
+.elite-action-btn:hover {
+    background: var(--elite-primary);
+    border-color: var(--elite-primary);
+    color: #000;
+    transform: scale(1.02);
+}
+
+.elite-action-btn i {
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+/* Luxury Dashboard Headers */
+.elite-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.elite-header-group {
+    position: relative;
+    padding-left: 20px;
+}
+
+.elite-header-group::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 80%;
+    background: linear-gradient(180deg, var(--elite-purple), var(--elite-orange));
+    border-radius: 10px;
+}
+
+.elite-header-title {
+    font-size: 2.5rem !important;
+    font-weight: 900 !important;
+    margin: 0 !important;
+    letter-spacing: -1px;
+    background: linear-gradient(90deg, var(--elite-black), var(--elite-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.elite-header-subtitle {
+    font-size: 0.95rem;
+    color: var(--elite-gray-text);
+    margin-top: 5px !important;
+    font-weight: 600;
+}
+
+.elite-header-subtitle strong {
+    color: var(--elite-orange) !important;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.mobile-nav-toggle {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--elite-white);
+    margin-bottom: 15px;
+    width: 45px;
+    height: 45px;
+    background: var(--elite-grey-light);
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.mobile-nav-toggle:hover {
+    background: var(--elite-purple);
+    color: white;
+}
+
+.elite-status-badge {
+    background: #000;
+    color: #fff;
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+/* Old h1/p styles removed — now using .elite-header-title and .elite-header-subtitle */
+
+/* Sidebar Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+    }
+
+    .sidebar.mobile-active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .content-wrapper {
+        padding-top: 90px !important;
+    }
+
+    .holi-dashboard {
+        padding: 20px 15px;
+    }
+}
+
+/* Responsive Master */
+@media (max-width: 1280px) {
+    .elite-hero-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 1024px) {
+    .elite-hero-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .elite-content-row {
+        grid-template-columns: 1fr;
+    }
+
+    .holi-dashboard {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .elite-header-group h1 {
+        font-size: 2.2rem;
+    }
+
+    .elite-stat-value {
+        font-size: 1.8rem;
+    }
+
+    .elite-card {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 640px) {
+    .elite-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .elite-header-group h1 {
+        font-size: 1.8rem;
+    }
+
+    .elite-dashboard-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 15px;
+    }
+
+    .mobile-nav-toggle {
+        display: flex;
+    }
+}
+
+/* --- Global Responsive Table Utilities --- */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+    border-radius: 12px;
+}
+
+.elite-table-responsive,
+.pay-table,
+.elite-table {
+    min-width: 900px !important;
+    /* Force "Laptop View" on all screens */
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.elite-table-responsive td,
+.elite-table-responsive th,
+.pay-table td,
+.pay-table th,
+.elite-table td,
+.elite-table th {
+    white-space: nowrap !important;
+    /* Prevent text wrapping */
+}
+
+/* Scrollbar styling for better UX */
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: var(--elite-gray-bg);
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--elite-purple);
+    border-radius: 10px;
+}

@@ -1,0 +1,572 @@
+{% extends 'base.html' %}
+
+{% block title %}Revenue Ledger - Holi Hub{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<style>
+    .content-wrapper {
+        background: #F8F9FC !important;
+        padding: 0 !important;
+    }
+
+    .ledger-container {
+        padding: 40px;
+        max-width: 1440px;
+        margin: 0 auto;
+        animation: fadeUp 0.6s ease;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Filter Segmented Control */
+    .period-filters {
+        display: flex;
+        background: white;
+        padding: 4px;
+        border-radius: 12px;
+        border: 1px solid #EEF0F6;
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .period-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .filter-link {
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #8B95A5;
+        font-weight: 600;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .filter-link:hover {
+        color: #6C5DD3;
+        background: #F0EEFF;
+    }
+
+    .filter-link.active {
+        background: #6C5DD3;
+        color: white;
+        box-shadow: 0 4px 12px rgba(108, 93, 211, 0.2);
+    }
+
+    /* ─── Stat Cards ─── */
+    .pay-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+
+    .pay-stat-card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 22px 24px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #EEF0F6;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .pay-stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+    }
+
+    .psc-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        margin-bottom: 16px;
+    }
+
+    .psc-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #8B95A5;
+        margin-bottom: 6px;
+    }
+
+    .psc-value {
+        font-size: 1.85rem;
+        font-weight: 900;
+        color: #111827;
+        letter-spacing: -1px;
+        line-height: 1;
+    }
+
+    .psc-sub {
+        font-size: 0.78rem;
+        font-weight: 600;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #6B7280;
+    }
+
+    .psc-glow {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        right: -30px;
+        top: -30px;
+        opacity: 0.08;
+        transition: opacity 0.3s;
+    }
+
+    .pay-stat-card:hover .psc-glow {
+        opacity: 0.14;
+    }
+
+    /* Analytics Chart */
+    .chart-card {
+        background: #fff;
+        padding: 24px;
+        border-radius: 18px;
+        border: 1px solid #EEF0F6;
+        margin-bottom: 28px;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .chart-title {
+        font-weight: 800;
+        color: #111827;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* ─── Transaction Table Card ─── */
+    .pay-table-card {
+        background: #fff;
+        border-radius: 18px;
+        padding: 24px;
+        border: 1px solid #EEF0F6;
+    }
+
+    .ptc-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .ptc-title {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .ptc-count {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 8px;
+        background: #F0EEFF;
+        color: #6C5DD3;
+    }
+
+    /* ─── Table ─── */
+    .pay-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .pay-table thead th {
+        text-align: left;
+        padding: 12px 16px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #8B95A5;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        border-bottom: 2px solid #F0F1F5;
+        white-space: nowrap;
+    }
+
+    .pay-table tbody td {
+        padding: 14px 16px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 1px solid #F3F4F8;
+        white-space: nowrap;
+    }
+
+    .pay-table tbody tr:hover {
+        background: #FAFBFE;
+    }
+
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+
+    .status-success {
+        background: #ECFDF5;
+        color: #10B981;
+    }
+
+    .status-pending {
+        background: #FFF4E5;
+        color: #F97316;
+    }
+
+    .view-btn {
+        color: #6C5DD3;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 600;
+        font-size: 0.82rem;
+    }
+
+    .td-amount {
+        text-align: right !important;
+        font-weight: 800 !important;
+        color: #111827 !important;
+    }
+
+    .td-profit {
+        text-align: right !important;
+        font-weight: 700 !important;
+        color: #10B981 !important;
+    }
+
+
+    @media (max-width: 1024px) {
+        .pay-stats {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .pay-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .ledger-container {
+            padding: 16px;
+        }
+
+        .period-filters {
+            width: 100%;
+            padding: 2px;
+        }
+
+        .filter-link {
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            flex: 1;
+            text-align: center;
+        }
+
+        .chart-card {
+            padding: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ledger-container">
+    <!-- Header -->
+    <div class="elite-dashboard-header"
+        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+        <div class="elite-header-group" style="display: flex; gap: 15px; align-items: center;">
+            <div
+                style="width: 5px; height: 50px; background: linear-gradient(to bottom, #F97316, #FBBF24); border-radius: 4px;">
+            </div>
+            <div>
+                <h1 class="elite-header-title"
+                    style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; color: #111827;">
+                    Revenue <span style="color: #6C5DD3;">Ledger</span>
+                </h1>
+                <p class="elite-header-subtitle"
+                    style="margin: 5px 0 0 0; color: #6B7280; font-size: 0.95rem; font-weight: 600;">
+                    Financial overview for <strong style="color: #F97316; text-transform: uppercase;">{{
+                        (active_period|default('all')) }}</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="period-filters">
+            <a href="{{ url_for('main_store.ledger', period='all') }}"
+                class="filter-link {% if active_period|default('all') == 'all' %}active{% endif %}">All Time</a>
+            <a href="{{ url_for('main_store.ledger', period='day') }}"
+                class="filter-link {% if active_period|default('') == 'day' %}active{% endif %}">Today</a>
+            <a href="{{ url_for('main_store.ledger', period='week') }}"
+                class="filter-link {% if active_period|default('') == 'week' %}active{% endif %}">This Week</a>
+            <a href="{{ url_for('main_store.ledger', period='month') }}"
+                class="filter-link {% if active_period|default('') == 'month' %}active{% endif %}">This Month</a>
+            <a href="{{ url_for('main_store.ledger', period='year') }}"
+                class="filter-link {% if active_period|default('') == 'year' %}active{% endif %}">This Year</a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="pay-stats">
+        <div class="pay-stat-card">
+            <div class="psc-glow" style="background: #6C5DD3;"></div>
+            <div class="psc-icon" style="background: #F0EEFF; color: #6C5DD3;">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="psc-label">Total Revenue</div>
+            <div class="psc-value">₹{{ "{:,.0f}".format(total_revenue|default(0)|float) }}</div>
+            <div class="psc-sub">
+                <i class="fas fa-arrow-up" style="font-size: 0.6rem; color: #10B981;"></i>
+                Gross Sales
+            </div>
+        </div>
+
+        <div class="pay-stat-card">
+            <div class="psc-glow" style="background: #10B981;"></div>
+            <div class="psc-icon" style="background: #ECFDF5; color: #10B981;">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="psc-label">Net Profit</div>
+            <div class="psc-value" style="color: #10B981;">₹{{ "{:,.0f}".format(total_profit|default(0)|float) }}</div>
+            <div class="psc-sub">
+                <i class="fas fa-check-circle" style="font-size: 0.6rem;"></i>
+                After Costs
+            </div>
+        </div>
+
+        <div class="pay-stat-card">
+            <div class="psc-glow" style="background: #111827;"></div>
+            <div class="psc-icon" style="background: #F3F4F6; color: #111827;">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <div class="psc-label">Transactions</div>
+            <div class="psc-value">{{ total_bills|default(0) }}</div>
+            <div class="psc-sub">
+                <i class="fas fa-shopping-bag" style="font-size: 0.6rem;"></i>
+                Total Orders
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Chart -->
+    <div class="chart-card">
+        <div class="chart-header">
+            <div class="chart-title">
+                <i class="fas fa-chart-area" style="color: var(--accent-purple);"></i>
+                Revenue Trend
+            </div>
+            <div style="font-size: 0.8rem; color: var(--elite-gray-text); font-weight: 600;">
+                <span
+                    style="display:inline-block; width:10px; height:10px; background:var(--accent-purple); border-radius:50%; margin-right:5px;"></span>
+                Daily Revenue
+            </div>
+        </div>
+        <div style="height: 350px; width: 100%;">
+            <canvas id="ledgerChart" data-labels='{{ (graph_labels|default([]))|tojson }}'
+                data-revenue='{{ (graph_data|default([]))|tojson }}'>
+            </canvas>
+        </div>
+    </div>
+
+    <!-- Transaction History Table -->
+    <div class="pay-table-card">
+        <div class="ptc-header">
+            <div class="ptc-title">
+                <i class="fas fa-list" style="color: #F97316;"></i>
+                Transaction History
+            </div>
+            <div class="ptc-count">Showing {{ transactions|length if transactions else 0 }} records</div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="pay-table">
+                <thead>
+                    <tr>
+                        <th>BILL #</th>
+                        <th>CUSTOMER</th>
+                        <th>DATE & TIME</th>
+                        <th>STATUS</th>
+                        <th>BILL URL</th>
+                        <th>PROFIT</th>
+                        <th class="td-amount">TOTAL AMOUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if transactions %}
+                    {% for txn in transactions %}
+                    <tr>
+                        <td>#{{ txn.bill_number|default('-') }}</td>
+                        <td>
+                            <div style="font-weight: 700; color: #111827;">{{ txn.customer_name|default('Walk-in') }}
+                            </div>
+                            {% if txn.customer_phone %}
+                            <div style="font-size: 0.75rem; color: #6B7280;">{{ txn.customer_phone }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="color: #4B5563;">{{ txn.date|default('-') }}</div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-success">Completed</span>
+                        </td>
+                        <td>
+                            {% if txn.bill_url %}
+                            <a href="{{ txn.bill_url }}" target="_blank" class="view-btn">
+                                <i class="fas fa-external-link-alt"></i> View
+                            </a>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td class="td-profit">₹{{ "{:,.0f}".format(txn.profit|default(0)|float) }}</td>
+                        <td class="td-amount">₹{{ "{:,.0f}".format(txn.total_amount|default(0)|float) }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 60px 20px;">
+                            <i class="fas fa-folder-open"
+                                style="font-size: 3.5rem; color: #EEF0F6; margin-bottom: 15px;"></i>
+                            <div style="color: #8B95A5; font-weight: 600; font-size: 0.95rem;">No transactions found for
+                                this period.</div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Guard against missing canvas element
+        var canvasEl = document.getElementById('ledgerChart');
+        if (!canvasEl) {
+            console.warn('ledgerChart canvas not found, skipping chart render.');
+            return;
+        }
+
+        var ctx = canvasEl.getContext('2d');
+
+        // Read chart data from canvas data-attributes (avoids Jinja2 inside JS)
+        var labels = JSON.parse(canvasEl.getAttribute('data-labels') || '[]');
+        var revenueData = JSON.parse(canvasEl.getAttribute('data-revenue') || '[]');
+
+        // Guard against empty data — show a "No data" message instead of empty chart
+        if (!labels.length || !revenueData.length) {
+            canvasEl.parentElement.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center;justify-content:center;height:100%;color:#8B95A5;font-weight:600;"><i class="far fa-image" style="font-size:3.5rem; color: #EEF0F6; margin-bottom: 15px;"></i> No chart data available for this period.</div>';
+            return;
+        }
+
+        // Create Gradient
+        var gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(108, 93, 211, 0.2)');
+        gradient.addColorStop(1, 'rgba(108, 93, 211, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue',
+                    data: revenueData,
+                    borderColor: '#6C5DD3',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#6C5DD3',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#111827',
+                        padding: 12,
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        displayColors: false,
+                        callbacks: {
+                            label: function (context) {
+                                var val = context.parsed.y;
+                                return 'Revenue: ₹' + (val != null ? val.toLocaleString() : '0');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.03)' },
+                        ticks: {
+                            callback: function (v) { return '₹' + v.toLocaleString(); },
+                            font: { weight: '600' },
+                            color: '#6B7280'
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { weight: '600' },
+                            color: '#6B7280'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

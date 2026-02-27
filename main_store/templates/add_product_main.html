@@ -1,201 +1,191 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Product - Main Store{% endblock %}
+{% block title %}Add Product - Holi Hub{% endblock %}
 
 {% block extra_css %}
-<style>
-    .content-wrapper {
-        background: #F8F9FC !important;
-        padding: 0 !important;
-    }
+{{ super() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('main_store.static', filename='css/add_product.css') }}">
 
-    .add-product-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 40px;
-        animation: fadeUp 0.6s ease;
-    }
-
-    @keyframes fadeUp {
-        from {
-            opacity: 0;
-            transform: translateY(15px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .card {
-        background: #fff;
-        border-radius: 18px;
-        padding: 30px;
-        border: 1px solid #EEF0F6;
-        margin-bottom: 24px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        display: block;
-        font-weight: 700;
-        color: #374151;
-        margin-bottom: 8px;
-        font-size: 0.9rem;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 12px 16px;
-        border-radius: 10px;
-        border: 1px solid #D1D5DB;
-        font-size: 1rem;
-        transition: all 0.2s;
-    }
-
-    .form-control:focus {
-        border-color: #6C5DD3;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(108, 93, 211, 0.1);
-    }
-
-    .btn {
-        padding: 12px 24px;
-        border-radius: 10px;
-        font-weight: 700;
-        transition: all 0.3s;
-        cursor: pointer;
-        border: none;
-    }
-
-    .btn-primary {
-        background: #6C5DD3;
-        color: #fff;
-    }
-
-    .btn-primary:hover {
-        background: #5a4db8;
-        transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-        background: #F3F4F6;
-        color: #374151;
-        margin-right: 10px;
-    }
-
-    .grid-2 {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-
-    @media (max-width: 768px) {
-        .grid-2 {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
 {% endblock %}
+
+{% block page_title %}{% endblock %}
 
 {% block content %}
 <div class="add-product-container">
-    <div style="margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between;">
-        <h1 style="font-size: 1.8rem; font-weight: 800; color: #111827; margin: 0;">Add New Product</h1>
-        <a href="{{ url_for('main_store.index') }}" style="color: #6C5DD3; text-decoration: none; font-weight: 700;"><i
-                class="fas fa-arrow-left"></i> Back to Dashboard</a>
-    </div>
-
     <form action="{{ url_for('main_store.add_product') }}" method="POST">
-        <div class="card">
-            <h3
-                style="margin-top: 0; margin-bottom: 20px; font-size: 1.1rem; border-bottom: 1px solid #F3F4F8; padding-bottom: 15px;">
-                General Information</h3>
-            <div class="form-group">
-                <label class="form-label">Product Name</label>
-                <input type="text" name="product_name" class="form-control" placeholder="Enter product name" required>
-            </div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label class="form-label">Brand</label>
-                    <input type="text" name="brand" class="form-control" placeholder="Brand name">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select name="category" class="form-control">
-                        <option value="Groceries">Groceries</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Clothing">Clothing</option>
-                        <option value="Household">Household</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
+        <div class="page-header">
+            <h1 class="page-title">Add Product</h1>
+            <div class="header-actions">
+                <a href="{{ url_for('main_store.master_stock') }}" class="btn btn-secondary">Discard</a>
+                <button type="submit" class="btn btn-primary">Add Product</button>
             </div>
         </div>
 
-        <div class="card">
-            <h3
-                style="margin-top: 0; margin-bottom: 20px; font-size: 1.1rem; border-bottom: 1px solid #F3F4F8; padding-bottom: 15px;">
-                Pricing & Inventory</h3>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label class="form-label">Cost Price (₹)</label>
-                    <input type="number" step="0.01" name="cost_price" id="cost_price" class="form-control"
-                        placeholder="0.00">
+        <div class="main-grid">
+            <!-- Main Column -->
+            <div class="main-column">
+                <!-- General Info -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle"></i> General Information
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" name="product_name" class="form-control"
+                            placeholder="e.g. Organic Holi Colors Pack" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Brand</label>
+                        <input type="text" name="brand" class="form-control" placeholder="e.g. Festiv Brand">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Store Name</label>
+                        <input type="text" name="store_name" class="form-control" value="Main Store"
+                            placeholder="e.g. Main Store">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Base Price (₹)</label>
-                    <input type="number" step="0.01" name="base_price" id="base_price" class="form-control"
-                        placeholder="0.00" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Tax (%)</label>
-                    <input type="number" step="0.1" name="tax_percent" id="tax_percent" class="form-control"
-                        placeholder="0.0">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Sell Price (₹)</label>
-                    <input type="number" step="0.01" name="sell_price" id="sell_price" class="form-control"
-                        placeholder="0.00" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Stock Quantity</label>
-                    <input type="number" name="stock" class="form-control" placeholder="0" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Unit</label>
-                    <input type="text" name="product_unit" class="form-control" placeholder="e.g. piece, kg, box">
+
+                <!-- Organization & Status -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-layer-group"></i> Organization & Status
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-control category-select">
+                            <option value="Colors">Colors</option>
+                            <option value="Fersan">Fersan</option>
+                            <option value="Pichkari">Pichkari</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Product Status</label>
+                        <select name="product_status" class="form-control category-select">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Draft">Draft</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stock Status</label>
+                        <select name="stock_status" class="form-control category-select">
+                            <option value="In Stock">In Stock</option>
+                            <option value="Low Stock">Low Stock</option>
+                            <option value="Out of Stock">Out of Stock</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button type="reset" class="btn btn-secondary">Reset Form</button>
-            <button type="submit" class="btn btn-primary">Save Product</button>
+            <!-- Details Column -->
+            <div class="details-column">
+                <!-- Pricing -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-hand-holding-usd"></i> Pricing & Tax
+                    </div>
+                    <div class="pricing-grid">
+                        <div class="form-group">
+                            <label class="form-label">Cost Price</label>
+                            <input type="number" name="cost_price" step="0.01" class="form-control" placeholder="0.00"
+                                id="cost_price">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Base Price</label>
+                            <input type="number" name="base_price" step="0.01" class="form-control" placeholder="0.00"
+                                id="base_price" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tax (%)</label>
+                            <input type="number" name="tax_percent" step="0.01" class="form-control" placeholder="0"
+                                id="tax_percent">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tax Amount</label>
+                            <input type="number" name="tax_amount" step="0.01" class="form-control" placeholder="0.00"
+                                id="tax_amount" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Profit Margin</label>
+                            <input type="number" name="profit_margin" step="0.01" class="form-control"
+                                placeholder="0.00" id="profit_margin" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sell Price</label>
+                            <input type="number" name="sell_price" step="0.01" class="form-control" placeholder="0.00"
+                                id="sell_price" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-warehouse"></i> Inventory
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stock Quantity</label>
+                        <input type="number" name="stock" class="form-control" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sold Stock</label>
+                        <input type="number" name="sold_stock" class="form-control" placeholder="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit</label>
+                        <select name="product_unit" class="form-control category-select">
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="ltr">ltr</option>
+                            <option value="pcs">pcs</option>
+                            <option value="box">box</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Price Unit Description</label>
+                        <input type="text" name="price_quantity" class="form-control" placeholder="e.g. per 1 kg">
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
 </div>
 
 <script>
-    const baseInput = document.getElementById('base_price');
-    const taxInput = document.getElementById('tax_percent');
-    const sellInput = document.getElementById('sell_price');
+    const costPrice = document.getElementById('cost_price');
+    const basePrice = document.getElementById('base_price');
+    const taxPercent = document.getElementById('tax_percent');
+    const taxAmount = document.getElementById('tax_amount');
+    const profitMargin = document.getElementById('profit_margin');
+    const sellPrice = document.getElementById('sell_price');
 
-    function updateSellPrice() {
-        const base = parseFloat(baseInput.value) || 0;
-        const tax = parseFloat(taxInput.value) || 0;
-        if (base > 0) {
-            const total = base + (base * tax / 100);
-            sellInput.value = total.toFixed(2);
-        }
+    function calculateFromBase() {
+        const base = parseFloat(basePrice.value) || 0;
+        const taxP = parseFloat(taxPercent.value) || 0;
+        const taxA = (base * taxP) / 100;
+        taxAmount.value = taxA.toFixed(2);
+
+        const total = base + taxA;
+        sellPrice.value = total.toFixed(2);
+        calculateProfit();
     }
 
-    baseInput.addEventListener('input', updateSellPrice);
-    taxInput.addEventListener('input', updateSellPrice);
+    function calculateProfit() {
+        const sell = parseFloat(sellPrice.value) || 0;
+        const cost = parseFloat(costPrice.value) || 0;
+        const profit = sell - cost;
+        profitMargin.value = profit.toFixed(2);
+    }
+
+    // When base or tax changes, update Sell Price and then Profit
+    [basePrice, taxPercent].forEach(el => {
+        el.addEventListener('input', calculateFromBase);
+    });
+
+    // When Sell Price or Cost Price changes, update Profit Margin
+    [sellPrice, costPrice].forEach(el => {
+        el.addEventListener('input', calculateProfit);
+    });
 </script>
 {% endblock %}

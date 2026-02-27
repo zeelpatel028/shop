@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Data - Holi Hub{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<style>
+    @media (max-width: 768px) {
+
+        .container,
+        .main-container,
+        .dashboard-container {
+            padding: 10px !important;
+        }
+
+        .card {
+            margin-bottom: 15px !important;
+        }
+    }
+</style>
+
+<link rel="stylesheet" href="{{ url_for('main_store.static', filename='css/payments_main.css') }}">
+{% endblock %}
+
+{% block page_title %}{% endblock %}
+
+{% block content %}
+{% set total_collected = (cash_total|default(0)|float) + (upi_total|default(0)|float) %}
+{% set total_count = (cash_count|default(0)|int) + (upi_count|default(0)|int) %}
+{% set cash_count_pct = ((cash_count|default(0)|int / total_count * 100)|round|int) if total_count > 0 else 0 %}
+{% set upi_count_pct = (100 - cash_count_pct) if total_count > 0 else 0 %}
+{% set pay_count = (payments|default([]))|length %}
+
+<div class="payment-data-container">
+
+    <!-- ── Header ── -->
+    <div class="elite-dashboard-header"
+        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+        <div class="elite-header-group" style="display: flex; gap: 15px; align-items: center;">
+            <div
+                style="width: 5px; height: 50px; background: linear-gradient(to bottom, #F97316, #FBBF24); border-radius: 4px;">
+            </div>
+            <div>
+                <h1 class="elite-header-title"
+                    style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; color: #111827;">
+                    Payment <span style="color: #6C5DD3;">Data</span>
+                </h1>
+                <p class="elite-header-subtitle"
+                    style="margin: 5px 0 0 0; color: #6B7280; font-size: 0.95rem; font-weight: 600;">
+                    Overview for <strong style="color: #F97316; text-transform: uppercase;">{{
+                        (active_period|default('all')) }}</strong>
+                </p>
+            </div>
+        </div>
+
+        <div class="period-filters">
+            <a href="{{ url_for('main_store.payments', period='all') }}"
+                class="filter-link {% if active_period|default('all') == 'all' %}active{% endif %}">All Time</a>
+            <a href="{{ url_for('main_store.payments', period='day') }}"
+                class="filter-link {% if active_period|default('') == 'day' %}active{% endif %}">Today</a>
+            <a href="{{ url_for('main_store.payments', period='week') }}"
+                class="filter-link {% if active_period|default('') == 'week' %}active{% endif %}">This Week</a>
+            <a href="{{ url_for('main_store.payments', period='month') }}"
+                class="filter-link {% if active_period|default('') == 'month' %}active{% endif %}">This Month</a>
+            <a href="{{ url_for('main_store.payments', period='year') }}"
+                class="filter-link {% if active_period|default('') == 'year' %}active{% endif %}">This Year</a>
+        </div>
+    </div>
+
+    <!-- ── Stat Cards ── -->
+    <div class="pay-stats">
+        <div class="pay-stat-card">
+            <div class="psc-glow" style="background: #111827;"></div>
+            <div class="psc-icon" style="background: #F3F4F6; color: #111827;">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="psc-label">Cash Payments</div>
+            <div class="psc-value">₹{{ "{:,.0f}".format(cash_total|default(0)|float) }}</div>
+            <div class="psc-sub">
+                <i class="fas fa-file-invoice" style="font-size: 0.6rem;"></i>
+                {{ cash_count }} Bills · {{ cash_pct }}%
+            </div>
+        </div>
+
+        <div class="pay-stat-card">
+            <div class="psc-glow" style="background: #FF9F00;"></div>
+            <div class="psc-icon" style="background: #FFF4E5; color: #FF9F00;">
+                <i class="fas fa-mobile-screen"></i>
+            </div>
+            <div class="psc-label">UPI Payments</div>
+            <div class="psc-value" style="color: #FF9F00;">₹{{ "{:,.0f}".format(upi_total|default(0)|float) }}</div>
+            <div class="psc-sub">
+                <i class="fas fa-file-invoice" style="font-size: 0.6rem;"></i>
+                {{ upi_count }} Bills · {{ upi_pct }}%
+            </div>
+        </div>
+
+        <div class="pay-stat-card">
+            <div class="psc-glow" style="background: #6C5DD3;"></div>
+            <div class="psc-icon" style="background: #F0EEFF; color: #6C5DD3;">
+                <i class="fas fa-vault"></i>
+            </div>
+            <div class="psc-label">Total Collected</div>
+            <div class="psc-value" style="color: #6C5DD3;">₹{{ "{:,.0f}".format(total_collected) }}</div>
+            <div class="psc-sub">
+                <i class="fas fa-layer-group" style="font-size: 0.6rem;"></i>
+                {{ pay_count }} transactions
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Payment Split Bar ── -->
+    <div class="split-bar-wrap">
+        <div class="split-bar-header">
+            <div class="split-bar-title">Payment Method Distribution (by Bill Count)</div>
+            <div class="split-bar-legend">
+                <div class="legend-dot">
+                    <span style="background: #111827;"></span> Cash {{ cash_count_pct }}% ({{ cash_count }})
+                </div>
+                <div class="legend-dot">
+                    <span style="background: #FF9F00;"></span> UPI {{ upi_count_pct }}% ({{ upi_count }})
+                </div>
+            </div>
+        </div>
+        <div class="split-bar-track" data-cash="{{ cash_count_pct }}" data-upi="{{ upi_count_pct }}">
+            <div class="split-bar-cash"></div>
+            <div class="split-bar-upi"></div>
+        </div>
+    </div>
+
+    <!-- ── Transactions Table ── -->
+    <div class="pay-table-card">
+        <div class="ptc-header">
+            <div class="ptc-title">
+                <i class="fas fa-list-check"></i> All Transactions
+            </div>
+            <span class="ptc-count">{{ pay_count }} Records</span>
+        </div>
+
+        <div class="elite-table-wrapper">
+            <table class="pay-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Bill #</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                        <th style="text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments|default([]) %}
+                    <tr>
+                        <td class="td-id">
+                            {% if payment.transaction_id %}
+                            {{ payment.transaction_id[:12] }}
+                            {% else %}
+                            #{{ payment.payment_id|default('N/A', true) }}
+                            {% endif %}
+                        </td>
+                        <td class="td-customer">{{ payment.customer_name|default('Counter', true) }}</td>
+                        <td class="td-bill">
+                            #{{ payment.bills.bill_no if payment.bills else 'N/A' }}
+                        </td>
+                        <td>
+                            {% if payment.payment_method == 'UPI' %}
+                            <span class="method-badge method-upi">
+                                <i class="fas fa-mobile-screen"></i> UPI
+                            </span>
+                            {% else %}
+                            <span class="method-badge method-cash">
+                                <i class="fas fa-money-bill"></i> Cash
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if payment.payment_status == 'Paid' %}
+                            <span class="status-pill status-paid">
+                                <i class="fas fa-check-circle"></i> Paid
+                            </span>
+                            {% else %}
+                            <span class="status-pill status-pending">
+                                <i class="fas fa-clock"></i> {{ payment.payment_status|default('Pending', true) }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="td-time">
+                            {{ (payment.created_at|default('', true))[:16]|replace('T', ' · ') or 'N/A' }}
+                        </td>
+                        <td class="td-amount">
+                            ₹{{ "{:,.0f}".format(payment.paid_amount|default(0)|float) }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 60px 20px;">
+                            <div class="pay-empty"
+                                style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #8B95A5; font-weight: 600; padding: 0;">
+                                <i class="fas fa-folder-open"
+                                    style="font-size: 3.5rem; color: #EEF0F6; margin-bottom: 15px; opacity: 1;"></i>
+                                <div style="color: #8B95A5; font-weight: 600; font-size: 0.95rem;">No payment data
+                                    available yet.</div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Animate split bar widths from data attributes
+    var track = document.querySelector('.split-bar-track');
+    if (track) {
+        var cashW = track.getAttribute('data-cash') || '0';
+        var upiW = track.getAttribute('data-upi') || '0';
+        var cashBar = track.querySelector('.split-bar-cash');
+        var upiBar = track.querySelector('.split-bar-upi');
+        setTimeout(function () {
+            if (cashBar) cashBar.style.width = cashW + '%';
+            if (upiBar) upiBar.style.width = upiW + '%';
+        }, 100);
+    }
+</script>
+{% endblock %}
