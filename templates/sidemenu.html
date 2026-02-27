@@ -14,6 +14,12 @@
                 Main Store
                 {% elif request.blueprint == 'festiv_store' %}
                 Tulshi Shop
+                {% elif request.blueprint == 'customer' %}
+                Customer Portal
+                {% elif request.blueprint == 'seller' %}
+                Seller Portal
+                {% elif request.blueprint == 'employee' %}
+                Employee Portal
                 {% else %}
                 Tulshi Shop
                 {% endif %}
@@ -25,7 +31,7 @@
         </div>
     </div>
 
-    <nav class="sidebar-nav {% if request.blueprint == 'main_store' or request.blueprint == 'festiv_store' %}store-context{% else %}global-context{% endif %}"
+    <nav class="sidebar-nav {% if request.blueprint == 'main_store' or request.blueprint == 'festiv_store' %}store-context{% elif request.blueprint == 'customer' %}customer-context{% else %}global-context{% endif %}"
         style="padding: 25px 0;">
         <style>
             .sidebar-nav ul li a {
@@ -62,6 +68,14 @@
                 color: #fff !important;
             }
 
+            /* Customer Portal Active Styles */
+            .sidebar-nav.customer-context ul li.active a,
+            .sidebar-nav.customer-context ul li a.active-link {
+                border-left: 4px solid #FF9F00 !important;
+                background: rgba(255, 159, 0, 0.1) !important;
+                color: #FF9F00 !important;
+            }
+
             /* Hover states */
             .sidebar-nav.store-context ul li a:hover {
                 background: rgba(255, 255, 255, 0.03) !important;
@@ -70,6 +84,11 @@
 
             .sidebar-nav.global-context ul li a:hover {
                 background: #222 !important;
+                color: #fff !important;
+            }
+
+            .sidebar-nav.customer-context ul li a:hover {
+                background: rgba(255, 159, 0, 0.05) !important;
                 color: #fff !important;
             }
 
@@ -215,6 +234,64 @@
                 </a>
             </li>
 
+            {% elif request.blueprint == 'customer' %}
+            <!-- CUSTOMER MODULE LINKS -->
+            <li class="{% if request.endpoint == 'customer.dashboard' %}active{% endif %}">
+                <a href="{{ url_for('customer.dashboard') }}"
+                    class="{% if request.endpoint == 'customer.dashboard' %}active-link{% endif %}">
+                    <i class="fas fa-columns"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'customer.add_customer' %}active{% endif %}">
+                <a href="{{ url_for('customer.add_customer') }}"
+                    class="{% if request.endpoint == 'customer.add_customer' %}active-link{% endif %}">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Add Customer</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'customer.all_customers' %}active{% endif %}">
+                <a href="{{ url_for('customer.all_customers') }}"
+                    class="{% if request.endpoint == 'customer.all_customers' %}active-link{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>Manage Customers</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'customer.pending_bills' %}active{% endif %}">
+                <a href="{{ url_for('customer.pending_bills') }}"
+                    class="{% if request.endpoint == 'customer.pending_bills' %}active-link{% endif %}">
+                    <i class="fas fa-clock"></i>
+                    <span>Pending Bills</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'customer.approve_bills' %}active{% endif %}">
+                <a href="{{ url_for('customer.approve_bills') }}"
+                    class="{% if request.endpoint == 'customer.approve_bills' %}active-link{% endif %}">
+                    <i class="fas fa-check-double"></i>
+                    <span>Approved Bills</span>
+                </a>
+            </li>
+
+            {% elif request.blueprint == 'seller' %}
+            <!-- SELLER MODULE LINKS -->
+            <li class="{% if request.endpoint == 'seller.index' %}active{% endif %}">
+                <a href="{{ url_for('seller.index') }}"
+                    class="{% if request.endpoint == 'seller.index' %}active-link{% endif %}">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            {% elif request.blueprint == 'employee' %}
+            <!-- EMPLOYEE MODULE LINKS -->
+            <li class="{% if request.endpoint == 'employee.index' %}active{% endif %}">
+                <a href="{{ url_for('employee.index') }}"
+                    class="{% if request.endpoint == 'employee.index' %}active-link{% endif %}">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
             {% else %}
             <!-- DEFAULT / GLOBAL DASHBOARD LINKS -->
             <li class="{% if request.endpoint == 'home' %}active{% endif %}">
@@ -237,23 +314,24 @@
                     <span>Main Store</span>
                 </a>
             </li>
-            <li class="{% if request.endpoint == 'main_store.credit_customer' %}active{% endif %}">
-                <a href="{{ url_for('main_store.credit_customer') }}"
-                    class="{% if request.endpoint == 'main_store.credit_customer' %}active-link{% endif %}">
-                    <i class="fas fa-user-friends"></i>
+            <li
+                class="{% if request.endpoint == 'customer.dashboard' or request.endpoint == 'main_store.credit_customer' %}active{% endif %}">
+                <a href="{{ url_for('customer.dashboard') }}"
+                    class="{% if request.endpoint == 'customer.dashboard' or request.endpoint == 'main_store.credit_customer' %}active-link{% endif %}">
+                    <i class="fas fa-users-cog"></i>
                     <span>Credit Customer</span>
                 </a>
             </li>
-            <li class="{% if request.endpoint == 'main_store.seller' %}active{% endif %}">
-                <a href="{{ url_for('main_store.seller') }}"
-                    class="{% if request.endpoint == 'main_store.seller' %}active-link{% endif %}">
+            <li class="{% if request.endpoint == 'seller.index' %}active{% endif %}">
+                <a href="{{ url_for('seller.index') }}"
+                    class="{% if request.endpoint == 'seller.index' %}active-link{% endif %}">
                     <i class="fas fa-user-tie"></i>
                     <span>Seller</span>
                 </a>
             </li>
-            <li class="{% if request.endpoint == 'main_store.employee' %}active{% endif %}">
-                <a href="{{ url_for('main_store.employee') }}"
-                    class="{% if request.endpoint == 'main_store.employee' %}active-link{% endif %}">
+            <li class="{% if request.endpoint == 'employee.index' %}active{% endif %}">
+                <a href="{{ url_for('employee.index') }}"
+                    class="{% if request.endpoint == 'employee.index' %}active-link{% endif %}">
                     <i class="fas fa-id-badge"></i>
                     <span>Employee</span>
                 </a>
@@ -261,16 +339,17 @@
             {% endif %}
         </ul>
 
-        {% if request.blueprint == 'main_store' or request.blueprint == 'festiv_store' %}
+        {% if request.blueprint == 'main_store' or request.blueprint == 'festiv_store' or request.blueprint ==
+        'customer' or request.blueprint == 'seller' or request.blueprint == 'employee' %}
         <div style="padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.03); margin-top: 20px;">
             <ul>
-                {% if request.blueprint == 'main_store' %}
                 <li>
                     <a href="{{ url_for('home') }}">
                         <i class="fas fa-crown"></i>
                         <span>App Dashboard</span>
                     </a>
                 </li>
+                {% if request.blueprint != 'festiv_store' %}
                 <li class="{% if request.endpoint == 'festiv_store.index' %}active{% endif %}">
                     <a href="{{ url_for('festiv_store.index') }}"
                         class="{% if request.endpoint == 'festiv_store.index' %}active-link{% endif %}">
@@ -278,24 +357,10 @@
                         <span>Festiv Store</span>
                     </a>
                 </li>
-                {% elif request.blueprint == 'festiv_store' %}
-                <li>
-                    <a href="{{ url_for('home') }}">
-                        <i class="fas fa-shield-heart"></i>
-                        <span>Main Core</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('festiv_store.index') }}">
-                        <i class="fas fa-store"></i>
-                        <span>Public View</span>
-                    </a>
-                </li>
                 {% endif %}
             </ul>
         </div>
         {% endif %}
-        </ul>
     </nav>
 
     <div class="sidebar-footer" style="padding: 30px; border-top: 1px solid rgba(255,255,255,0.03);">

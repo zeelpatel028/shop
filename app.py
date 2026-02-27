@@ -36,6 +36,27 @@ try:
 except ImportError as e:
     logger.error(f"Could not import main_store blueprint: {e}")
 
+try:
+    from customer import customer_bp
+    app.register_blueprint(customer_bp, url_prefix='/customer')
+    logger.info("Successfully registered customer blueprint")
+except ImportError as e:
+    logger.error(f"Could not import customer blueprint: {e}")
+
+try:
+    from employee import employee_bp
+    app.register_blueprint(employee_bp, url_prefix='/employee')
+    logger.info("Successfully registered employee blueprint")
+except ImportError as e:
+    logger.error(f"Could not import employee blueprint: {e}")
+
+try:
+    from seller import seller_bp
+    app.register_blueprint(seller_bp, url_prefix='/seller')
+    logger.info("Successfully registered seller blueprint")
+except ImportError as e:
+    logger.error(f"Could not import seller blueprint: {e}")
+
 # --- PRODUCTION ENDPOINTS ---
 
 @app.route('/health')

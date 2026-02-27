@@ -1,12 +1,5 @@
 -- SQL Schema for Shop Project (Production PostgreSQL)
 
--- 0. Cleanup (Drop tables in reverse dependency order)
-DROP TABLE IF EXISTS payments CASCADE;
-DROP TABLE IF EXISTS bill_items CASCADE;
-DROP TABLE IF EXISTS bills CASCADE;
-DROP TABLE IF EXISTS products CASCADE;
-
-
 -- 2. Products Table
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
@@ -98,3 +91,42 @@ CREATE TABLE IF NOT EXISTS payments (
 
 CREATE INDEX idx_payment_ref ON payments(payment_reference);
 CREATE INDEX idx_payment_bill_id ON payments(bill_id);
+ 
+-- 6. Customer Table
+CREATE TABLE IF NOT EXISTS customer (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    phone_no TEXT UNIQUE NOT NULL,
+    address TEXT,
+    padin_amount_last DECIMAL(12, 2) DEFAULT 0,
+    padin_amount_total DECIMAL(12, 2) DEFAULT 0,
+    panding_bill_count INT DEFAULT 0,
+    all_bill_count INT DEFAULT 0,
+    last_payment_date TIMESTAMP,
+    status TEXT DEFAULT 'Active',
+    created_by TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_customer_phone ON customer(phone_no);
+
+-- 7. Credit Bill Table
+CREATE TABLE IF NOT EXISTS credit_bill (
+    id SERIAL PRIMARY KEY,
+    c_id INT REFERENCES customer(id) ON DELETE CASCADE,
+    bill_id INT REFERENCES bills(bill_id) ON DELETE SET NULL,
+    bill_url TEXT,
+    total_price DECIMAL(12, 2),
+    paid_amount DECIMAL(12, 2) DEFAULT 0,
+    remaining_amount DECIMAL(12, 2),
+    bill_discreption TEXT, -- all item and qun and price
+    bill_status TEXT,
+    payment_status TEXT,
+    payment_method TEXT,
+    payment_date TIMESTAMP,
+    created_by TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_credit_bill_cid ON credit_bill(c_id);
+CREATE INDEX idx_credit_bill_id ON credit_bill(bill_id);

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer Dashboard - Tulshi Shop{% endblock %}
+{% block page_title %}Customer Portal{% endblock %}
+
+{% block content %}
+<div class="dashboard-stats-grid"
+    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px;">
+    <!-- Stat Card 1 -->
+    <div class="stat-card"
+        style="background: #fff; padding: 25px; border-radius: 20px; box-shadow: var(--card-shadow); border: 1px solid var(--elite-border); display: flex; align-items: center; gap: 20px; transition: transform 0.3s ease; cursor: pointer;"
+        onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div
+            style="width: 60px; height: 60px; background: rgba(255, 159, 0, 0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #FF9F00;">
+            <i class="fas fa-users"></i>
+        </div>
+        <div>
+            <span style="display: block; font-size: 0.9rem; color: var(--text-grey); font-weight: 500;">Total
+                Customers</span>
+            <span style="display: block; font-size: 1.5rem; font-weight: 800; color: var(--dark-black);">124</span>
+        </div>
+    </div>
+
+    <!-- Stat Card 2 -->
+    <div class="stat-card"
+        style="background: #fff; padding: 25px; border-radius: 20px; box-shadow: var(--card-shadow); border: 1px solid var(--elite-border); display: flex; align-items: center; gap: 20px; transition: transform 0.3s ease; cursor: pointer;"
+        onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div
+            style="width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #ef4444;">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div>
+            <span style="display: block; font-size: 0.9rem; color: var(--text-grey); font-weight: 500;">Pending
+                Bills</span>
+            <span style="display: block; font-size: 1.5rem; font-weight: 800; color: var(--dark-black);">18</span>
+        </div>
+    </div>
+
+    <!-- Stat Card 3 -->
+    <div class="stat-card"
+        style="background: #fff; padding: 25px; border-radius: 20px; box-shadow: var(--card-shadow); border: 1px solid var(--elite-border); display: flex; align-items: center; gap: 20px; transition: transform 0.3s ease; cursor: pointer;"
+        onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div
+            style="width: 60px; height: 60px; background: rgba(34, 197, 94, 0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #22c55e;">
+            <i class="fas fa-check-double"></i>
+        </div>
+        <div>
+            <span style="display: block; font-size: 0.9rem; color: var(--text-grey); font-weight: 500;">Approved
+                Bills</span>
+            <span style="display: block; font-size: 1.5rem; font-weight: 800; color: var(--dark-black);">450</span>
+        </div>
+    </div>
+</div>
+
+<div class="quick-actions" style="margin-top: 40px;">
+    <h3 style="font-weight: 800; margin-bottom: 20px; color: var(--dark-black);">Quick Actions</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <a href="{{ url_for('customer.add_customer') }}"
+            style="text-decoration: none; display: flex; align-items: center; gap: 12px; background: #FF9F00; color: #fff; padding: 15px 25px; border-radius: 12px; font-weight: 700; transition: all 0.3s ease;"
+            onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            <i class="fas fa-user-plus"></i> Add New Customer
+        </a>
+        <a href="{{ url_for('customer.pending_bills') }}"
+            style="text-decoration: none; display: flex; align-items: center; gap: 12px; background: var(--dark-black); color: #fff; padding: 15px 25px; border-radius: 12px; font-weight: 700; transition: all 0.3s ease;"
+            onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            <i class="fas fa-file-invoice"></i> Manage Bills
+        </a>
+    </div>
+</div>
+{% endblock %}

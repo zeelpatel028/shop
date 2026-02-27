@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, redirect, url_for
 from . import main_store_bp
 
 @main_store_bp.route('/')
@@ -15,7 +15,7 @@ def all_product():
 
 @main_store_bp.route('/credit-customer')
 def credit_customer():
-    return "<h1>Coming Soon: Credit Customer</h1><a href='/main_store'>Back</a>"
+    return redirect(url_for('customer.dashboard'))
 
 @main_store_bp.route('/billing')
 def billing():
