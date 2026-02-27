@@ -1,0 +1,398 @@
+{% extends 'base.html' %}
+
+{% block title %}Billing - Main Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    .content-wrapper {
+        background: #F8F9FC !important;
+        padding: 0 !important;
+    }
+
+    .billing-container {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 24px;
+        padding: 40px;
+        max-width: 1600px;
+        margin: 0 auto;
+        height: calc(100vh - 100px);
+        overflow: hidden;
+    }
+
+    .products-column,
+    .cart-column {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid #EEF0F6;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .panel-header {
+        padding: 20px;
+        border-bottom: 1px solid #F3F4F8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .panel-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #111827;
+        margin: 0;
+    }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+        padding: 20px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .product-card {
+        background: #fff;
+        border: 1px solid #F3F4F8;
+        border-radius: 14px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+    }
+
+    .product-card:hover {
+        border-color: #6C5DD3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 93, 211, 0.05);
+    }
+
+    .product-card .name {
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 4px;
+        font-size: 0.95rem;
+    }
+
+    .product-card .price {
+        color: #6C5DD3;
+        font-weight: 800;
+        font-size: 1rem;
+    }
+
+    .product-card .stock {
+        font-size: 0.75rem;
+        color: #6B7280;
+        margin-top: 8px;
+    }
+
+    .cart-items {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #F3F4F8;
+    }
+
+    .cart-item-info {
+        flex: 1;
+    }
+
+    .cart-item-info .name {
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .cart-item-info .price-row {
+        color: #6B7280;
+        font-size: 0.75rem;
+        margin-top: 2px;
+    }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: 15px;
+    }
+
+    .qty-btn {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        border: 1px solid #E5E7EB;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.8rem;
+    }
+
+    .cart-summary {
+        padding: 20px;
+        background: #F9FAFB;
+        border-top: 1px solid #EEF0F6;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        color: #4B5563;
+        font-size: 0.9rem;
+    }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 2px dashed #D1D5DB;
+        font-weight: 900;
+        font-size: 1.2rem;
+        color: #111827;
+    }
+
+    .billing-footer {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-finalize {
+        background: #6C5DD3;
+        color: #fff;
+        border: none;
+        padding: 16px;
+        border-radius: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1rem;
+    }
+
+    .btn-finalize:hover {
+        background: #5a4db8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(108, 93, 211, 0.2);
+    }
+
+    .search-bar {
+        width: 100%;
+        border: none;
+        padding: 12px;
+        background: #F3F4F6;
+        border-radius: 10px;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 1024px) {
+        .billing-container {
+            grid-template-columns: 1fr;
+            height: auto;
+            overflow: visible;
+        }
+
+        .cart-column {
+            height: 500px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="billing-container">
+    <!-- Products Panel -->
+    <div class="products-column">
+        <div class="panel-header" style="flex-direction: column; gap: 15px; align-items: stretch;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="panel-title">Main Store Billing</h2>
+                <span style="color: #6B7280; font-size: 0.8rem;">Select items to add to cart</span>
+            </div>
+            <input type="text" id="productSearch" class="search-bar" placeholder="Search product name or category...">
+        </div>
+
+        <div class="product-grid" id="productGrid">
+            {% for p in products %}
+            <div class="product-card" data-product='{{ p|tojson|safe }}' onclick="addToCart(this)">
+                <div class="name">{{ p.product_name }}</div>
+                <div class="price">₹{{ "{:.2f}".format(p.sell_price|default(0)|float) }}</div>
+                <div class="stock">Stock: {{ p.stock }} {{ p.product_unit or '' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Cart Panel -->
+    <div class="cart-column">
+        <div class="panel-header">
+            <h2 class="panel-title"><i class="fas fa-shopping-cart"></i> Your Cart</h2>
+            <button onclick="clearCart()"
+                style="background: none; border: none; color: #EF4444; font-weight: 700; cursor: pointer; font-size: 0.8rem;">Clear</button>
+        </div>
+
+        <div class="cart-items" id="cartItems">
+            <!-- Items injected via JS -->
+            <div style="text-align: center; color: #9CA3AF; padding-top: 40px;">Cart is empty</div>
+        </div>
+
+        <div class="cart-summary">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <input type="text" id="customer_name" class="form-control" placeholder="Customer Name (Optional)"
+                    style="font-size: 0.85rem; padding: 10px;">
+            </div>
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="subtotal">₹0.00</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax</span>
+                <span id="tax">₹0.00</span>
+            </div>
+            <div class="summary-total">
+                <span>Total</span>
+                <span id="total">₹0.00</span>
+            </div>
+        </div>
+
+        <div class="billing-footer">
+            <button class="btn-finalize" onclick="finalizeBill()">FINALIZE & PRINT BILL</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let cart = [];
+
+    function addToCart(element) {
+        let product;
+        if (element instanceof HTMLElement) {
+            product = JSON.parse(element.getAttribute('data-product'));
+        } else {
+            product = element; // Fallback for +/- buttons
+        }
+
+        const existing = cart.find(item => item.product_id === product.product_id);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            cart.push({
+                product_id: product.product_id,
+                name: product.product_name || product.name,
+                price: parseFloat(product.sell_price || product.price),
+                tax_pct: parseFloat(product.tax_percent || product.tax_pct),
+                quantity: 1
+            });
+        }
+        renderCart();
+    }
+
+    function removeFromCart(productId) {
+        const item = cart.find(i => i.product_id === productId);
+        if (item.quantity > 1) {
+            item.quantity -= 1;
+        } else {
+            cart = cart.filter(i => i.product_id !== productId);
+        }
+        renderCart();
+    }
+
+    function clearCart() {
+        cart = [];
+        renderCart();
+    }
+
+    function renderCart() {
+        const container = document.getElementById('cartItems');
+        if (cart.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #9CA3AF; padding-top: 40px;">Cart is empty</div>';
+            updateSummary(0, 0, 0);
+            return;
+        }
+
+        container.innerHTML = cart.map(item => `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="name">${item.name}</div>
+                    <div class="price-row">₹${item.price.toFixed(2)} x ${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}</div>
+                </div>
+                <div class="quantity-controls">
+                    <button class="qty-btn" onclick="removeFromCart(${item.product_id})">-</button>
+                    <span style="font-weight: 700; min-width: 20px; text-align: center;">${item.quantity}</span>
+                    <button class="qty-btn" onclick="addToCart({product_id: ${item.product_id}, name: '${item.name}', price: ${item.price}, tax_pct: ${item.tax_pct}})">+</button>
+                </div>
+            </div>
+        `).join('');
+
+        let total = 0;
+        let subtotal = 0;
+        let tax = 0;
+
+        cart.forEach(item => {
+            const lineTotal = item.price * item.quantity;
+            const itemBase = lineTotal / (1 + (item.tax_pct / 100));
+            const itemTax = lineTotal - itemBase;
+
+            total += lineTotal;
+            subtotal += itemBase;
+            tax += itemTax;
+        });
+
+        updateSummary(subtotal, tax, total);
+    }
+
+    function updateSummary(sub, t, total) {
+        document.getElementById('subtotal').innerText = `₹${sub.toFixed(2)}`;
+        document.getElementById('tax').innerText = `₹${t.toFixed(2)}`;
+        document.getElementById('total').innerText = `₹${total.toFixed(2)}`;
+    }
+
+    async function finalizeBill() {
+        if (cart.length === 0) {
+            alert('Cart is empty!');
+            return;
+        }
+
+        const customerName = document.getElementById('customer_name').value || 'Cash';
+
+        const response = await fetch("{{ url_for('main_store.billing') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                items: cart,
+                customer_name: customerName
+            })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Bill Finalized: ' + result.bill_no);
+            clearCart();
+            window.location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    }
+
+    // Search Logic
+    document.getElementById('productSearch').addEventListener('input', function () {
+        const query = this.value.toLowerCase();
+        const cards = document.querySelectorAll('.product-card');
+        cards.forEach(card => {
+            const text = card.innerText.toLowerCase();
+            card.style.display = text.includes(query) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

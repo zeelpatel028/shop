@@ -1,80 +1,123 @@
-{% extends "base.html" %}
+{% extends "customer_base.html" %}
 
-{% block title %}Add Customer - Tulshi Shop{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('customer.static', filename='css/add_customer.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-{% endblock %}
-
-{% block page_title %}{% endblock %}
+{% block title %}Add Customer - Shop{% endblock %}
 
 {% block content %}
-<div class="add-customer-container">
+<div class="customer-container">
     <form action="{{ url_for('customer.add_customer') }}" method="POST">
-        <div class="page-header">
-            <h1 class="page-title"><i class="fas fa-user-plus accent-orange"></i> Add New Customer</h1>
-            <div class="header-actions">
-                <a href="{{ url_for('customer.dashboard') }}" class="btn btn-secondary">Discard</a>
-                <button type="submit" class="btn btn-primary">Save Customer</button>
+        <!-- Header Section -->
+        <div class="elite-dashboard-header"
+            style="margin-bottom: 35px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+            <div class="elite-header-group">
+                <h1 class="elite-header-title">Register Customer</h1>
+                <p class="elite-header-subtitle">Onboard new customers to the <strong>Shop ecosystem</strong>.</p>
+            </div>
+            <div class="elite-form-btn-group" style="margin-top: 0;">
+                <a href="{{ url_for('customer.dashboard') }}" class="elite-btn"
+                    style="background: #eee; color: #666;">Discard</a>
+                <button type="submit" class="elite-btn elite-btn-primary">
+                    <i class="fas fa-save"></i> Save Customer Profile
+                </button>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-id-card"></i> Personal Information
-            </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="name" class="form-control" placeholder="Enter customer name" required>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;" class="dashboard-main-row">
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                <!-- Personal Info Card -->
+                <div class="elite-card">
+                    <div class="elite-card-header">
+                        <i class="fas fa-id-card"></i> Personal Information
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Full Name <span style="color: #EF4444;">*</span></label>
+                            <input type="text" name="name" class="elite-form-control" placeholder="Enter customer name"
+                                value="{{ form_data.get('name', '') if form_data else '' }}" required>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Phone Number <span style="color: #EF4444;">*</span></label>
+                            <input type="text" name="phone_no" class="elite-form-control"
+                                placeholder="Enter 10-digit number"
+                                value="{{ form_data.get('phone_no', '') if form_data else '' }}" required>
+                        </div>
+                    </div>
+                    <div class="elite-form-group">
+                        <label class="elite-form-label">Address <span style="color: #EF4444;">*</span></label>
+                        <textarea name="address" class="elite-form-control" rows="3"
+                            placeholder="Enter full address location..."
+                            required>{{ form_data.get('address', '') if form_data else '' }}</textarea>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="text" name="phone_no" class="form-control" placeholder="Enter phone number" required>
-                </div>
-                <div class="form-group" style="grid-column: span 2;">
-                    <label class="form-label">Address</label>
-                    <textarea name="address" class="form-control" rows="3" placeholder="Enter full address"></textarea>
-                </div>
-            </div>
-        </div>
 
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-wallet"></i> Credit & Billing Details
+                <!-- Billing Stats Card -->
+                <div class="elite-card">
+                    <div class="elite-card-header">
+                        <i class="fas fa-wallet"></i> Credit & Billing Details
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Last Paid Amount</label>
+                            <input type="number" step="0.01" name="padin_amount_last" class="elite-form-control"
+                                value="0.00">
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Total Paid Amount</label>
+                            <input type="number" step="0.01" name="padin_amount_total" class="elite-form-control"
+                                value="0.00">
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Pending Bill Count</label>
+                            <input type="number" name="panding_bill_count" class="elite-form-control" value="0">
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">All Bill Count</label>
+                            <input type="number" name="all_bill_count" class="elite-form-control" value="0">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label">Last Paid Amount</label>
-                    <input type="number" step="0.01" name="padin_amount_last" class="form-control" value="0.00">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Total Paid Amount</label>
-                    <input type="number" step="0.01" name="padin_amount_total" class="form-control" value="0.00">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Pending Bill Count</label>
-                    <input type="number" name="panding_bill_count" class="form-control" value="0">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">All Bill Count</label>
-                    <input type="number" name="all_bill_count" class="form-control" value="0">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select name="status" class="form-control">
-                        <option value="Active">Active</option>
-                        <option value="Blocked">Blocked</option>
-                        <option value="VIP">VIP</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Created By</label>
-                    <input type="text" name="created_by" class="form-control" placeholder="Staff Name">
+
+            <!-- Sidebar Info/Status Card -->
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                <div class="elite-card" style="background: var(--elite-black) !important; color: #fff;">
+                    <div class="elite-card-header" style="color: #fff; border-bottom-color: #333;">
+                        <i class="fas fa-cog" style="color: var(--elite-orange);"></i> Classification
+                    </div>
+
+                    <div class="elite-form-group">
+                        <label class="elite-form-label" style="color: #aaa;">Initial Status</label>
+                        <select name="status" class="elite-form-control"
+                            style="background: #222; border-color: #333; color: #fff;">
+                            <option value="Active">Active</option>
+                            <option value="Blocked">Blocked</option>
+                            <option value="VIP">VIP</option>
+                        </select>
+                    </div>
+
+                    <div class="elite-form-group">
+                        <label class="elite-form-label" style="color: #aaa;">Registrar (Staff)</label>
+                        <input type="text" name="created_by" class="elite-form-control"
+                            style="background: #222; border-color: #333; color: #fff;" placeholder="Enter your name">
+                    </div>
+
+                    <div
+                        style="margin-top: 20px; padding: 15px; background: rgba(255,159,0,0.1); border-radius: 12px; border: 1px solid rgba(255,159,0,0.2);">
+                        <p style="font-size: 0.75rem; color: var(--elite-orange); margin: 0; font-weight: 600;">
+                            <i class="fas fa-info-circle"></i> New customers are automatically assigned a unique
+                            management ID upon saving.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </form>
 </div>
+
+<style>
+    @media (max-width: 1024px) {
+        .dashboard-main-row {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
 {% endblock %}

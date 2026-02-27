@@ -1,0 +1,425 @@
+/* Customer Management - Elite Premium UI (Inspired by Festiv Store) */
+
+:root {
+    --elite-purple: #6C5DD3;
+    --elite-orange: #FF9F00;
+    --elite-black: #111827;
+    --elite-black-light: #1F2937;
+    --elite-white: #FFFFFF;
+    --elite-gray-bg: #F9FAFB;
+    --elite-gray-text: #6B7280;
+    --elite-border: #E5E7EB;
+    --elite-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Global Content Wrapper Override */
+.content-wrapper {
+    padding-top: 20px !important;
+    background: var(--elite-gray-bg) !important;
+    min-height: calc(100vh - 70px);
+}
+
+/* Customer Container Layout */
+.customer-dashboard,
+.customer-container,
+.bill-view-container {
+    padding: 30px 40px 40px 40px;
+    animation: slideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Luxury Headers */
+.elite-header-group {
+    position: relative;
+    padding-left: 20px;
+}
+
+.elite-header-group::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 80%;
+    background: linear-gradient(180deg, var(--elite-purple), var(--elite-orange));
+    border-radius: 10px;
+}
+
+.elite-header-title {
+    font-size: 2.2rem !important;
+    font-weight: 900 !important;
+    margin: 0 !important;
+    letter-spacing: -1px;
+    background: linear-gradient(90deg, var(--elite-black), var(--elite-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.elite-header-subtitle {
+    font-size: 0.95rem;
+    color: var(--elite-gray-text);
+    margin-top: 5px !important;
+    font-weight: 600;
+}
+
+/* Elite Grid & Cards */
+.elite-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.elite-stat-card {
+    background: var(--elite-white);
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid var(--elite-border);
+    box-shadow: var(--elite-shadow);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.4s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.elite-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    border-color: var(--elite-purple);
+}
+
+.elite-stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.elite-stat-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--elite-gray-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.elite-stat-value {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--elite-black);
+    line-height: 1.2;
+}
+
+/* Premium Tables */
+.elite-card {
+    background: var(--elite-white);
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: var(--elite-shadow);
+    border: 1px solid var(--elite-border);
+    margin-bottom: 30px;
+}
+
+.elite-table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+}
+
+.elite-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.elite-table th {
+    text-align: left;
+    padding: 16px 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--elite-gray-text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid var(--elite-gray-bg);
+}
+
+.elite-table td {
+    padding: 18px 20px;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--elite-gray-bg);
+    color: var(--elite-black);
+}
+
+.elite-table tr:hover td {
+    background: var(--elite-gray-bg);
+}
+
+/* Buttons & Actions */
+.elite-btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+}
+
+.elite-btn-primary {
+    background: var(--elite-purple);
+    color: white;
+}
+
+.elite-btn-primary:hover {
+    background: #5b4eb3;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(108, 93, 211, 0.3);
+}
+
+/* Search Box */
+.elite-search-wrapper {
+    position: relative;
+}
+
+.elite-search-input {
+    padding: 12px 20px 12px 45px;
+    border-radius: 12px;
+    border: 1px solid var(--elite-border);
+    width: 350px;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.elite-search-input:focus {
+    border-color: var(--elite-purple);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(108, 93, 211, 0.1);
+}
+
+.elite-search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--elite-gray-text);
+}
+
+/* Utility Classes for Dynamic Colors */
+.text-danger-bold {
+    color: #EF4444 !important;
+    font-weight: 800 !important;
+}
+
+.text-success-bold {
+    color: #10B981 !important;
+    font-weight: 800 !important;
+}
+
+/* Form Elements & Inputs */
+.elite-form-group {
+    margin-bottom: 25px;
+}
+
+.elite-form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--elite-black);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.elite-form-control {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid var(--elite-border);
+    font-size: 0.95rem;
+    color: var(--elite-black);
+    transition: all 0.3s;
+    background: var(--elite-gray-bg);
+}
+
+.elite-form-control:focus {
+    background: #fff;
+    border-color: var(--elite-purple);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(108, 93, 211, 0.1);
+}
+
+.elite-form-control::placeholder {
+    color: #BBB;
+}
+
+.elite-card-header {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--elite-black);
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--elite-gray-bg);
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.elite-card-header i {
+    color: var(--elite-purple);
+}
+
+.elite-form-btn-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+}
+
+/* Modal Slide Down Animation (upeer thi aje) */
+.modal.fade .modal-dialog {
+    transform: translateY(-100px);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0);
+}
+
+.elite-current-val {
+    font-size: 0.72rem;
+    color: #666;
+    margin-top: 6px;
+    font-weight: 600;
+    display: block;
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.elite-current-val i {
+    color: var(--elite-purple);
+    margin-right: 5px;
+}
+
+.elite-current-val strong {
+    color: var(--elite-black);
+}
+
+/* --- GLOBAL RESPONSIVE OVERRIDES --- */
+
+@media (max-width: 1200px) {
+
+    .customer-dashboard,
+    .customer-container {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-main-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Adjust Main Content for Fixed Navbar on Mobile if needed */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .top-navbar {
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 1000 !important;
+    }
+
+    .sidebar {
+        z-index: 2000 !important;
+    }
+
+    /* Toggle Desktop/Mobile Branding */
+    .desktop-brand {
+        display: none !important;
+    }
+
+    .mobile-brand {
+        display: inline-block !important;
+    }
+
+    /* Hide Navbar Brand when Sidebar is open on Mobile */
+    .sidebar.mobile-active~.main-content .brand-container,
+    .sidebar.mobile-open~.main-content .brand-container {
+        display: none !important;
+    }
+
+    .customer-dashboard,
+    .customer-container {
+        padding: 20px 15px;
+        margin-top: 0px;
+    }
+
+    .elite-header-title {
+        font-size: 1.8rem !important;
+    }
+
+    .elite-search-input {
+        width: 100%;
+    }
+
+    .elite-table th,
+    .elite-table td {
+        padding: 12px 15px;
+        white-space: nowrap;
+    }
+
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .elite-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .elite-stat-card {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .elite-header-title {
+        font-size: 1.5rem !important;
+    }
+
+    .elite-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

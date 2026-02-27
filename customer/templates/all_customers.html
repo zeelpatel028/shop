@@ -1,20 +1,358 @@
-{% extends "base.html" %}
+{% extends 'customer_base.html' %}
+
+{% block title %}Manage Customers - Shop{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <h1>All Customers</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- List of customers will go here -->
-        </tbody>
-    </table>
+<div class="customer-container">
+    <!-- Header Section -->
+    <div class="elite-dashboard-header"
+        style="margin-bottom: 35px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+        <div class="elite-header-group">
+            <h1 class="elite-header-title">Customer Master List</h1>
+            <p class="elite-header-subtitle">Managing <strong>{{ stats.total_customers }}</strong> registered customers
+                in the system.</p>
+        </div>
+        <div
+            style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between;">
+            <div class="elite-search-wrapper" style="flex: 1; min-width: 250px;">
+                <i class="fas fa-search elite-search-icon"></i>
+                <input type="text" id="custSearch" class="elite-search-input"
+                    placeholder="Search name, phone, address or ID...">
+            </div>
+            <a href="{{ url_for('customer.add_customer') }}" class="elite-btn elite-btn-primary" style="margin-top: 0;">
+                <i class="fas fa-user-plus"></i> New Customer
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Summary -->
+    <div class="elite-grid" style="margin-bottom: 30px;">
+        <div class="elite-stat-card">
+            <div class="elite-stat-icon" style="background: rgba(108, 93, 211, 0.1); color: var(--elite-purple);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <div class="elite-stat-label">Total Customers</div>
+                <div class="elite-stat-value">{{ stats.total_customers }}</div>
+            </div>
+        </div>
+        <div class="elite-stat-card">
+            <div class="elite-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+                <div class="elite-stat-label">Active Users</div>
+                <div class="elite-stat-value">{{ stats.active_users }}</div>
+            </div>
+        </div>
+        <div class="elite-stat-card">
+            <div class="elite-stat-icon" style="background: rgba(255, 159, 0, 0.1); color: var(--elite-orange);">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <div>
+                <div class="elite-stat-label">Credit Active</div>
+                <div class="elite-stat-value">{{ stats.credit_active }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Table Card -->
+    <div class="elite-card">
+        <div class="table-responsive">
+            <table class="elite-table" id="custTable">
+                <thead>
+                    <tr>
+                        <th class="hide-on-mobile" style="width: 80px;">ID</th>
+                        <th>Customer Identity</th>
+                        <th class="hide-on-mobile">Contact & Location</th>
+                        <th>Bills (P/T)</th>
+                        <th class="hide-on-mobile">Last Activity</th>
+                        <th>Financials</th>
+                        <th class="hide-on-mobile">Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in customers %}
+                    <tr class="searchable-row">
+                        <td class="hide-on-mobile" style="font-family: monospace; font-weight: 800; color: #9CA3AF;">#{{
+                            c.id }}</td>
+                        <td class="edit-customer-btn" data-id="{{ c.id }}" data-name="{{ c.name }}"
+                            data-phone="{{ c.phone_no }}" data-address="{{ c.address or '' }}"
+                            data-last-paid="{{ c.padin_amount_last or 0 }}"
+                            data-total-paid="{{ c.padin_amount_total or 0 }}"
+                            data-pending-bills="{{ c.panding_bill_count or 0 }}"
+                            data-all-bills="{{ c.all_bill_count or 0 }}" data-status="{{ c.status }}"
+                            data-created-by="{{ c.created_by or '' }}" style="cursor: pointer;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div
+                                    style="width: 36px; height: 36px; border-radius: 10px; background: #6C5DD3; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;">
+                                    {{ c.name[:1]|upper }}</div>
+                                <div>
+                                    <div style="font-weight: 700; color: var(--elite-black);">{{ c.name }}</div>
+                                    <div class="show-on-mobile" style="font-size: 0.75rem; color: #6B7280;">{{
+                                        c.phone_no }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="hide-on-mobile">
+                            <div style="font-weight: 600; font-size: 0.85rem;">{{ c.phone_no }}</div>
+                            <div style="font-size: 0.75rem; color: #9CA3AF; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                title="{{ c.address or '-' }}">
+                                <i class="fas fa-map-marker-alt" style="font-size: 0.7rem;"></i> {{ c.address or 'N/A'
+                                }}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span
+                                    class="{% if (c.panding_bill_count|default(0)|int) > 0 %}text-danger-bold{% else %}text-success-bold{% endif %}">
+                                    {{ c.panding_bill_count|default(0) }}
+                                </span>
+                                <span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 600;">/ {{
+                                    c.all_bill_count|default(0) }}</span>
+                            </div>
+                        </td>
+                        <td class="hide-on-mobile">
+                            {% if c.last_payment_date %}
+                            <div style="font-size: 0.8rem; font-weight: 700; color: var(--elite-black);">₹{{
+                                "{:,.2f}".format(c.padin_amount_last|default(0)|float) }}</div>
+                            <div style="font-size: 0.7rem; color: #9CA3AF;">{{ (c.last_payment_date|string)[:10] }}
+                            </div>
+                            {% else %}
+                            <span style="font-size: 0.75rem; color: #D1D5DB; font-style: italic;">No history</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="font-weight: 900; color: #10B981; font-size: 1rem;">₹{{
+                                "{:,.2f}".format(c.padin_amount_total|default(0)|float) }}</div>
+                            <div class="hide-on-mobile" style="font-size: 0.7rem; color: #888;"><b>Total Invested</b>
+                            </div>
+                        </td>
+                        <td class="hide-on-mobile">
+                            {% if c.status == 'Active' %}
+                            <span
+                                style="background: #ECFDF5; color: #10B981; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fas fa-circle" style="font-size: 0.4rem;"></i> ACTIVE
+                            </span>
+                            {% else %}
+                            <span
+                                style="background: #F3F4F6; color: #6B7280; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800;">INACTIVE</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                <a href="#"
+                                    style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid #EEF0F6; color: #6C5DD3; display: flex; align-items: center; justify-content: center; transition: 0.2s;"
+                                    title="Ledger"><i class="fas fa-list-ul"></i></a>
+                                <button class="edit-customer-btn" data-id="{{ c.id }}" data-name="{{ c.name }}"
+                                    data-phone="{{ c.phone_no }}" data-address="{{ c.address or '' }}"
+                                    data-last-paid="{{ c.padin_amount_last or 0 }}"
+                                    data-total-paid="{{ c.padin_amount_total or 0 }}"
+                                    data-pending-bills="{{ c.panding_bill_count or 0 }}"
+                                    data-all-bills="{{ c.all_bill_count or 0 }}" data-status="{{ c.status }}"
+                                    data-created-by="{{ c.created_by or '' }}"
+                                    style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid #EEF0F6; color: #6B7280; display: flex; align-items: center; justify-content: center; transition: 0.2s; background: none; cursor: pointer;"
+                                    title="Edit"><i class="fas fa-pen"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+<!-- Edit Customer Modal (Luxury Style with Old Data View) -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content"
+            style="border-radius: 24px; border: none; box-shadow: 0 30px 70px rgba(0,0,0,0.15); overflow: hidden; margin: 15px;">
+            <form id="editCustomerForm" method="POST">
+                <div class="modal-header"
+                    style="padding: 25px 30px; border-bottom: 1px solid #F3F4F6; background: #fff; position: relative; z-index: 1;">
+                    <h5 class="modal-title" style="font-weight: 900; color: var(--elite-black); font-size: 1.25rem;">
+                        <i class="fas fa-user-edit" style="color: var(--elite-purple); margin-right: 10px;"></i>
+                        Update Account Identity
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"
+                    style="padding: 20px 30px; background: #fff; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Full Name <span style="color: #EF4444;">*</span></label>
+                            <input type="text" name="name" id="edit_name" class="elite-form-control" required
+                                placeholder="Update name">
+                            <span class="elite-current-val" id="current_name"><i class="fas fa-info-circle"></i>
+                                Current: <strong>-</strong></span>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Phone Number <span style="color: #EF4444;">*</span></label>
+                            <input type="text" name="phone_no" id="edit_phone_no" class="elite-form-control" required
+                                placeholder="Update phone">
+                            <span class="elite-current-val" id="current_phone"><i class="fas fa-phone"></i> Current:
+                                <strong>-</strong></span>
+                        </div>
+                    </div>
+                    <div class="elite-form-group" style="margin-top: 20px;">
+                        <label class="elite-form-label">Address / Location <span
+                                style="color: #EF4444;">*</span></label>
+                        <textarea name="address" id="edit_address" class="elite-form-control" rows="2" required
+                            placeholder="Update address"></textarea>
+                        <span class="elite-current-val" id="current_address"><i class="fas fa-map-marker-alt"></i>
+                            Current: <strong>-</strong></span>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Last Payment Analysis</label>
+                            <input type="number" step="0.01" name="padin_amount_last" id="edit_last_paid"
+                                class="elite-form-control">
+                            <span class="elite-current-val" id="current_last_paid">Current:
+                                <strong>₹0.00</strong></span>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Lifetime Billing</label>
+                            <input type="number" step="0.01" name="padin_amount_total" id="edit_total_paid"
+                                class="elite-form-control">
+                            <span class="elite-current-val" id="current_total_paid">Current:
+                                <strong>₹0.00</strong></span>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Unpaid Vouchers</label>
+                            <input type="number" name="panding_bill_count" id="edit_pending_bills"
+                                class="elite-form-control">
+                            <span class="elite-current-val" id="current_pending_bills">Current:
+                                <strong>0</strong></span>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Total Transactions</label>
+                            <input type="number" name="all_bill_count" id="edit_all_bills" class="elite-form-control">
+                            <span class="elite-current-val" id="current_all_bills">Current: <strong>0</strong></span>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Account Classification</label>
+                            <select name="status" id="edit_status" class="elite-form-control">
+                                <option value="Active">Active</option>
+                                <option value="Blocked">Blocked</option>
+                                <option value="VIP">VIP</option>
+                            </select>
+                            <span class="elite-current-val" id="current_status">Current: <strong>Active</strong></span>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Registrar Identity</label>
+                            <input type="text" name="created_by" id="edit_created_by" class="elite-form-control">
+                            <span class="elite-current-val" id="current_created_by">Current: <strong>-</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"
+                    style="padding: 25px 30px; background: #F9FAFB; border-top: 1px solid #F3F4F6; border-radius: 0 0 24px 24px;">
+                    <button type="button" class="elite-btn" data-bs-dismiss="modal"
+                        style="background: #eee; color: #666;">Discard</button>
+                    <button type="submit" class="elite-btn elite-btn-primary"
+                        style="box-shadow: 0 10px 20px rgba(108, 93, 211, 0.2);">
+                        <i class="fas fa-check-double"></i> Finalize Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search functionality
+    document.getElementById('custSearch').addEventListener('input', function () {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.searchable-row');
+        rows.forEach(row => {
+            const content = row.innerText.toLowerCase();
+            row.style.display = content.includes(query) ? '' : 'none';
+        });
+    });
+
+    // Enhanced Edit functionality (Slide and Old Data)
+    document.addEventListener('DOMContentLoaded', function () {
+        const editModal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
+        const editForm = document.getElementById('editCustomerForm');
+
+        document.querySelectorAll('.edit-customer-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+                const phone = this.getAttribute('data-phone');
+                const address = this.getAttribute('data-address');
+                const lastPaid = this.getAttribute('data-last-paid');
+                const totalPaid = this.getAttribute('data-total-paid');
+                const pendingBills = this.getAttribute('data-pending-bills');
+                const allBills = this.getAttribute('data-all-bills');
+                const status = this.getAttribute('data-status');
+                const createdBy = this.getAttribute('data-created-by');
+
+                // Populate Inputs
+                document.getElementById('edit_name').value = name;
+                document.getElementById('edit_phone_no').value = phone;
+                document.getElementById('edit_address').value = address;
+                document.getElementById('edit_last_paid').value = lastPaid;
+                document.getElementById('edit_total_paid').value = totalPaid;
+                document.getElementById('edit_pending_bills').value = pendingBills;
+                document.getElementById('edit_all_bills').value = allBills;
+                document.getElementById('edit_status').value = status;
+                document.getElementById('edit_created_by').value = createdBy;
+
+                // Populate "Old Data" Labels
+                document.querySelector('#current_name strong').innerText = name;
+                document.querySelector('#current_phone strong').innerText = phone;
+                document.querySelector('#current_address strong').innerText = address || '-';
+                document.querySelector('#current_last_paid strong').innerText = '₹' + parseFloat(lastPaid || 0).toLocaleString();
+                document.querySelector('#current_total_paid strong').innerText = '₹' + parseFloat(totalPaid || 0).toLocaleString();
+                document.querySelector('#current_pending_bills strong').innerText = pendingBills || 0;
+                document.querySelector('#current_all_bills strong').innerText = allBills || 0;
+                document.querySelector('#current_status strong').innerText = status;
+                document.querySelector('#current_created_by strong').innerText = createdBy || '-';
+
+                // Update Form Action
+                editForm.action = `/customer/edit/${id}`;
+
+                // Show Modal
+                editModal.show();
+            });
+        });
+    });
+</script>
+
+<style>
+    @media (max-width: 768px) {
+        .hide-on-mobile {
+            display: none !important;
+        }
+
+        .show-on-mobile {
+            display: block !important;
+        }
+
+        .elite-dashboard-header {
+            margin-bottom: 20px !important;
+        }
+
+        .elite-header-title {
+            font-size: 1.5rem !important;
+        }
+    }
+
+    .show-on-mobile {
+        display: none;
+    }
+</style>
 {% endblock %}

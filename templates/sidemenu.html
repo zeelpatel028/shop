@@ -4,24 +4,20 @@
         <div class="logo toggle-sidebar-btn" id="toggle-sidebar-alt"
             style="cursor: pointer; display: flex; align-items: center;">
             <div
-                style="width: 35px; height: 35px; border-radius: 10px; overflow: hidden; margin-right: 15px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); flex-shrink: 0;">
+                style="width: 32px; height: 32px; border-radius: 8px; overflow: hidden; margin-right: 12px; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); flex-shrink: 0;">
                 <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Logo"
                     style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             <span class="brand-name"
-                style="font-size: 1.2rem; font-weight: 900; white-space: nowrap; color: #fff !important;">
-                {% if request.blueprint == 'main_store' %}
+                style="font-size: 1.1rem; font-weight: 800; white-space: nowrap; color: #fff !important; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">
+                {% if request.blueprint == 'customer' %}
+                Customers
+                {% elif request.blueprint == 'main_store' %}
                 Main Store
                 {% elif request.blueprint == 'festiv_store' %}
-                Tulshi Shop
-                {% elif request.blueprint == 'customer' %}
-                Customer Portal
-                {% elif request.blueprint == 'seller' %}
-                Seller Portal
-                {% elif request.blueprint == 'employee' %}
-                Employee Portal
+                Festiv Store
                 {% else %}
-                Tulshi Shop
+                Shop Admin
                 {% endif %}
             </span>
         </div>
@@ -300,18 +296,18 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-            <li class="{% if request.endpoint == 'festiv_store.index' %}active{% endif %}">
-                <a href="{{ url_for('festiv_store.index') }}"
-                    class="{% if request.endpoint == 'festiv_store.index' %}active-link{% endif %}">
-                    <i class="fas fa-store"></i>
-                    <span>Festiv Store</span>
-                </a>
-            </li>
             <li class="{% if request.endpoint == 'main_store.index' %}active{% endif %}">
                 <a href="{{ url_for('main_store.index') }}"
                     class="{% if request.endpoint == 'main_store.index' %}active-link{% endif %}">
                     <i class="fas fa-store"></i>
                     <span>Main Store</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'festiv_store.index' %}active{% endif %}">
+                <a href="{{ url_for('festiv_store.index') }}"
+                    class="{% if request.endpoint == 'festiv_store.index' %}active-link{% endif %}">
+                    <i class="fas fa-gifts"></i>
+                    <span>Festiv Store</span>
                 </a>
             </li>
             <li
@@ -349,12 +345,12 @@
                         <span>App Dashboard</span>
                     </a>
                 </li>
-                {% if request.blueprint != 'festiv_store' %}
-                <li class="{% if request.endpoint == 'festiv_store.index' %}active{% endif %}">
-                    <a href="{{ url_for('festiv_store.index') }}"
-                        class="{% if request.endpoint == 'festiv_store.index' %}active-link{% endif %}">
+                {% if request.blueprint != 'main_store' %}
+                <li class="{% if request.endpoint == 'main_store.index' %}active{% endif %}">
+                    <a href="{{ url_for('main_store.index') }}"
+                        class="{% if request.endpoint == 'main_store.index' %}active-link{% endif %}">
                         <i class="fas fa-th-large"></i>
-                        <span>Festiv Store</span>
+                        <span>Main Store</span>
                     </a>
                 </li>
                 {% endif %}

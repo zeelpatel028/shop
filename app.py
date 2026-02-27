@@ -107,5 +107,5 @@ def login():
 if __name__ == '__main__':
     # Render environment provides PORT variable
     port = int(os.environ.get("PORT", 5000))
-    # host='0.0.0.0' is required for cloud binding
-    app.run(host='0.0.0.0', port=port)
+    # Enable debug mode for auto-reloading during development
+    app.run(host='0.0.0.0', port=port, debug=True)

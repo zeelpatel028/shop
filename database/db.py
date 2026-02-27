@@ -105,6 +105,7 @@ class QueryBuilder:
     # (Simplified for the sake of the walkthrough/transfer)
     def select(self, columns='*', count=None): self._select = columns; self._count = count; return self
     def eq(self, col, val): self._wheres.append((f"{col} = %s", val)); return self
+    def neq(self, col, val): self._wheres.append((f"{col} != %s", val)); return self
     def order(self, col, desc=False): self._order = f"{col} {'DESC' if desc else 'ASC'}"; return self
     def limit(self, n): self._limit = n; return self
     def insert(self, data): self._insert_data = data; return self
@@ -161,15 +162,24 @@ class QueryBuilder:
                         if "(" in self._select and ")" in self._select:
                             try:
                                 import re
-                                match = re.search(r'(\w+)\(([\w,\*]+)\)', self._select)
+                                # Pattern for traditional "table(cols)" or aliased "table:fk_col(cols)"
+                                match = re.search(r'(\w+):?(\w+)?\(([\w,\*]+)\)', self._select)
                                 if match:
                                     linked_table = match.group(1)
-                                    linked_cols_raw = match.group(2)
+                                    custom_fk = match.group(2)
+                                    linked_cols_raw = match.group(3)
+                                    
                                     primary_select = self._select.replace(match.group(0), "").strip(", ")
                                     if not primary_select: primary_select = "*"
-                                    fk_col = linked_table[:-1] if linked_table.endswith('s') else linked_table
-                                    fk_col += "_id"
-                                    join_str = f" LEFT JOIN {linked_table} ON {self.table}.{fk_col} = {linked_table}.{fk_col}"
+                                    
+                                    # Use custom FK if provided, else guess it
+                                    if custom_fk:
+                                        fk_col = custom_fk
+                                    else:
+                                        fk_col = linked_table[:-1] if linked_table.endswith('s') else linked_table
+                                        fk_col += "_id"
+                                        
+                                    join_str = f" LEFT JOIN {linked_table} ON {self.table}.{fk_col} = {linked_table}.id"
                                     linked_cols = [f"{linked_table}.{c.strip()} AS __joined_{linked_table}_{c.strip()}" 
                                                  for c in linked_cols_raw.split(",")]
                                     select_str = f"{self.table}.{primary_select}, {', '.join(linked_cols)}"

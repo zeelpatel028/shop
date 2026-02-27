@@ -175,6 +175,16 @@ form {
     opacity: 0.7;
 }
 
+/* Fix Autofill Spillage / Background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--input-bg) inset !important;
+    -webkit-text-fill-color: var(--text-color) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 /* Password Toggle */
 .input-field .toggle-password {
     cursor: pointer;
@@ -370,12 +380,17 @@ form {
 
     .btn {
         height: 50px;
+        font-size: 0.95rem;
     }
 
     .social-text::before,
     .social-text::after {
         width: 15%;
-        /* Shorter lines on small screens */
+    }
+
+    /* Prevent horizontal overflow */
+    .login-card {
+        overflow: hidden;
     }
 }
 
