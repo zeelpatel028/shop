@@ -60,13 +60,19 @@ function addToCart(productId) {
         existingItem.displayQty = `${existingItem.quantity} ${baseUnit}`;
     } else {
         // Add new item
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const bPrice = parseFloat(product.base_price || 0);
+        const sPrice = parseFloat(product.sell_price || product.final_price || product.price || 0);
+
         cart.push({
             product_id: product.product_id,
             name: product.product_name || product.name,
             brand: product.brand || '-',
             product_unit: product.product_unit || '-',
-            price: parseFloat(product.base_price || 0),
-            final_price: parseFloat(product.sell_price || product.final_price || product.price || 0),
+            base_price: bPrice,
+            normal_sell_price: sPrice,
+            price: bPrice,
+            final_price: (paymentMethod === 'Wholesale') ? bPrice : sPrice,
             tax_percent: parseFloat(product.tax_percent || 0),
             stock: product.stock,
             quantity: 1,
@@ -155,15 +161,15 @@ function renderCart() {
 
     let html = '';
     cart.forEach((item, index) => {
-        const total = item.final_price * item.quantity;
+        const total = Math.round(item.final_price * item.quantity);
         // Clean display formatting for floats
         const cleanQty = Number.isInteger(item.quantity) ? item.quantity : item.quantity.toFixed(3).replace(/\.?0+$/, '');
 
         // Calculate item tax
         const taxRate = item.tax_percent || 0;
         const baseTotal = total / (1 + (taxRate / 100));
-        const taxAmount = total - baseTotal;
-        const taxDisplay = taxRate > 0 ? `<span style="font-size: 11px; margin-left: 5px; color: #ff9f43; font-weight: 500;">(Inc. Tax ${taxRate}%: ₹${taxAmount.toFixed(2)})</span>` : '';
+        const taxAmount = Math.round(total - baseTotal);
+        const taxDisplay = taxRate > 0 ? `<span style="font-size: 11px; margin-left: 5px; color: #ff9f43; font-weight: 500;">(Inc. Tax ${taxRate}%: ₹${taxAmount})</span>` : '';
 
         const displayParts = (item.displayQty || `${cleanQty} ${item.product_unit}`).split(' ');
         const currentDisplayQty = parseFloat(displayParts[0]);
@@ -184,12 +190,22 @@ function renderCart() {
             unitOptions = `<option value="${currentDisplayUnit}" selected>${currentDisplayUnit}</option>` + unitOptions;
         }
 
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        let priceDisplayHTML = '';
+        if (paymentMethod === 'Credit' || paymentMethod === 'Wholesale') {
+            priceDisplayHTML = `₹<input type="number" class="price-input-inline" value="${Math.round(item.final_price)}" step="1" 
+                onchange="updateItemPrice(${index}, this.value)" 
+                style="width: 60px; text-align: center; border: 1px solid var(--border-color); border-radius: 4px; padding: 2px; font-weight: 600; font-size: 13px; outline: none; background: #fff; color: var(--text-main);">/unit ${taxDisplay}`;
+        } else {
+            priceDisplayHTML = `₹${Math.round(item.final_price)}/unit ${taxDisplay}`;
+        }
+
         html += `
         <div class="cart-item">
             <div class="cart-item-info">
                 <div class="cart-item-title">${item.name}</div>
                 <div class="cart-item-subtext">${item.brand} | ${item.displayQty || (cleanQty + ' ' + item.product_unit)}</div>
-                <div class="cart-item-price">₹${item.final_price.toFixed(2)}/unit ${taxDisplay}</div>
+                <div class="cart-item-price">${priceDisplayHTML}</div>
             </div>
             <div class="cart-controls" style="display: flex; gap: 8px; align-items: center;">
                 <input type="number" id="qty-input-${index}" class="qty-input-inline" value="${currentDisplayQty}" min="0.1" step="0.1" 
@@ -199,7 +215,7 @@ function renderCart() {
                     style="border: 1px solid var(--border-color); border-radius: 6px; padding: 4px; font-size: 13px; outline: none; background: #fff; color: var(--text-main); cursor: pointer; min-width: 50px;">
                     ${unitOptions}
                 </select>
-                <div class="item-total-price" style="margin-left: 10px;">₹${total.toFixed(2)}</div>
+                <div class="item-total-price" style="margin-left: 10px;">₹${total}</div>
                 <i class="fas fa-trash-alt remove-item-btn" onclick="removeFromCart(${index})" title="Remove"></i>
             </div>
         </div>`;
@@ -209,13 +225,24 @@ function renderCart() {
     updateTotals();
 }
 
+function updateItemPrice(index, newPrice) {
+    const parsedPrice = parseFloat(newPrice);
+    if (!isNaN(parsedPrice) && parsedPrice >= 0) {
+        cart[index].final_price = parsedPrice;
+        renderCart();
+    } else {
+        showToast("Invalid price entered.", "warning");
+        renderCart(); // Revert to previous value
+    }
+}
+
 function updateTotals() {
     let subtotal = 0;
     let tax = 0;
     let total = 0;
 
     cart.forEach(item => {
-        const itemTotal = item.final_price * item.quantity;
+        const itemTotal = Math.round(item.final_price * item.quantity);
         total += itemTotal;
 
         // Back calculate tax
@@ -227,9 +254,9 @@ function updateTotals() {
         tax += (itemTotal - baseTotal);
     });
 
-    document.getElementById('subTotal').innerText = '₹' + subtotal.toFixed(2);
-    document.getElementById('taxTotal').innerText = '₹' + tax.toFixed(2);
-    document.getElementById('grandTotal').innerText = '₹' + total.toFixed(2);
+    document.getElementById('subTotal').innerText = '₹' + Math.round(subtotal);
+    document.getElementById('taxTotal').innerText = '₹' + Math.round(tax);
+    document.getElementById('grandTotal').innerText = '₹' + Math.round(total);
 
     // Disable checkout if empty
     const btn = document.getElementById('checkoutBtn');
@@ -270,6 +297,86 @@ document.getElementById('productSearch').addEventListener('input', function (e) 
     }
 });
 
+// --- Customer Dropdown Logic ---
+function toggleCustomerInput() {
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const regularInput = document.getElementById('regularCustomerInput');
+    const creditInput = document.getElementById('creditCustomerInput');
+
+    if (paymentMethod === 'Credit') {
+        regularInput.style.display = 'none';
+        creditInput.style.display = 'block';
+    } else {
+        regularInput.style.display = 'block';
+        creditInput.style.display = 'none';
+
+        // Hide dropdown if open
+        document.getElementById('customerDropdown').style.display = 'none';
+    }
+
+    // Update cart prices based on selected method
+    cart.forEach(item => {
+        // Ensure missing fields are populated from old cart items if any
+        if (item.base_price === undefined) item.base_price = item.price;
+        if (item.normal_sell_price === undefined) item.normal_sell_price = item.final_price;
+
+        if (paymentMethod === 'Wholesale') {
+            item.final_price = item.base_price;
+        } else {
+            item.final_price = item.normal_sell_price;
+        }
+    });
+
+    // Re-render cart to show/hide editable prices based on payment method
+    renderCart();
+}
+
+function showCustomerDropdown() {
+    document.getElementById('customerDropdown').style.display = 'block';
+}
+
+function selectCustomer(name, phone) {
+    document.getElementById('creditCustomerSearch').value = name;
+    document.getElementById('customerPhone').value = phone;
+    document.getElementById('customerDropdown').style.display = 'none';
+}
+
+function filterCustomers() {
+    const searchTerm = document.getElementById('creditCustomerSearch').value.toLowerCase();
+    const options = document.querySelectorAll('#customerDropdown .customer-option:not(:last-child)'); // exclude "add new"
+
+    options.forEach(opt => {
+        const name = (opt.getAttribute('data-name') || '').toLowerCase();
+        const phone = (opt.getAttribute('data-phone') || '').toLowerCase();
+
+        if (name.includes(searchTerm) || phone.includes(searchTerm)) {
+            opt.style.display = 'block';
+        } else {
+            opt.style.display = 'none';
+        }
+    });
+}
+
+function openAddCustomerModal() {
+    // Redirect or open modal to add customer. For now, just alert or redirect if exists
+    // You can implement an actual modal here
+    document.getElementById('customerDropdown').style.display = 'none';
+    if (typeof openCustomerModal === 'function') {
+        openCustomerModal();
+    } else {
+        alert("Please go to the Customers section to add a new customer.");
+    }
+}
+
+// Close dropdown if clicked outside
+document.addEventListener('click', function (event) {
+    const creditInput = document.getElementById('creditCustomerInput');
+    const dropdown = document.getElementById('customerDropdown');
+    if (creditInput && !creditInput.contains(event.target)) {
+        if (dropdown) dropdown.style.display = 'none';
+    }
+});
+
 // --- Checkout ---
 
 function processCheckout() {
@@ -278,9 +385,16 @@ function processCheckout() {
 }
 
 function executeCheckout(action = 'finalize') {
-    const customerName = document.getElementById('customerName').value;
-    const customerPhone = document.getElementById('customerPhone').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
+    let customerName = '';
+
+    if (paymentMethod === 'Credit') {
+        customerName = document.getElementById('creditCustomerSearch').value;
+    } else {
+        customerName = document.getElementById('customerName').value;
+    }
+
+    const customerPhone = document.getElementById('customerPhone').value;
     const btn = document.getElementById('checkoutBtn');
 
     // Loading state for finalization

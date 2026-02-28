@@ -149,11 +149,11 @@ def generate_bill_pdf(bill_data, items):
 def holi_dashboard():
     # Count documents using Supabase
     try:
-        product_count = supabase.table('products').select('*', count='exact').execute().count
-        bill_count = supabase.table('bills').select('*', count='exact').execute().count
+        product_count = supabase.table('products').select('*', count='exact').eq('store_name', 'Holi Store').execute().count
+        bill_count = supabase.table('bills').select('*', count='exact').eq('store_name', 'Holi Store').execute().count
         
         # Fetching all bills for revenue calculation:
-        bills_response = supabase.table('bills').select('*').order('created_at', desc=True).execute()
+        bills_response = supabase.table('bills').select('*').eq('store_name', 'Holi Store').order('created_at', desc=True).execute()
         all_bills = bills_response.data or []
         total_revenue = sum(safe_float(bill.get('bill_total')) for bill in all_bills)
 
@@ -161,7 +161,7 @@ def holi_dashboard():
         items_res = supabase.table('bill_items').select('product_id, product_name, quantity').execute()
         bill_items = items_res.data or []
         
-        prods_res = supabase.table('products').select('product_id, product_name, profit_margin, stock, sell_price').execute()
+        prods_res = supabase.table('products').select('product_id, product_name, profit_margin, stock, sell_price').eq('store_name', 'Holi Store').execute()
         all_products = prods_res.data or []
         product_profits = {p['product_id']: safe_float(p.get('profit_margin')) for p in all_products}
         
@@ -233,11 +233,11 @@ def holi_dashboard():
 def master_stock():
     try:
         # Fetch active products for the main list
-        active_products_response = supabase.table('products').select('*').eq('product_status', 'Active').execute()
+        active_products_response = supabase.table('products').select('*').eq('store_name', 'Holi Store').eq('product_status', 'Active').execute()
         active_products = active_products_response.data or []
         
         # Fetch inactive products for the removed tab
-        inactive_products_response = supabase.table('products').select('*').eq('product_status', 'Inactive').execute()
+        inactive_products_response = supabase.table('products').select('*').eq('store_name', 'Holi Store').eq('product_status', 'Inactive').execute()
         inactive_products = inactive_products_response.data or []
         
         # Fetch bill_items for sales count (for all products, active or inactive)
@@ -374,23 +374,28 @@ def add_product():
 def ledger():
     period = request.args.get('period', 'all')
     try:
-        from datetime import timedelta
-        now = datetime.now()
+        from datetime import timedelta, timezone
+        IST = timezone(timedelta(hours=5, minutes=30))
+        now_ist = datetime.now(IST)
         
-        query = supabase.table('bills').select('*').order('created_at', desc=True)
+        query = supabase.table('bills').select('*').eq('store_name', 'Holi Store').order('created_at', desc=True)
         
         if period == 'day':
-            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
-            query = query.gte('created_at', start_date)
+            start_ist = now_ist.replace(hour=0, minute=0, second=0, microsecond=0)
+            start_utc = start_ist.astimezone(timezone.utc).isoformat()
+            query = query.gte('created_at', start_utc)
         elif period == 'week':
-            start_date = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
-            query = query.gte('created_at', start_date)
+            start_ist = (now_ist - timedelta(days=now_ist.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+            start_utc = start_ist.astimezone(timezone.utc).isoformat()
+            query = query.gte('created_at', start_utc)
         elif period == 'month':
-            start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
-            query = query.gte('created_at', start_date)
+            start_ist = now_ist.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            start_utc = start_ist.astimezone(timezone.utc).isoformat()
+            query = query.gte('created_at', start_utc)
         elif period == 'year':
-            start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
-            query = query.gte('created_at', start_date)
+            start_ist = now_ist.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            start_utc = start_ist.astimezone(timezone.utc).isoformat()
+            query = query.gte('created_at', start_utc)
             
         bills_response = query.execute()
         bills = bills_response.data or []
@@ -400,7 +405,7 @@ def ledger():
         all_items = all_items_res.data or []
         
         # Fetch product margins
-        prods_res = supabase.table('products').select('product_id, profit_margin').execute()
+        prods_res = supabase.table('products').select('product_id, profit_margin').eq('store_name', 'Holi Store').execute()
         product_profits = {p['product_id']: safe_float(p.get('profit_margin')) for p in prods_res.data} if prods_res.data else {}
         
         # Group items by bill_id
@@ -436,12 +441,19 @@ def ledger():
         # Helper to format dates for grouping
         def get_group_key(created_at, period):
             # 2024-03-21T14:30:00...
-            dt = datetime.fromisoformat(created_at[:19])
-            if period == 'day': return dt.strftime('%H:00')
-            if period == 'week': return dt.strftime('%a')
-            if period == 'month': return dt.strftime('%d %b')
-            if period == 'year': return dt.strftime('%B')
-            return dt.strftime('%Y-%m-%d')
+            try:
+                dt_utc = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                if dt_utc.tzinfo is None:
+                    from datetime import timezone
+                    dt_utc = dt_utc.replace(tzinfo=timezone.utc)
+                dt_ist = dt_utc.astimezone(IST)
+            except:
+                dt_ist = datetime.fromisoformat(created_at[:19])
+            if period == 'day': return dt_ist.strftime('%H:00')
+            if period == 'week': return dt_ist.strftime('%a')
+            if period == 'month': return dt_ist.strftime('%d %b')
+            if period == 'year': return dt_ist.strftime('%B')
+            return dt_ist.strftime('%Y-%m-%d')
 
         trend_map = defaultdict(float)
         for b in sorted_bills:
@@ -458,8 +470,8 @@ def ledger():
         elif period == 'month':
             # Approximation of days in current month
             from calendar import monthrange
-            days_in_month = monthrange(now.year, now.month)[1]
-            graph_labels = [f"{d:02d} {now.strftime('%b')}" for d in range(1, days_in_month + 1)]
+            days_in_month = monthrange(now_ist.year, now_ist.month)[1]
+            graph_labels = [f"{d:02d} {now_ist.strftime('%b')}" for d in range(1, days_in_month + 1)]
         elif period == 'year':
             graph_labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         else:
@@ -520,7 +532,7 @@ def make_bill():
                         return jsonify({'success': False, 'message': f"Quantity limit exceeded for {item.get('name', 'item')}"})
                     
                     # Fetch fresh product data
-                    res = supabase.table('products').select('*').eq('product_id', p_id).execute()
+                    res = supabase.table('products').select('*').eq('store_name', 'Holi Store').eq('product_id', p_id).execute()
                     if not res.data:
                         return jsonify({'success': False, 'message': f"Product not found: {item.get('name', p_id)}"})
                     
@@ -793,7 +805,7 @@ def make_bill():
     # GET Request
     try:
         # Filter: Only show products with 'Active' status on the billing page
-        products_response = supabase.table('products').select('*').eq('product_status', 'Active').execute()
+        products_response = supabase.table('products').select('*').eq('store_name', 'Holi Store').eq('product_status', 'Active').execute()
         products = products_response.data or []
     except:
         products = []

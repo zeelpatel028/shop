@@ -29,6 +29,41 @@
         }
     }
 
+    /* ─── Header ─── */
+    .elite-dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 60px;
+        margin-bottom: 30px;
+    }
+
+    .elite-header-group {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .elite-header-title {
+        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 900;
+        letter-spacing: -1px;
+        color: #111827;
+    }
+
+    .elite-header-subtitle {
+        margin: 5px 0 0 0;
+        color: #6B7280;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .elite-header-subtitle strong {
+        color: #F97316;
+        text-transform: uppercase;
+    }
+
     /* Filter Segmented Control */
     .period-filters {
         display: flex;
@@ -278,6 +313,19 @@
         }
     }
 
+    @media (max-width: 768px) {
+        .elite-dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .period-filters {
+            width: 100%;
+            overflow-x: auto;
+        }
+    }
+
     @media (max-width: 640px) {
         .pay-stats {
             grid-template-columns: 1fr;
@@ -285,6 +333,14 @@
 
         .ledger-container {
             padding: 16px;
+        }
+
+        .elite-dashboard-header {
+            margin-bottom: 20px;
+        }
+
+        .elite-header-title {
+            font-size: 1.8rem;
         }
 
         .period-filters {
@@ -306,26 +362,19 @@
 </style>
 {% endblock %}
 
+{% block page_title %}{% endblock %}
+
 {% block content %}
 <div class="ledger-container">
     <!-- Header -->
-    <div class="elite-dashboard-header"
-        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
-        <div class="elite-header-group" style="display: flex; gap: 15px; align-items: center;">
-            <div
+    <div class="elite-dashboard-header">
+        <div class="elite-header-group">
+            <div class="elite-header-accent"
                 style="width: 5px; height: 50px; background: linear-gradient(to bottom, #F97316, #FBBF24); border-radius: 4px;">
             </div>
-            <div>
-                <h1 class="elite-header-title"
-                    style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; color: #111827;">
-                    Revenue <span style="color: #6C5DD3;">Ledger</span>
-                </h1>
-                <p class="elite-header-subtitle"
-                    style="margin: 5px 0 0 0; color: #6B7280; font-size: 0.95rem; font-weight: 600;">
-                    Financial overview for <strong style="color: #F97316; text-transform: uppercase;">{{
-                        (active_period|default('all')) }}</strong>
-                </p>
-            </div>
+            <h1 class="elite-header-title">
+                <span style="color: #6C5DD3;">Revenue</span>
+            </h1>
         </div>
 
         <div class="period-filters">
@@ -411,7 +460,7 @@
                 <i class="fas fa-list" style="color: #F97316;"></i>
                 Transaction History
             </div>
-            <div class="ptc-count">Showing {{ transactions|length if transactions else 0 }} records</div>
+            <div class="ptc-count">Showing {{ bills|length if bills else 0 }} records</div>
         </div>
 
         <div style="overflow-x: auto;">
@@ -428,25 +477,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if transactions %}
-                    {% for txn in transactions %}
+                    {% if bills %}
+                    {% for txn in bills %}
                     <tr>
-                        <td>#{{ txn.bill_number|default('-') }}</td>
+                        <td>#{{ txn.bill_no|default('-') }}</td>
                         <td>
                             <div style="font-weight: 700; color: #111827;">{{ txn.customer_name|default('Walk-in') }}
                             </div>
-                            {% if txn.customer_phone %}
+                            {% if txn.customer_phone and txn.customer_phone != '-' %}
                             <div style="font-size: 0.75rem; color: #6B7280;">{{ txn.customer_phone }}</div>
                             {% endif %}
                         </td>
                         <td>
-                            <div style="color: #4B5563;">{{ txn.date|default('-') }}</div>
+                            <div style="color: #4B5563;">{{ (txn.created_at|default('', true))[:16]|replace('T', ' · ')
+                                or 'N/A' }}</div>
                         </td>
                         <td>
-                            <span class="status-badge status-success">Completed</span>
+                            <span
+                                class="status-badge {% if txn.payment_status == 'Paid' %}status-success{% else %}status-pending{% endif %}">{{
+                                txn.payment_status|default('Pending') }}</span>
                         </td>
                         <td>
-                            {% if txn.bill_url %}
+                            {% if txn.bill_url and txn.bill_url != '-' %}
                             <a href="{{ txn.bill_url }}" target="_blank" class="view-btn">
                                 <i class="fas fa-external-link-alt"></i> View
                             </a>
@@ -454,8 +506,8 @@
                             -
                             {% endif %}
                         </td>
-                        <td class="td-profit">₹{{ "{:,.0f}".format(txn.profit|default(0)|float) }}</td>
-                        <td class="td-amount">₹{{ "{:,.0f}".format(txn.total_amount|default(0)|float) }}</td>
+                        <td class="td-profit">₹{{ "{:,.0f}".format(txn.bill_profit|default(0)|float) }}</td>
+                        <td class="td-amount">₹{{ "{:,.0f}".format(txn.bill_total|default(0)|float) }}</td>
                     </tr>
                     {% endfor %}
                     {% else %}
@@ -478,7 +530,7 @@
 
 {% block extra_js %}
 {{ super() }}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Guard against missing canvas element
@@ -494,16 +546,32 @@
         var labels = JSON.parse(canvasEl.getAttribute('data-labels') || '[]');
         var revenueData = JSON.parse(canvasEl.getAttribute('data-revenue') || '[]');
 
-        // Guard against empty data — show a "No data" message instead of empty chart
+        // Guard against empty data
         if (!labels.length || !revenueData.length) {
-            canvasEl.parentElement.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center;justify-content:center;height:100%;color:#8B95A5;font-weight:600;"><i class="far fa-image" style="font-size:3.5rem; color: #EEF0F6; margin-bottom: 15px;"></i> No chart data available for this period.</div>';
+            canvasEl.parentElement.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center;justify-content:center;height:100%;color:#8B95A5;font-weight:600;"><i class="far fa-chart-bar" style="font-size:3.5rem; color: #EEF0F6; margin-bottom: 15px;"></i> No chart data available for this period.</div>';
             return;
         }
 
-        // Create Gradient
+        // Create Gradient Fill
         var gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(108, 93, 211, 0.2)');
+        gradient.addColorStop(0, 'rgba(108, 93, 211, 0.4)');
         gradient.addColorStop(1, 'rgba(108, 93, 211, 0)');
+
+        // Custom shadow plugin for glowing line effect
+        const glowPlugin = {
+            id: 'glowPlugin',
+            beforeDatasetsDraw(chart) {
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.shadowColor = 'rgba(108, 93, 211, 0.45)';
+                ctx.shadowBlur = 12;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 6;
+            },
+            afterDatasetsDraw(chart) {
+                chart.ctx.restore();
+            }
+        };
 
         new Chart(ctx, {
             type: 'line',
@@ -514,16 +582,18 @@
                     data: revenueData,
                     borderColor: '#6C5DD3',
                     backgroundColor: gradient,
-                    borderWidth: 3,
-                    fill: true,
+                    borderWidth: 4,
+                    fill: 'start',
                     tension: 0.4,
-                    pointRadius: 6,
+                    pointRadius: 0,
                     pointHoverRadius: 8,
                     pointBackgroundColor: '#fff',
                     pointBorderColor: '#6C5DD3',
-                    pointBorderWidth: 2
+                    pointBorderWidth: 3,
+                    pointHitRadius: 20
                 }]
             },
+            plugins: [glowPlugin],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -531,18 +601,24 @@
                     mode: 'index',
                     intersect: false
                 },
+                layout: {
+                    padding: { left: -10, bottom: 0, right: 10, top: 10 }
+                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#111827',
-                        padding: 12,
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 13 },
+                        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        padding: 14,
+                        cornerRadius: 12,
+                        titleFont: { size: 14, family: "'Inter', sans-serif", weight: 'bold' },
+                        bodyFont: { size: 14, family: "'Inter', sans-serif", weight: '500' },
                         displayColors: false,
                         callbacks: {
                             label: function (context) {
                                 var val = context.parsed.y;
-                                return 'Revenue: ₹' + (val != null ? val.toLocaleString() : '0');
+                                return '₹' + (val != null ? val.toLocaleString('en-IN') : '0');
                             }
                         }
                     }
@@ -550,18 +626,25 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.03)' },
+                        border: { display: false },
+                        grid: {
+                            color: 'rgba(0,0,0,0.04)',
+                            drawTicks: false
+                        },
                         ticks: {
-                            callback: function (v) { return '₹' + v.toLocaleString(); },
-                            font: { weight: '600' },
-                            color: '#6B7280'
+                            callback: function (v) { return '₹' + v.toLocaleString('en-IN'); },
+                            font: { size: 12, family: "'Inter', sans-serif", weight: '600' },
+                            color: '#8B95A5',
+                            padding: 12
                         }
                     },
                     x: {
-                        grid: { display: false },
+                        grid: { display: false, drawTicks: false },
+                        border: { display: false },
                         ticks: {
-                            font: { weight: '600' },
-                            color: '#6B7280'
+                            font: { size: 12, family: "'Inter', sans-serif", weight: '600' },
+                            color: '#8B95A5',
+                            padding: 8
                         }
                     }
                 }

@@ -117,7 +117,7 @@ def start_keep_alive():
     def ping_self():
         # Wait for the server to spin up
         logger.info("Keep-alive initialization: Waiting 10s for server startup...")
-        time.sleep(10)
+        time.sleep(300)
         
         # Priority: RENDER_EXTERNAL_URL > local URL
         url = os.environ.get('RENDER_EXTERNAL_URL')
@@ -141,8 +141,8 @@ def start_keep_alive():
             except Exception as e:
                 logger.error(f"Keep-alive ping error: {e}")
             
-            # Ping every 10 seconds exactly as requested
-            time.sleep(10)
+            # Ping every 5 minutes (300 seconds) as requested
+            time.sleep(300)
 
     # Use a daemon thread so it exits when the main process does
     thread = threading.Thread(target=ping_self, daemon=True)

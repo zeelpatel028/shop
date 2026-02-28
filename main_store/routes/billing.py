@@ -157,9 +157,14 @@ def make_bill():
                     if p_stock < p_qty:
                          return jsonify({'success': False, 'message': f"Insufficient stock for {p_name} (Available: {p_stock})"})
                     
-                    line_total = p_sell_price * p_qty
+                    # Accept custom final price from frontend for Credit bills, otherwise use DB price
+                    payment_method = data.get('payment_method', 'Cash')
+                    if payment_method == 'Credit':
+                        p_sell_price = safe_float(item.get('final_price', p_sell_price))
+                    
+                    line_total = round(p_sell_price * p_qty)
                     base_price = line_total / (1 + (p_tax_pct/100))
-                    tax_amount = line_total - base_price
+                    tax_amount = round(line_total - base_price)
                     
                     bill_total += line_total
                     subtotal_amount += base_price
@@ -263,8 +268,8 @@ def make_bill():
                 "subtotal_amount": round(subtotal_amount, 2),
                 "total_tax_amount": round(total_tax_amount, 2),
                 "bill_total": round(bill_total, 2),
-                "payment_status": "Paid",
-                "bill_status": "Completed",
+                "payment_status": "Paid" if payment_method != 'Credit' else "Unpaid",
+                "bill_status": "Completed" if payment_method != 'Credit' else "Pending",
                 "payment_id": payment_ref if payment_method == 'UPI' else None,
                 "customer_name": data.get('customer_name', 'Cash'),
                 "customer_phone": data.get('customer_phone', '-')
@@ -289,12 +294,12 @@ def make_bill():
                     "store_name": "Main Store",
                     "payment_method": payment_method,
                     "payment_type": "Full",
-                    "paid_amount": round(bill_total, 2),
-                    "remaining_amount": 0,
-                    "payment_status": "Paid",
+                    "paid_amount": round(bill_total, 2) if payment_method != 'Credit' else 0,
+                    "remaining_amount": 0 if payment_method != 'Credit' else round(bill_total, 2),
+                    "payment_status": "Paid" if payment_method != 'Credit' else "Unpaid",
                     "received_by": "Counter",
-                    "payment_reference": f"CASH-{uuid.uuid4().hex[:6].upper()}",
-                    "transaction_id": "CASH-TRANSACTION",
+                    "payment_reference": f"{payment_method.upper()}-{uuid.uuid4().hex[:6].upper()}",
+                    "transaction_id": f"{payment_method.upper()}-TRANSACTION",
                     "is_bill_generated": True,
                     "created_at": datetime.now().isoformat(),
                     "updated_at": datetime.now().isoformat()
@@ -353,6 +358,66 @@ def make_bill():
                     pass
             except:
                 pass
+                
+            if payment_method == 'Credit':
+                customer_phone = data.get('customer_phone', '-')
+                customer_name = data.get('customer_name', 'Cash')
+                
+                cust_res = supabase.table('customer').select('*').eq('phone_no', customer_phone).execute()
+                cust = None
+                if cust_res.data:
+                    cust = cust_res.data[0]
+                else:
+                    new_cust = {
+                        "name": customer_name,
+                        "phone_no": customer_phone,
+                        "address": "-",
+                        "padin_amount_last": 0,
+                        "padin_amount_total": 0,
+                        "panding_bill_count": 0,
+                        "all_bill_count": 0,
+                        "status": "Active",
+                        "created_by": "System"
+                    }
+                    try:
+                        ins_cust = supabase.table('customer').insert(new_cust).execute()
+                        if ins_cust.data:
+                            cust = ins_cust.data[0]
+                    except:
+                        pass
+                
+                if cust:
+                    updated_padin_total = float(cust.get('padin_amount_total', 0) or 0) + round(bill_total, 2)
+                    try:
+                        supabase.table('customer').update({
+                            "padin_amount_last": round(bill_total, 2),
+                            "padin_amount_total": round(updated_padin_total, 2),
+                            "panding_bill_count": int(cust.get('panding_bill_count', 0) or 0) + 1,
+                            "all_bill_count": int(cust.get('all_bill_count', 0) or 0) + 1,
+                            "last_payment_date": datetime.now().isoformat()
+                        }).eq('id', cust['id']).execute()
+                        
+                        bill_desc = ", ".join([f"{item['name']} ({item['quantity']}{item['product_unit']} x {item['final_price']})" for item in validated_items])
+                        credit_bill_data = {
+                            "c_id": cust['id'],
+                            "bill_id": bill_pk,
+                            "bill_url": bill_url or "-",
+                            "total_price": round(bill_total, 2),
+                            "paid_amount": 0,
+                            "remaining_amount": round(bill_total, 2),
+                            "bill_discreption": bill_desc,
+                            "bill_status": "Pending",
+                            "payment_status": "Unpaid",
+                            "payment_method": "Credit",
+                            "payment_date": datetime.now().isoformat(),
+                            "created_date": datetime.now().strftime("%Y-%m-%d"),
+                            "created_time": datetime.now().strftime("%H:%M:%S"),
+                            "created_by": "System",
+                            "created_at": datetime.now().isoformat()
+                        }
+                        supabase.table('credit_bill').insert(credit_bill_data).execute()
+                    except Exception as ex:
+                        print("Error saving credit bill:", ex)
 
             return jsonify({'success': True, 'bill_no': bill_no, 'bill_url': bill_url})
 
@@ -364,5 +429,11 @@ def make_bill():
         products = products_response.data or []
     except:
         products = []
+        
+    try:
+        customers_response = supabase.table('customer').select('*').eq('status', 'Active').execute()
+        customers = customers_response.data or []
+    except:
+        customers = []
             
-    return render_template('make_bill_main.html', products=products)
+    return render_template('make_bill_main.html', products=products, customers=customers)

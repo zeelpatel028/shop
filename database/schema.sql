@@ -124,6 +124,11 @@ CREATE TABLE IF NOT EXISTS credit_bill (
     payment_status TEXT,
     payment_method TEXT,
     payment_date TIMESTAMP,
+    created_date TEXT,
+    created_time TEXT,
+    approved_date TEXT,
+    approved_time TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_by TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

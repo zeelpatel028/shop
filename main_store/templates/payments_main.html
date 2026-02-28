@@ -27,30 +27,24 @@
 {% block content %}
 {% set total_collected = (cash_total|default(0)|float) + (upi_total|default(0)|float) %}
 {% set total_count = (cash_count|default(0)|int) + (upi_count|default(0)|int) %}
-{% set cash_count_pct = ((cash_count|default(0)|int / total_count * 100)|round|int) if total_count > 0 else 0 %}
-{% set upi_count_pct = (100 - cash_count_pct) if total_count > 0 else 0 %}
 {% set pay_count = (payments|default([]))|length %}
+
+{# Use total_collected for percentages rather than count to better reflect revenue impact, or stick to count if
+preferred. Sticking to count as per UI explicitly saying "(by Bill Count)" #}
+{% set cash_count_pct = ((cash_count|default(0)|int / total_count * 100)|round(1)) if total_count > 0 else 0 %}
+{% set upi_count_pct = ((upi_count|default(0)|int / total_count * 100)|round(1)) if total_count > 0 else 0 %}
 
 <div class="payment-data-container">
 
     <!-- ── Header ── -->
-    <div class="elite-dashboard-header"
-        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
-        <div class="elite-header-group" style="display: flex; gap: 15px; align-items: center;">
-            <div
+    <div class="elite-dashboard-header">
+        <div class="elite-header-group">
+            <div class="elite-header-accent"
                 style="width: 5px; height: 50px; background: linear-gradient(to bottom, #F97316, #FBBF24); border-radius: 4px;">
             </div>
-            <div>
-                <h1 class="elite-header-title"
-                    style="margin: 0; font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; color: #111827;">
-                    Payment <span style="color: #6C5DD3;">Data</span>
-                </h1>
-                <p class="elite-header-subtitle"
-                    style="margin: 5px 0 0 0; color: #6B7280; font-size: 0.95rem; font-weight: 600;">
-                    Overview for <strong style="color: #F97316; text-transform: uppercase;">{{
-                        (active_period|default('all')) }}</strong>
-                </p>
-            </div>
+            <h1 class="elite-header-title">
+                Payment <span>Data</span>
+            </h1>
         </div>
 
         <div class="period-filters">
@@ -78,7 +72,7 @@
             <div class="psc-value">₹{{ "{:,.0f}".format(cash_total|default(0)|float) }}</div>
             <div class="psc-sub">
                 <i class="fas fa-file-invoice" style="font-size: 0.6rem;"></i>
-                {{ cash_count }} Bills · {{ cash_pct }}%
+                {{ cash_count }} Bills · {{ cash_count_pct }}%
             </div>
         </div>
 
@@ -91,7 +85,7 @@
             <div class="psc-value" style="color: #FF9F00;">₹{{ "{:,.0f}".format(upi_total|default(0)|float) }}</div>
             <div class="psc-sub">
                 <i class="fas fa-file-invoice" style="font-size: 0.6rem;"></i>
-                {{ upi_count }} Bills · {{ upi_pct }}%
+                {{ upi_count }} Bills · {{ upi_count_pct }}%
             </div>
         </div>
 
@@ -137,7 +131,8 @@
             <span class="ptc-count">{{ pay_count }} Records</span>
         </div>
 
-        <div class="elite-table-wrapper">
+        <div class="elite-table-wrapper"
+            style="overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; border: 1px solid #EEF0F6;">
             <table class="pay-table">
                 <thead>
                     <tr>

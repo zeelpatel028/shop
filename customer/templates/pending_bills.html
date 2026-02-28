@@ -78,8 +78,8 @@
                             </span>
                         </td>
                         <td style="text-align: right;">
-                            <button class="elite-btn elite-btn-primary view-bills-trigger" data-id="{{ c.customer_id }}"
-                                data-name="{{ c.name }}"
+                            <button class="elite-btn elite-btn-primary" onclick="openBillsModal(this)"
+                                data-id="{{ c.customer_id }}" data-name="{{ c.name | escape }}"
                                 style="padding: 10px 18px; font-size: 0.8rem; margin-left: auto;">
                                 <i class="fas fa-eye"></i> View All Unpaid Bills
                             </button>
@@ -101,93 +101,263 @@
     </div>
 </div>
 
-<!-- Unpaid Bills Modal (Luxury Style) -->
-<div class="modal fade" id="unpaidBillsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content" style="border-radius: 24px; border: none; box-shadow: 0 30px 70px rgba(0,0,0,0.15);">
-            <div class="modal-header" style="padding: 25px 30px; border-bottom: 1px solid #F3F4F6;">
-                <h5 class="modal-title" style="font-weight: 900; color: var(--elite-black); font-size: 1.25rem;">
-                    <i class="fas fa-receipt" style="color: var(--elite-purple); margin-right: 10px;"></i>
-                    <span id="modalCustomerName">Customer Bills</span>
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Unpaid Bills Modal (Custom Style) -->
+<div id="unpaidBillsModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div
+        style="background: #fff; width: 95%; max-width: 800px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh;">
+
+        <!-- Header -->
+        <div
+            style="background: #6C5DD3; color: #fff; padding: 20px 25px; display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
+            <div>
+                <h2
+                    style="margin: 0; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-receipt"></i> Pending Bills
+                </h2>
+                <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px; font-weight: 600;">Customer: <span
+                        id="modalCustomerName"></span></div>
             </div>
-            <div class="modal-body" style="padding: 30px;">
-                <div id="loading" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status"
-                        style="width: 3rem; height: 3rem; color: var(--elite-purple) !important;"></div>
-                    <p class="mt-3" style="font-weight: 600; color: var(--elite-gray-text);">Retrieving payment
-                        history...</p>
-                </div>
-                <div id="billsList" style="display: none;">
-                    <!-- Appended by JS -->
-                </div>
+            <button type="button" onclick="closeBillsModal()"
+                style="background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; padding: 0; line-height: 1;">&times;</button>
+        </div>
+
+        <div style="padding: 25px; overflow-y: auto; background: #F8F9FA;">
+            <div id="billsList" style="display: none;">
+                <!-- Appended by JS -->
             </div>
         </div>
     </div>
 </div>
 
+<!-- NEW: Settlement Confirmation Modal (Security Layer) -->
+<div id="settlementModal"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1100; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+    <div
+        style="background: #fff; width: 90%; max-width: 400px; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.3); animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+        <div style="background: #10B981; color: #fff; padding: 25px; text-align: center;">
+            <div
+                style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3 style="margin: 0; font-weight: 800; font-size: 1.25rem;">Secure Settlement</h3>
+            <p style="margin: 5px 0 0; opacity: 0.9; font-size: 0.85rem; font-weight: 600;">Confirming payment for Bill
+                #<span id="settleBillIdHeader"></span></p>
+        </div>
+
+        <div style="padding: 30px;">
+            <div style="margin-bottom: 20px;">
+                <label
+                    style="display: block; font-size: 0.75rem; font-weight: 800; color: #8B95A5; text-transform: uppercase; margin-bottom: 8px;">Amount
+                    to Pay (₹)</label>
+                <div style="position: relative;">
+                    <span
+                        style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-weight: 800; color: #4B5563;">₹</span>
+                    <input type="number" id="settleAmountInput"
+                        style="width: 100%; padding: 12px 15px 12px 35px; border: 2px solid #F3F4F6; border-radius: 12px; font-weight: 800; font-size: 1.1rem; color: #111827; outline: none; transition: 0.2s;"
+                        onfocus="this.style.borderColor='#10B981'" onblur="this.style.borderColor='#F3F4F6'">
+                </div>
+                <div id="maxAmountHint" style="font-size: 0.7rem; color: #6B7280; margin-top: 5px; font-weight: 600;">
+                    Full balance: ₹0.00</div>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <label
+                    style="display: block; font-size: 0.75rem; font-weight: 800; color: #8B95A5; text-transform: uppercase; margin-bottom: 8px;">Security
+                    Password</label>
+                <input type="password" id="settlePasswordInput" placeholder="Enter Access Code"
+                    style="width: 100%; padding: 12px 15px; border: 2px solid #F3F4F6; border-radius: 12px; font-weight: 700; outline: none; transition: 0.2s; background: #F9FAFB;"
+                    onfocus="this.style.borderColor='#10B981'; this.style.background='#fff'"
+                    onblur="this.style.borderColor='#F3F4F6'; this.style.background='#F9FAFB'">
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <button onclick="closeSettlementModal()"
+                    style="flex: 1; padding: 14px; border-radius: 12px; border: 1px solid #E5E7EB; background: #fff; color: #4B5563; font-weight: 700; cursor: pointer; transition: 0.2s;">Cancel</button>
+                <button onclick="submitSettlement()" id="finalizeSettleBtn"
+                    style="flex: 2; padding: 14px; border-radius: 12px; border: none; background: #10B981; color: #fff; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">Confirm
+                    Pay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes scaleUp {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+</style>
+
 <script>
-    const modal = new bootstrap.Modal(document.getElementById('unpaidBillsModal'));
     const billsList = document.getElementById('billsList');
-    const loading = document.getElementById('loading');
     const modalTitleText = document.getElementById('modalCustomerName');
+    let currentActiveCustomerId = null;
 
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.view-bills-trigger').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const customerId = this.getAttribute('data-id');
-                const name = this.getAttribute('data-name');
-                openBillsModal(customerId, name);
-            });
-        });
-    });
+    function openBillsModal(btn) {
+        const customerId = btn.getAttribute('data-id');
+        const name = btn.getAttribute('data-name');
 
-    function openBillsModal(customerId, name) {
-        modalTitleText.innerText = `Pending Bills - ${name}`;
-        billsList.style.display = 'none';
-        loading.style.display = 'block';
-        modal.show();
+        currentActiveCustomerId = customerId;
+        modalTitleText.innerText = name;
+
+        billsList.style.display = 'block';
+        billsList.innerHTML = '<div class="text-center py-5" style="color: var(--elite-gray-text); font-weight: 600;">Data is loading...</div>';
+
+        // Native Modal Show with transition
+        const modal = document.getElementById('unpaidBillsModal');
+        modal.style.display = 'flex';
+        modal.style.opacity = '0';
+        setTimeout(() => {
+            modal.style.transition = 'opacity 0.2s ease';
+            modal.style.opacity = '1';
+        }, 10);
 
         fetch(`/customer/api/unpaid-bills/${customerId}`)
             .then(res => res.json())
             .then(data => {
-                loading.style.display = 'none';
                 billsList.innerHTML = '';
 
                 if (data.status === 'success' && data.bills.length > 0) {
                     data.bills.forEach(bill => {
-                        const date = new Date(bill.created_at).toLocaleDateString('en-IN', {
+                        const date = bill.created_date || new Date(bill.created_at).toLocaleDateString('en-IN', {
                             day: 'numeric', month: 'short', year: 'numeric'
                         });
+                        const time = bill.created_time || '';
+
                         const html = `
-                            <div style="background: #F9FAFB; border: 1px solid #EEF0F6; border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; cursor: default;">
+                            <div style="background: #fff; border: 1px solid #EEF0F6; border-radius: 12px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
                                 <div>
                                     <div style="font-weight: 900; font-size: 1rem; color: var(--elite-black); margin-bottom: 2px;">BILL #${bill.bill_id || bill.id}</div>
-                                    <div style="font-size: 0.8rem; color: var(--elite-gray-text); font-weight: 600;">Settled on: ${date}</div>
-                                    <div style="margin-top: 8px; font-weight: 800; color: #EF4444; font-size: 0.9rem;">Remaining: ₹${bill.remaining_amount}</div>
+                                    <div style="font-size: 0.8rem; color: var(--elite-gray-text); font-weight: 600;">Created on: ${date} ${time}</div>
+                                    <div style="margin-top: 8px; font-weight: 800; color: #EF4444; font-size: 0.9rem;"><i class="fas fa-exclamation-circle"></i> Remaining: ₹${bill.remaining_amount}</div>
                                 </div>
                                 <div style="text-align: right;">
                                     <div style="font-weight: 900; font-size: 1.15rem; color: var(--elite-black);">₹${bill.total_price}</div>
                                     <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 10px;">Paid: ₹${bill.paid_amount}</div>
-                                    <a href="${bill.bill_url || '#'}" target="_blank" style="color: var(--elite-purple); text-decoration: none; font-weight: 800; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; justify-content: flex-end;">
-                                        <i class="fas fa-file-pdf"></i> VIEW PDF
-                                    </a>
+                                    
+                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                        <a href="${bill.bill_url || '#'}" target="_blank" class="elite-btn elite-btn-secondary" style="padding: 6px 12px; font-size: 0.75rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <button onclick="approveSingleBill('${bill.id}', '${bill.remaining_amount}')" class="elite-btn" style="padding: 6px 12px; font-size: 0.75rem; background: #10B981; color: #fff; border: none; display: inline-flex; align-items: center; gap: 5px;">
+                                            <i class="fas fa-check-circle"></i> Approve
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         `;
                         billsList.insertAdjacentHTML('beforeend', html);
                     });
-                    billsList.style.display = 'block';
                 } else {
                     billsList.innerHTML = '<div class="text-center py-5" style="color: var(--elite-gray-text); font-weight: 600;">No unpaid records found.</div>';
-                    billsList.style.display = 'block';
                 }
             })
             .catch(err => {
-                loading.style.display = 'none';
                 billsList.innerHTML = '<div class="text-center py-5 text-danger" style="font-weight: 700;">Connection failed. Please refresh and try again.</div>';
-                billsList.style.display = 'block';
+            });
+    }
+
+    function closeBillsModal() {
+        const modal = document.getElementById('unpaidBillsModal');
+        modal.style.opacity = '0';
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 200);
+    }
+
+    // Close when clicking outside of the modal content
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('unpaidBillsModal');
+        if (event.target === modal) {
+            closeBillsModal();
+        }
+    });
+
+    let pendingSettleBillId = null;
+    let pendingSettleMaxAmount = 0;
+
+    function approveSingleBill(bill_id, remainingAmount) {
+        pendingSettleBillId = bill_id;
+        pendingSettleMaxAmount = parseFloat(remainingAmount);
+
+        document.getElementById('settleBillIdHeader').innerText = bill_id;
+        document.getElementById('settleAmountInput').value = remainingAmount;
+        document.getElementById('maxAmountHint').innerText = `Full balance: ₹${parseFloat(remainingAmount).toFixed(2)}`;
+        document.getElementById('settlePasswordInput').value = '';
+
+        const modal = document.getElementById('settlementModal');
+        modal.style.display = 'flex';
+    }
+
+    function closeSettlementModal() {
+        document.getElementById('settlementModal').style.display = 'none';
+    }
+
+    function submitSettlement() {
+        const amountStr = document.getElementById('settleAmountInput').value;
+        const password = document.getElementById('settlePasswordInput').value;
+        const amount = parseFloat(amountStr);
+
+        if (!amount || amount <= 0) {
+            alert('Please enter a valid amount.');
+            return;
+        }
+
+        if (amount > pendingSettleMaxAmount) {
+            alert(`Amount cannot exceed the remaining balance of ₹${pendingSettleMaxAmount}.`);
+            return;
+        }
+
+        if (password !== '9933') {
+            alert('Incorrect security password. Please try again.');
+            document.getElementById('settlePasswordInput').style.borderColor = '#EF4444';
+            return;
+        }
+
+        const btn = document.getElementById('finalizeSettleBtn');
+        btn.disabled = true;
+        btn.innerText = 'Processing...';
+
+        fetch(`/customer/api/approve-bill/${pendingSettleBillId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: amount })
+        })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerText = 'Confirm Pay';
+
+                if (data.status === 'success') {
+                    closeSettlementModal();
+
+                    // 1. Refresh the modal data
+                    const btnSimulate = {
+                        getAttribute: (attr) => attr === 'data-id' ? currentActiveCustomerId : modalTitleText.innerText
+                    };
+                    openBillsModal(btnSimulate);
+
+                    // 2. Refresh the background page to update total outstanding sums
+                    setTimeout(() => {
+                        location.reload();
+                    }, 800);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerText = 'Confirm Pay';
+                console.error(err);
+                alert('Connection failed while approving bill.');
             });
     }
 </script>

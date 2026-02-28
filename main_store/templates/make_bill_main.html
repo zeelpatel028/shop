@@ -28,11 +28,34 @@
         </div>
 
         <div class="customer-details">
-            <input type="text" id="customerName" class="form-control mb-2" placeholder="Customer Name"
-                style="margin-bottom: 10px;">
+            <div id="regularCustomerInput">
+                <input type="text" id="customerName" class="form-control mb-2" placeholder="Customer Name"
+                    style="margin-bottom: 10px;">
+            </div>
+            <div id="creditCustomerInput" style="display: none; position: relative; margin-bottom: 10px;">
+                <input type="text" id="creditCustomerSearch" class="form-control mb-2"
+                    placeholder="Search Customer Name or Phone..." oninput="filterCustomers()"
+                    onfocus="showCustomerDropdown()">
+                <div id="customerDropdown"
+                    style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #ccc; border-radius: 4px; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    {% for customer in customers %}
+                    <div class="customer-option" data-id="{{ customer.id }}" data-name="{{ customer.name }}"
+                        data-phone="{{ customer.phone_no }}"
+                        onclick="selectCustomer('{{ customer.name }}', '{{ customer.phone_no }}')"
+                        style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;">
+                        <strong>{{ customer.name }}</strong><br>
+                        <small style="color: #666;">{{ customer.phone_no }}</small>
+                    </div>
+                    {% endfor %}
+                    <div class="customer-option" onclick="openAddCustomerModal()"
+                        style="padding: 10px; color: var(--elite-purple); font-weight: bold; cursor: pointer; text-align: center; border-top: 1px solid #eee;">
+                        <i class="fas fa-plus"></i> Add New Customer
+                    </div>
+                </div>
+            </div>
             <div class="form-row">
                 <input type="tel" id="customerPhone" class="form-control" placeholder="Phone Number">
-                <select id="paymentMethod" class="form-control" style="width: 40%;">
+                <select id="paymentMethod" class="form-control" style="width: 40%;" onchange="toggleCustomerInput()">
                     <option value="Cash">Cash</option>
                     <option value="UPI">UPI</option>
                     <option value="Credit">Credit</option>
@@ -52,16 +75,16 @@
         <div class="cart-summary">
             <div class="summary-line">
                 <span>Subtotal</span>
-                <span id="subTotal">₹0.00</span>
+                <span id="subTotal">₹0</span>
             </div>
             <div class="summary-line">
                 <span>Tax</span>
-                <span id="taxTotal">₹0.00</span>
+                <span id="taxTotal">₹0</span>
             </div>
 
             <div class="summary-total">
                 <span>Grand Total</span>
-                <span id="grandTotal" style="color: var(--elite-purple);">₹0.00</span>
+                <span id="grandTotal" style="color: var(--elite-purple);">₹0</span>
             </div>
 
             <button class="checkout-btn" onclick="processCheckout()" id="checkoutBtn">

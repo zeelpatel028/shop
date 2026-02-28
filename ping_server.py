@@ -7,12 +7,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # The target URL of your Render application
-URL = os.environ.get('RENDER_EXTERNAL_URL', 'https://shop-d07d.onrender.com')
+URL = 'https://shop-d07d.onrender.com'
 PING_URL = f"{URL.rstrip('/')}/ping"
 
 print(f"--- Render Keep-Alive Script Started ---")
 print(f"Target URL: {PING_URL}")
-print(f"Interval: 10 seconds")
+print(f"Interval: 5 minutes (300 seconds)")
 print(f"Press Ctrl+C to stop.")
 
 def ping():
@@ -29,4 +29,5 @@ def ping():
 if __name__ == "__main__":
     while True:
         ping()
-        time.sleep(10)
+        # Ping every 5 minutes (300 seconds)
+        time.sleep(300)

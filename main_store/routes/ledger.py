@@ -14,25 +14,71 @@ def safe_float(value, default=0.0):
 def ledger():
     period = request.args.get('period', 'all')
     try:
-        now = datetime.now()
+        from datetime import timezone
+        IST = timezone(timedelta(hours=5, minutes=30))
+        now_ist = datetime.now(IST)
         
         query = supabase.table('bills').select('*').eq('store_name', 'Main Store').order('created_at', desc=True)
         
         if period == 'day':
-            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
-            query = query.gte('created_at', start_date)
+            start_ist = now_ist.replace(hour=0, minute=0, second=0, microsecond=0)
+            start_utc = start_ist.astimezone(timezone.utc).isoformat()
+            query = query.gte('created_at', start_utc)
         elif period == 'week':
-            start_date = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
-            query = query.gte('created_at', start_date)
+            start_ist = (now_ist - timedelta(days=now_ist.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+            start_utc = start_ist.astimezone(timezone.utc).isoformat()
+            query = query.gte('created_at', start_utc)
         elif period == 'month':
-            start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
-            query = query.gte('created_at', start_date)
+            start_ist = now_ist.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            start_utc = start_ist.astimezone(timezone.utc).isoformat()
+            query = query.gte('created_at', start_utc)
         elif period == 'year':
-            start_date = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
-            query = query.gte('created_at', start_date)
+            start_ist = now_ist.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            start_utc = start_ist.astimezone(timezone.utc).isoformat()
+            query = query.gte('created_at', start_utc)
             
         bills_response = query.execute()
-        bills = bills_response.data or []
+        standard_bills = bills_response.data or []
+        
+        # --- FETCH APPROVED CREDIT BILLS ---
+        credit_query = supabase.table('credit_bill').select('*').eq('payment_status', 'Paid')
+        
+        if period == 'day':
+            credit_query = credit_query.gte('created_at', start_utc)
+        elif period == 'week':
+            credit_query = credit_query.gte('created_at', start_utc)
+        elif period == 'month':
+            credit_query = credit_query.gte('created_at', start_utc)
+        elif period == 'year':
+            credit_query = credit_query.gte('created_at', start_utc)
+            
+        credit_res = credit_query.execute()
+        credit_bills_raw = credit_res.data or []
+        
+        # Normalize Credit Bills to match Standard Bills structure
+        normalized_credit_bills = []
+        for cb in credit_bills_raw:
+            # Skip if linked to a standard bill (to avoid double counting)
+            if cb.get('bill_id'):
+                continue
+                
+            normalized_credit_bills.append({
+                'id': cb.get('id'),
+                'bill_id': str(cb.get('id')), # Map ID to bill_id for HTML
+                'customer_name': 'Account Settled', 
+                'customer_phone': '-',
+                'bill_total': cb.get('total_price'),
+                'payment_method': 'Credit Paid',
+                'payment_status': 'Paid',
+                'created_at': cb.get('created_at'),
+                'bill_url': cb.get('bill_url', '#')
+            })
+            
+        all_bills = standard_bills + normalized_credit_bills
+        all_bills = sorted(all_bills, key=lambda x: x.get('created_at', ''), reverse=True)
+        
+        # FILTER ONLY ON PAID BILLS FOR REVENUE AND PROFIT CALCULATION
+        bills = [b for b in all_bills if b.get('payment_status') == 'Paid']
         
         all_items_res = supabase.table('bill_items').select('bill_id, product_id, quantity').execute()
         all_items = all_items_res.data or []
@@ -64,15 +110,23 @@ def ledger():
         graph_labels = []
         graph_data = []
         
+        # Sort bills ascending for the graph trend
         sorted_bills = sorted(bills, key=lambda x: x.get('created_at'))
         
         def get_group_key(created_at, period):
-            dt = datetime.fromisoformat(created_at[:19])
-            if period == 'day': return dt.strftime('%H:00')
-            if period == 'week': return dt.strftime('%a')
-            if period == 'month': return dt.strftime('%d %b')
-            if period == 'year': return dt.strftime('%B')
-            return dt.strftime('%Y-%m-%d')
+            try:
+                dt_utc = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                if dt_utc.tzinfo is None:
+                    from datetime import timezone
+                    dt_utc = dt_utc.replace(tzinfo=timezone.utc)
+                dt_ist = dt_utc.astimezone(IST)
+            except:
+                dt_ist = datetime.fromisoformat(created_at[:19])
+            if period == 'day': return dt_ist.strftime('%H:00')
+            if period == 'week': return dt_ist.strftime('%a')
+            if period == 'month': return dt_ist.strftime('%d %b')
+            if period == 'year': return dt_ist.strftime('%B')
+            return dt_ist.strftime('%Y-%m-%d')
 
         trend_map = defaultdict(float)
         for b in sorted_bills:
@@ -87,8 +141,8 @@ def ledger():
             graph_labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         elif period == 'month':
             from calendar import monthrange
-            days_in_month = monthrange(now.year, now.month)[1]
-            graph_labels = [f"{d:02d} {now.strftime('%b')}" for d in range(1, days_in_month + 1)]
+            days_in_month = monthrange(now_ist.year, now_ist.month)[1]
+            graph_labels = [f"{d:02d} {now_ist.strftime('%b')}" for d in range(1, days_in_month + 1)]
         elif period == 'year':
             graph_labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         else:
@@ -106,7 +160,7 @@ def ledger():
         graph_data = []
         
     return render_template('ledger_main.html', 
-                         bills=bills, 
+                         bills=all_bills, 
                          total_revenue=total_revenue, 
                          total_bills=total_bills,
                          total_profit=total_profit,

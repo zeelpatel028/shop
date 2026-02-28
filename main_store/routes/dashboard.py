@@ -28,9 +28,10 @@ def index():
         # Filter bills by store_name = 'Main Store'
         bills_res = supabase.table('bills').select('*').eq('store_name', 'Main Store').order('created_at', desc=True).execute()
         all_bills = bills_res.data or []
-        bill_count = len(all_bills)
+        paid_bills = [b for b in all_bills if b.get('payment_status') == 'Paid']
+        bill_count = len(paid_bills)
         
-        total_revenue = sum(safe_float(bill.get('bill_total')) for bill in all_bills)
+        total_revenue = sum(safe_float(bill.get('bill_total')) for bill in paid_bills)
         
         # Calculate Profit
         items_res = supabase.table('bill_items').select('product_id, product_name, quantity, bill_id').execute()
@@ -40,10 +41,11 @@ def index():
         
         total_profit = 0
         product_sales = Counter()
+        main_paid_bill_ids = {b.get('bill_id') for b in paid_bills if b.get('bill_id')}
+        
         for item in bill_items:
-            # We need to make sure the item belongs to a Main Store bill
-            main_bill_ids = {b['bill_id'] for b in all_bills}
-            if item.get('bill_id') in main_bill_ids or not item.get('bill_id'): # Fallback for legacy
+            # We need to make sure the item belongs to a Paid Main Store bill
+            if item.get('bill_id') in main_paid_bill_ids:
                 p_id = item.get('product_id')
                 qty = safe_float(item.get('quantity'))
                 margin = product_profits.get(p_id, 0)
@@ -55,11 +57,11 @@ def index():
         # Today's stats
         now = datetime.now()
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
-        today_bills = [b for b in all_bills if (b.get('created_at') or '') >= today_start]
+        today_bills = [b for b in paid_bills if (b.get('created_at') or '') >= today_start]
         today_revenue = sum(safe_float(b.get('bill_total')) for b in today_bills)
         today_count = len(today_bills)
         
-        recent_bills = all_bills[:5]
+        recent_bills = all_bills[:5] # keep all bills for activity feed
         top_products = product_sales.most_common(5)
         low_stock = [p for p in all_products if safe_float(p.get('stock')) <= 10.0]
         profit_pct = (total_profit / total_revenue * 100) if total_revenue else 0
