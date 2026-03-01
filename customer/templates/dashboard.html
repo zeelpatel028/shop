@@ -5,15 +5,17 @@
 {% block content %}
 <div class="customer-dashboard">
     <!-- Hero Header -->
-    <div class="elite-dashboard-header" style="margin-bottom: 45px;">
-        <div class="elite-header-group">
-            <h1 class="elite-header-title">Customer Analytics</h1>
-            <p class="elite-header-subtitle">Real-time overview of your <strong>customer database</strong> and credit
-                lifecycle.</p>
+    <div class="elite-dashboard-header">
+        <div class="elite-header-group" style="display: flex; flex-direction: row; align-items: center;">
+            <div class="elite-header-accent"></div>
+            <div>
+                <h1 class="elite-header-title">Customer <span>Analytics</span></h1>
+                <p class="elite-header-subtitle">Real-time overview of your <strong>customer database</strong> and
+                    credit lifecycle.</p>
+            </div>
         </div>
         <div class="elite-status-badge">
-            <i class="fas fa-shield-alt" style="color: var(--elite-purple); margin-right: 8px;"></i> System Secure &
-            Active
+            <i class="fas fa-shield-alt"></i> System Secure & Active
         </div>
     </div>
 
@@ -49,77 +51,75 @@
     </div>
 
     <!-- Main Content Area -->
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;" class="dashboard-main-row">
+    <div class="dashboard-main-row">
         <!-- Quick Actions Card -->
         <div class="elite-card">
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
-                <div
-                    style="width: 40px; height: 40px; border-radius: 10px; background: var(--elite-purple); color: #fff; display: flex; align-items: center; justify-content: center;">
+            <div class="elite-card-header">
+                <div class="elite-card-header-icon">
                     <i class="fas fa-bolt"></i>
                 </div>
-                <h3 style="font-weight: 800; margin: 0; color: var(--elite-black);">Quick Operations</h3>
+                <h3>Quick Operations</h3>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
                 <a href="{{ url_for('customer.add_customer') }}" class="elite-btn elite-btn-primary"
-                    style="justify-content: center; padding: 20px;">
-                    <i class="fas fa-user-plus"></i> Register New Customer
+                    style="justify-content: center;">
+                    <i class="fas fa-user-plus"></i> Register Customer
                 </a>
-                <a href="{{ url_for('customer.all_customers') }}" class="elite-btn"
-                    style="justify-content: center; padding: 20px; background: var(--elite-black-light); color: #fff;">
-                    <i class="fas fa-address-book"></i> Customer Directory
+                <a href="{{ url_for('customer.all_customers') }}" class="elite-btn elite-btn-secondary"
+                    style="justify-content: center; background: var(--elite-black-light); color: #fff;">
+                    <i class="fas fa-address-book"></i> Full Directory
                 </a>
                 <a href="{{ url_for('customer.pending_bills') }}" class="elite-btn"
-                    style="justify-content: center; padding: 20px; background: #FEF2F2; color: #EF4444; border: 1px solid #FEE2E2;">
-                    <i class="fas fa-file-invoice"></i> Manage Pending Bills
+                    style="justify-content: center; background: #FEF2F2; color: #EF4444; border: 1px solid #FEE2E2;">
+                    <i class="fas fa-file-invoice"></i> Pending Bills
                 </a>
                 <a href="{{ url_for('customer.approve_bills') }}" class="elite-btn"
-                    style="justify-content: center; padding: 20px; background: #ECFDF5; color: #10B981; border: 1px solid #D1FAE5;">
-                    <i class="fas fa-check-circle"></i> Approved History
+                    style="justify-content: center; background: #ECFDF5; color: #10B981; border: 1px solid #D1FAE5;">
+                    <i class="fas fa-check-circle"></i> Paid History
                 </a>
             </div>
         </div>
 
         <!-- Recent Activity Card -->
-        <div class="elite-card" style="background: var(--elite-black) !important; color: #fff;">
-            <h3
-                style="font-weight: 800; margin-bottom: 25px; color: #fff; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-stream" style="color: var(--elite-orange);"></i> System Activity
-            </h3>
+        <div class="elite-card" style="background: var(--elite-black) !important; color: #fff; border: none;">
+            <div class="elite-card-header" style="border: none;">
+                <div class="elite-card-header-icon"
+                    style="background: rgba(255, 159, 0, 0.15); color: var(--elite-orange);">
+                    <i class="fas fa-stream"></i>
+                </div>
+                <h3 style="color: #fff;">System Activity</h3>
+            </div>
 
-            <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 25px; margin-top: 10px;">
                 <div style="display: flex; gap: 15px;">
-                    <div style="width: 8px; height: 8px; border-radius: 50%; background: #10B981; margin-top: 6px;">
+                    <div
+                        style="width: 10px; height: 10px; border-radius: 50%; background: #10B981; margin-top: 5px; box-shadow: 0 0 10px #10B981;">
                     </div>
                     <div>
-                        <div style="font-size: 0.85rem; font-weight: 700;">Database Sync Successful</div>
-                        <div style="font-size: 0.75rem; color: #888;">Just now</div>
+                        <div style="font-size: 0.95rem; font-weight: 800; color: #fff;">Database Sync Successful</div>
+                        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 600;">System online & healthy</div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 15px;">
                     <div
-                        style="width: 8px; height: 8px; border-radius: 50%; background: var(--elite-purple); margin-top: 6px;">
+                        style="width: 10px; height: 10px; border-radius: 50%; background: var(--elite-purple); margin-top: 5px; box-shadow: 0 0 10px var(--elite-purple);">
                     </div>
                     <div>
-                        <div style="font-size: 0.85rem; font-weight: 700;">Stats Recalculated</div>
-                        <div style="font-size: 0.75rem; color: #888;">2 minutes ago</div>
+                        <div style="font-size: 0.95rem; font-weight: 800; color: #fff;">Cloud Backup Ready</div>
+                        <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 600;">Data integrity verified</div>
                     </div>
                 </div>
             </div>
 
-            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #333;">
-                <div style="font-size: 0.75rem; color: #666; font-weight: 600;">ACTIVE PORTAL</div>
-                <div style="font-size: 1rem; font-weight: 800; color: var(--elite-orange);">EST. 2026</div>
+            <div style="margin-top: 45px; padding-top: 25px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div
+                    style="font-size: 0.75rem; color: #64748B; font-weight: 850; text-transform: uppercase; letter-spacing: 1px;">
+                    Security Status</div>
+                <div style="font-size: 1.1rem; font-weight: 950; color: var(--elite-orange); margin-top: 4px;">ENCRYPTED
+                    v4.2</div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    @media (max-width: 1024px) {
-        .dashboard-main-row {
-            grid-template-columns: 1fr !important;
-        }
-    }
-</style>
 {% endblock %}

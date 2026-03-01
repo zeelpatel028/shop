@@ -11,6 +11,16 @@ from urllib.parse import urlparse
 # Load .env file
 load_dotenv()
 
+# Explicit mapping of table names to their primary keys from schema.sql
+TABLE_PRIMARY_KEYS = {
+    'products': 'product_id',
+    'bills': 'bill_id',
+    'bill_items': 'bill_item_id',
+    'payments': 'payment_id',
+    'customer': 'id',
+    'credit_bill': 'id'
+}
+
 class DatabaseConnectionError(Exception):
     pass
 
@@ -108,6 +118,14 @@ class QueryBuilder:
     def neq(self, col, val): self._wheres.append((f"{col} != %s", val)); return self
     def order(self, col, desc=False): self._order = f"{col} {'DESC' if desc else 'ASC'}"; return self
     def limit(self, n): self._limit = n; return self
+    def lt(self, col, val): self._wheres.append((f"{col} < %s", val)); return self
+    def gt(self, col, val): self._wheres.append((f"{col} > %s", val)); return self
+    def lte(self, col, val): self._wheres.append((f"{col} <= %s", val)); return self
+    def gte(self, col, val): self._wheres.append((f"{col} >= %s", val)); return self
+    def in_(self, col, vals): 
+        if not vals: self._wheres.append(("1=0", None))
+        else: self._wheres.append((f"{col} IN %s", tuple(vals)))
+        return self
     def insert(self, data): self._insert_data = data; return self
     def update(self, data): self._update_data = data; return self
     def delete(self): self._delete = True; return self
@@ -143,14 +161,16 @@ class QueryBuilder:
                     elif self._update_data is not None:
                         if not self._update_data: return Response()
                         cols = list(self._update_data.keys())
+                        # Target columns in SET cannot be qualified with a table/alias name in PostgreSQL
                         set_strs = [f"{c} = %s" for c in cols]
                         values = [self._update_data[c] for c in cols]
                         where_str = ""
                         if self._wheres:
-                            where_clauses = [w[0] for w in self._wheres]
+                            where_clauses = [f"{self.table}.{w[0]}" if "." not in w[0] and "(" not in w[0] else w[0] for w in self._wheres]
                             where_str = " WHERE " + " AND ".join(where_clauses)
                             values.extend([w[1] for w in self._wheres])
                         query = f"UPDATE {self.table} SET {', '.join(set_strs)}{where_str} RETURNING *"
+                        print(f"DEBUG: EXEC SQL -> {query}")
                         cur.execute(query, values)
                         results = cur.fetchall()
                         conn.commit()
@@ -162,8 +182,8 @@ class QueryBuilder:
                         if "(" in self._select and ")" in self._select:
                             try:
                                 import re
-                                # Pattern for traditional "table(cols)" or aliased "table:fk_col(cols)"
-                                match = re.search(r'(\w+):?(\w+)?\(([\w,\*]+)\)', self._select)
+                                # Pattern for traditional "table(cols)", aliased "table:fk_col(cols)", or "table!fk_col(cols)"
+                                match = re.search(r'(\w+)[!:]?(\w+)?\(([\w,\*]+)\)', self._select)
                                 if match:
                                     linked_table = match.group(1)
                                     custom_fk = match.group(2)
@@ -173,13 +193,13 @@ class QueryBuilder:
                                     if not primary_select: primary_select = "*"
                                     
                                     # Use custom FK if provided, else guess it
-                                    if custom_fk:
-                                        fk_col = custom_fk
-                                    else:
-                                        fk_col = linked_table[:-1] if linked_table.endswith('s') else linked_table
-                                        fk_col += "_id"
+                                    # If the user provides 'table!fk', then 'fk' is the column name in the current table
+                                    fk_col = custom_fk if custom_fk else (linked_table[:-1] if linked_table.endswith('s') else f"{linked_table}_id")
+                                    
+                                    # Use explicit PK mapping if available, else default to 'id'
+                                    target_pk = TABLE_PRIMARY_KEYS.get(linked_table, 'id')
                                         
-                                    join_str = f" LEFT JOIN {linked_table} ON {self.table}.{fk_col} = {linked_table}.id"
+                                    join_str = f" JOIN {linked_table} ON {self.table}.{fk_col} = {linked_table}.{target_pk}"
                                     linked_cols = [f"{linked_table}.{c.strip()} AS __joined_{linked_table}_{c.strip()}" 
                                                  for c in linked_cols_raw.split(",")]
                                     select_str = f"{self.table}.{primary_select}, {', '.join(linked_cols)}"
@@ -188,11 +208,11 @@ class QueryBuilder:
                         where_str = ""
                         values = []
                         if self._wheres:
-                            where_clauses = [w[0] for w in self._wheres]
+                            where_clauses = [f"{self.table}.{w[0]}" if "." not in w[0] and "(" not in w[0] else w[0] for w in self._wheres]
                             where_str = " WHERE " + " AND ".join(where_clauses)
                             values.extend([w[1] for w in self._wheres])
                         
-                        order_str = f" ORDER BY {self._order}" if self._order else ""
+                        order_str = f" ORDER BY {self.table}.{self._order}" if self._order and "." not in self._order else (f" ORDER BY {self._order}" if self._order else "")
                         limit_str = f" LIMIT {self._limit}" if self._limit else ""
                         
                         query = f"SELECT {select_str} FROM {self.table}{join_str}{where_str}{order_str}{limit_str}"

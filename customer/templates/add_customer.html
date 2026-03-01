@@ -6,106 +6,137 @@
 <div class="customer-container">
     <form action="{{ url_for('customer.add_customer') }}" method="POST">
         <!-- Header Section -->
-        <div class="elite-dashboard-header"
-            style="margin-bottom: 35px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
-            <div class="elite-header-group">
-                <h1 class="elite-header-title">Register Customer</h1>
-                <p class="elite-header-subtitle">Onboard new customers to the <strong>Shop ecosystem</strong>.</p>
+        <div class="elite-dashboard-header">
+            <div class="elite-header-group" style="display: flex; flex-direction: row; align-items: center;">
+                <div class="elite-header-accent"></div>
+                <div>
+                    <h1 class="elite-header-title">Register <span>Customer</span></h1>
+                    <p class="elite-header-subtitle">Onboard new customers to the <strong>Shop ecosystem</strong>.</p>
+                </div>
             </div>
-            <div class="elite-form-btn-group" style="margin-top: 0;">
-                <a href="{{ url_for('customer.dashboard') }}" class="elite-btn"
-                    style="background: #eee; color: #666;">Discard</a>
+
+            <div class="elite-header-actions" style="display: flex; gap: 15px;">
+                <a href="{{ url_for('customer.dashboard') }}" class="elite-btn elite-btn-secondary"
+                    style="background: var(--elite-black-light); color: #fff; border: none;">Discard</a>
                 <button type="submit" class="elite-btn elite-btn-primary">
-                    <i class="fas fa-save"></i> Save Customer Profile
+                    <i class="fas fa-user-plus"></i> Save Profile
                 </button>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;" class="dashboard-main-row">
-            <div style="display: flex; flex-direction: column; gap: 30px;">
-                <!-- Personal Info Card -->
-                <div class="elite-card">
-                    <div class="elite-card-header">
-                        <i class="fas fa-id-card"></i> Personal Information
+        <div class="elite-form-grid">
+            <!-- Main Content Area -->
+            <div style="display: flex; flex-direction: column; gap: 40px;">
+                <!-- Identity Section -->
+                <div class="elite-card" style="padding: 40px;">
+                    <div
+                        style="font-size: 1.1rem; font-weight: 1000; color: var(--elite-black); margin-bottom: 35px; display: flex; align-items: center; gap: 12px;">
+                        <div
+                            style="width: 36px; height: 36px; border-radius: 12px; background: rgba(108, 93, 211, 0.1); color: var(--elite-purple); display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        Identity & Contact Information
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
                         <div class="elite-form-group">
-                            <label class="elite-form-label">Full Name <span style="color: #EF4444;">*</span></label>
-                            <input type="text" name="name" class="elite-form-control" placeholder="Enter customer name"
+                            <label class="elite-form-label">Full Legal Name <span
+                                    style="color: #EF4444;">*</span></label>
+                            <input type="text" name="name" class="elite-form-control" placeholder="e.g. Rahul Sharma"
                                 value="{{ form_data.get('name', '') if form_data else '' }}" required>
                         </div>
                         <div class="elite-form-group">
                             <label class="elite-form-label">Phone Number <span style="color: #EF4444;">*</span></label>
                             <input type="text" name="phone_no" class="elite-form-control"
-                                placeholder="Enter 10-digit number"
+                                placeholder="10-digit mobile number"
                                 value="{{ form_data.get('phone_no', '') if form_data else '' }}" required>
                         </div>
                     </div>
-                    <div class="elite-form-group">
-                        <label class="elite-form-label">Address <span style="color: #EF4444;">*</span></label>
-                        <textarea name="address" class="elite-form-control" rows="3"
-                            placeholder="Enter full address location..."
-                            required>{{ form_data.get('address', '') if form_data else '' }}</textarea>
+
+                    <div class="elite-form-group" style="margin-top: 25px;">
+                        <label class="elite-form-label">Permanent Address <span style="color: #EF4444;">*</span></label>
+                        <textarea name="address" class="elite-form-control" rows="4"
+                            placeholder="Enter complete primary address..." required
+                            style="resize: none;">{{ form_data.get('address', '') if form_data else '' }}</textarea>
                     </div>
                 </div>
 
-                <!-- Billing Stats Card -->
-                <div class="elite-card">
-                    <div class="elite-card-header">
-                        <i class="fas fa-wallet"></i> Credit & Billing Details
+                <!-- Initial Balance Section -->
+                <div class="elite-card" style="padding: 40px;">
+                    <div
+                        style="font-size: 1.1rem; font-weight: 1000; color: var(--elite-black); margin-bottom: 35px; display: flex; align-items: center; gap: 12px;">
+                        <div
+                            style="width: 36px; height: 36px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10B981; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        Historical Balance (Migration Only)
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
                         <div class="elite-form-group">
-                            <label class="elite-form-label">Last Paid Amount</label>
+                            <label class="elite-form-label">Last Paid Amount (₹)</label>
                             <input type="number" step="0.01" name="padin_amount_last" class="elite-form-control"
-                                value="0.00">
+                                value="0.00" style="font-weight: 800;">
                         </div>
                         <div class="elite-form-group">
-                            <label class="elite-form-label">Total Paid Amount</label>
+                            <label class="elite-form-label">Lifetime Paid (₹)</label>
                             <input type="number" step="0.01" name="padin_amount_total" class="elite-form-control"
-                                value="0.00">
+                                value="0.00" style="font-weight: 800;">
                         </div>
                         <div class="elite-form-group">
                             <label class="elite-form-label">Pending Bill Count</label>
                             <input type="number" name="panding_bill_count" class="elite-form-control" value="0">
                         </div>
                         <div class="elite-form-group">
-                            <label class="elite-form-label">All Bill Count</label>
+                            <label class="elite-form-label">Total Bill Count</label>
                             <input type="number" name="all_bill_count" class="elite-form-control" value="0">
                         </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 30px; padding: 20px; background: #FFFBEB; border-radius: 16px; border: 1.5px dashed #F59E0B; display: flex; gap: 15px; align-items: flex-start;">
+                        <i class="fas fa-info-circle" style="color: #F59E0B; font-size: 1.2rem; margin-top: 2px;"></i>
+                        <p style="font-size: 0.85rem; color: #92400E; margin: 0; font-weight: 700;">
+                            <strong>Migration Tip:</strong> Only provide financial data if you are migrating an existing
+                            customer from another system. For new customers, keep these values at zero.
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar Info/Status Card -->
+            <!-- Sidebar -->
             <div style="display: flex; flex-direction: column; gap: 30px;">
-                <div class="elite-card" style="background: var(--elite-black) !important; color: #fff;">
-                    <div class="elite-card-header" style="color: #fff; border-bottom-color: #333;">
-                        <i class="fas fa-cog" style="color: var(--elite-orange);"></i> Classification
+                <div class="elite-card"
+                    style="background: var(--elite-black) !important; color: #fff; border: none; padding: 35px;">
+                    <div
+                        style="font-size: 1rem; font-weight: 950; color: #fff; margin-bottom: 30px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-shield-alt" style="color: var(--elite-orange);"></i> Classification
                     </div>
 
                     <div class="elite-form-group">
-                        <label class="elite-form-label" style="color: #aaa;">Initial Status</label>
+                        <label class="elite-form-label" style="color: #94A3B8;">Initial Security Status</label>
                         <select name="status" class="elite-form-control"
-                            style="background: #222; border-color: #333; color: #fff;">
-                            <option value="Active">Active</option>
-                            <option value="Blocked">Blocked</option>
-                            <option value="VIP">VIP</option>
+                            style="background: #1E293B; border-color: #334155; color: #fff; font-weight: 700;">
+                            <option value="Active">Active / Trusted</option>
+                            <option value="Blocked">Blocked / Risky</option>
+                            <option value="VIP">Premium / VIP</option>
                         </select>
                     </div>
 
-                    <div class="elite-form-group">
-                        <label class="elite-form-label" style="color: #aaa;">Registrar (Staff)</label>
+                    <div class="elite-form-group" style="margin-top: 25px;">
+                        <label class="elite-form-label" style="color: #94A3B8;">Authorized Registrar</label>
                         <input type="text" name="created_by" class="elite-form-control"
-                            style="background: #222; border-color: #333; color: #fff;" placeholder="Enter your name">
+                            style="background: #1E293B; border-color: #334155; color: #fff; font-weight: 700;"
+                            placeholder="Staff Member Name">
                     </div>
 
-                    <div
-                        style="margin-top: 20px; padding: 15px; background: rgba(255,159,0,0.1); border-radius: 12px; border: 1px solid rgba(255,159,0,0.2);">
-                        <p style="font-size: 0.75rem; color: var(--elite-orange); margin: 0; font-weight: 600;">
-                            <i class="fas fa-info-circle"></i> New customers are automatically assigned a unique
-                            management ID upon saving.
-                        </p>
+                    <div style="margin-top: 40px; text-align: center;">
+                        <div
+                            style="width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-fingerprint" style="font-size: 3rem; color: rgba(255,255,255,0.1);"></i>
+                        </div>
+                        <p style="font-size: 0.8rem; color: #64748B; font-weight: 700;">System will generate a unique
+                            hash for this customer profile upon confirmation.</p>
                     </div>
                 </div>
             </div>
@@ -113,11 +144,4 @@
     </form>
 </div>
 
-<style>
-    @media (max-width: 1024px) {
-        .dashboard-main-row {
-            grid-template-columns: 1fr !important;
-        }
-    }
-</style>
 {% endblock %}

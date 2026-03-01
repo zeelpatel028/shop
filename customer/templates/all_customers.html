@@ -5,40 +5,38 @@
 {% block content %}
 <div class="customer-container">
     <!-- Header Section -->
-    <div class="elite-dashboard-header"
-        style="margin-bottom: 35px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
-        <div class="elite-header-group">
-            <h1 class="elite-header-title">Customer Master List</h1>
-            <p class="elite-header-subtitle">Managing <strong>{{ stats.total_customers }}</strong> registered customers
-                in the system.</p>
-        </div>
-        <div
-            style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; width: 100%; justify-content: space-between;">
-            <div class="elite-search-wrapper" style="flex: 1; min-width: 250px;">
-                <i class="fas fa-search elite-search-icon"></i>
-                <input type="text" id="custSearch" class="elite-search-input"
-                    placeholder="Search name, phone, address or ID...">
+    <div class="elite-dashboard-header">
+        <div class="elite-header-group" style="display: flex; flex-direction: row; align-items: center;">
+            <div class="elite-header-accent"></div>
+            <div>
+                <h1 class="elite-header-title">Customer <span>Master List</span></h1>
+                <p class="elite-header-subtitle">Managing <strong>{{ stats.total_customers }}</strong> registered
+                    customers in the system.</p>
             </div>
-            <a href="{{ url_for('customer.add_customer') }}" class="elite-btn elite-btn-primary" style="margin-top: 0;">
-                <i class="fas fa-user-plus"></i> New Customer
-            </a>
+        </div>
+        <div class="elite-status-badge">
+            <i class="fas fa-users"></i> {{ stats.total_customers }} Total
         </div>
     </div>
 
+    <!-- Search & Actions -->
+    <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; gap: 20px; flex-wrap: wrap;">
+        <div class="elite-search-wrapper" style="flex: 1;">
+            <i class="fas fa-search elite-search-icon"></i>
+            <input type="text" id="custSearch" class="elite-search-input"
+                placeholder="Search name, phone, address or ID...">
+        </div>
+        <a href="{{ url_for('customer.add_customer') }}" class="elite-btn elite-btn-primary">
+            <i class="fas fa-user-plus"></i> New Customer
+        </a>
+    </div>
+
     <!-- Quick Stats Summary -->
-    <div class="elite-grid" style="margin-bottom: 30px;">
+    <div class="elite-grid">
         <div class="elite-stat-card">
             <div class="elite-stat-icon" style="background: rgba(108, 93, 211, 0.1); color: var(--elite-purple);">
-                <i class="fas fa-users"></i>
-            </div>
-            <div>
-                <div class="elite-stat-label">Total Customers</div>
-                <div class="elite-stat-value">{{ stats.total_customers }}</div>
-            </div>
-        </div>
-        <div class="elite-stat-card">
-            <div class="elite-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
-                <i class="fas fa-check-circle"></i>
+                <i class="fas fa-user-check"></i>
             </div>
             <div>
                 <div class="elite-stat-label">Active Users</div>
@@ -54,11 +52,20 @@
                 <div class="elite-stat-value">{{ stats.credit_active }}</div>
             </div>
         </div>
+        <div class="elite-stat-card">
+            <div class="elite-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div>
+                <div class="elite-stat-label">Total Revenue</div>
+                <div class="elite-stat-value">₹{{ "{:,.0f}".format(stats.total_revenue|default(0)) }}</div>
+            </div>
+        </div>
     </div>
 
     <!-- Main Table Card -->
-    <div class="elite-card">
-        <div class="table-responsive">
+    <div class="elite-card" style="padding: 0; overflow: hidden;">
+        <div class="elite-table-wrapper">
             <table class="elite-table" id="custTable">
                 <thead>
                     <tr>
@@ -66,7 +73,7 @@
                         <th>Customer Identity</th>
                         <th class="hide-on-mobile">Contact & Location</th>
                         <th>Bills (P/T)</th>
-                        <th class="hide-on-mobile">Last Activity</th>
+                        <th class="hide-on-mobile">Recent Activity</th>
                         <th>Financials</th>
                         <th class="hide-on-mobile">Status</th>
                         <th style="text-align: right;">Actions</th>
@@ -75,77 +82,81 @@
                 <tbody>
                     {% for c in customers %}
                     <tr class="searchable-row">
-                        <td class="hide-on-mobile" style="font-family: monospace; font-weight: 800; color: #9CA3AF;">#{{
+                        <td class="hide-on-mobile" style="font-family: monospace; font-weight: 800; color: #94A3B8;">#{{
                             c.id }}</td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
                                 <div
-                                    style="width: 36px; height: 36px; border-radius: 10px; background: #6C5DD3; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0;">
-                                    {{ c.name[:1]|upper }}</div>
+                                    style="width: 42px; height: 42px; border-radius: 14px; background: var(--elite-purple-glow); color: var(--elite-purple); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem; flex-shrink: 0; border: 1px solid rgba(108, 93, 211, 0.1);">
+                                    {{ c.name[:1]|upper }}
+                                </div>
                                 <div>
-                                    <div style="font-weight: 700; color: var(--elite-black);">{{ c.name }}</div>
-                                    <div class="show-on-mobile" style="font-size: 0.75rem; color: #6B7280;">{{
+                                    <div style="font-weight: 850; color: var(--elite-black); font-size: 1.05rem;">{{
+                                        c.name }}</div>
+                                    <div class="show-on-mobile"
+                                        style="font-size: 0.8rem; color: var(--elite-gray-text); font-weight: 700;">{{
                                         c.phone_no }}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="hide-on-mobile">
-                            <div style="font-weight: 600; font-size: 0.85rem;">{{ c.phone_no }}</div>
-                            <div style="font-size: 0.75rem; color: #9CA3AF; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                            <div style="font-weight: 800; font-size: 0.95rem; color: var(--elite-black);">{{ c.phone_no
+                                }}</div>
+                            <div style="font-size: 0.78rem; color: var(--elite-gray-text); font-weight: 700; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
                                 title="{{ c.address or '-' }}">
-                                <i class="fas fa-map-marker-alt" style="font-size: 0.7rem;"></i> {{ c.address or 'N/A'
-                                }}
+                                <i class="fas fa-map-marker-alt"
+                                    style="font-size: 0.7rem; color: var(--elite-orange);"></i> {{ c.address or 'N/A' }}
                             </div>
                         </td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 6px;">
-                                <span
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-weight: 900; font-size: 1rem;"
                                     class="{% if (c.panding_bill_count|default(0)|int) > 0 %}text-danger-bold{% else %}text-success-bold{% endif %}">
                                     {{ c.panding_bill_count|default(0) }}
                                 </span>
-                                <span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 600;">/ {{
+                                <span style="font-size: 0.8rem; color: #94A3B8; font-weight: 800;">/ {{
                                     c.all_bill_count|default(0) }}</span>
                             </div>
                         </td>
                         <td class="hide-on-mobile">
                             {% if c.last_payment_date %}
-                            <div style="font-size: 0.8rem; font-weight: 700; color: var(--elite-black);">₹{{
+                            <div style="font-size: 0.9rem; font-weight: 800; color: var(--elite-black);">₹{{
                                 "{:,.2f}".format(c.padin_amount_last|default(0)|float) }}</div>
-                            <div style="font-size: 0.7rem; color: #9CA3AF;">{{ (c.last_payment_date|string)[:10] }}
-                            </div>
+                            <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 700;">{{
+                                (c.last_payment_date|string)[:10] }}</div>
                             {% else %}
-                            <span style="font-size: 0.75rem; color: #D1D5DB; font-style: italic;">No history</span>
+                            <span style="font-size: 0.8rem; color: #CBD5E1; font-style: italic; font-weight: 700;">No
+                                history</span>
                             {% endif %}
                         </td>
                         <td>
-                            <div style="font-weight: 900; color: #10B981; font-size: 1rem;">₹{{
-                                "{:,.2f}".format(c.padin_amount_total|default(0)|float) }}</div>
-                            <div class="hide-on-mobile" style="font-size: 0.7rem; color: #888;"><b>Total Invested</b>
-                            </div>
+                            <div style="font-weight: 1000; color: #10B981; font-size: 1.1rem; letter-spacing: -0.5px;">
+                                ₹{{ "{:,.0f}".format(c.padin_amount_total|default(0)|float) }}</div>
+                            <div class="hide-on-mobile"
+                                style="font-size: 0.7rem; color: #94A3B8; font-weight: 850; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">
+                                Invested</div>
                         </td>
                         <td class="hide-on-mobile">
                             {% if c.status == 'Active' %}
                             <span
-                                style="background: #ECFDF5; color: #10B981; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
-                                <i class="fas fa-circle" style="font-size: 0.4rem;"></i> ACTIVE
+                                style="background: #ECFDF5; color: #10B981; padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 900; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #D1FAE5;">
+                                <i class="fas fa-circle" style="font-size: 0.45rem;"></i> ACTIVE
                             </span>
                             {% else %}
                             <span
-                                style="background: #F3F4F6; color: #6B7280; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800;">INACTIVE</span>
+                                style="background: #F8FAFC; color: #94A3B8; padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 900; border: 1px solid #F1F5F9;">INACTIVE</span>
                             {% endif %}
                         </td>
                         <td style="text-align: right;">
-                            <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                <button onclick="openEditModal(this)" data-id="{{ c.id }}"
-                                    data-name="{{ c.name | escape }}" data-phone_no="{{ c.phone_no | escape }}"
-                                    data-address="{{ c.address | escape }}" data-status="{{ c.status }}"
-                                    data-pending="{{ c.panding_bill_count|default(0) }}"
-                                    data-total="{{ c.all_bill_count|default(0) }}"
-                                    data-last-paid="{{ c.padin_amount_last|default(0) }}"
-                                    data-total-invested="{{ c.padin_amount_total|default(0) }}"
-                                    style="padding: 6px 12px; border-radius: 6px; background: #6C5DD3; color: #ffffff; font-size: 0.75rem; font-weight: 700; border: none; cursor: pointer; transition: 0.2s;"
-                                    title="Edit">Edit</button>
-                            </div>
+                            <button onclick="openEditModal(this)" data-id="{{ c.id }}" data-name="{{ c.name | escape }}"
+                                data-phone_no="{{ c.phone_no | escape }}" data-address="{{ c.address | escape }}"
+                                data-status="{{ c.status }}" data-pending="{{ c.panding_bill_count|default(0) }}"
+                                data-total="{{ c.all_bill_count|default(0) }}"
+                                data-last-paid="{{ c.padin_amount_last|default(0) }}"
+                                data-total-invested="{{ c.padin_amount_total|default(0) }}" class="elite-btn"
+                                style="padding: 8px 16px; font-size: 0.8rem; background: var(--elite-purple-glow); color: var(--elite-purple); border: 1px solid rgba(108, 93, 211, 0.1);">
+                                Details <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i>
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -155,200 +166,119 @@
     </div>
 </div>
 
+<!-- Premium Edit Modal -->
+<div id="editCustomerModal" class="elite-modal-overlay" style="display: none;">
+    <div class="elite-modal-content">
+        <div class="elite-modal-header-premium">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="modal-icon-accent">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div>
+                    <h2 id="modalTitle">Customer Profile</h2>
+                    <p>Managing details for ID: <span id="modalCustIdStr"></span></p>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeEditModal()">&times;</button>
+        </div>
+
+        <form id="editCustomerForm" method="POST" action="">
+            <div class="modal-body-premium">
+                <div class="modal-grid">
+                    <!-- Identity Section -->
+                    <div class="modal-section">
+                        <div class="section-label"><i class="fas fa-id-card"></i> Identity & Contact</div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Full Legal Name</label>
+                            <input type="text" name="name" id="modalName" class="elite-form-control"
+                                placeholder="John Doe" required>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Primary Phone</label>
+                            <input type="text" name="phone_no" id="modalPhone" class="elite-form-control"
+                                placeholder="+91 00000 00000" required>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Physical Address</label>
+                            <textarea name="address" id="modalAddress" class="elite-form-control" rows="3"
+                                placeholder="Enter complete address..." required style="resize: none;"></textarea>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Account Status</label>
+                            <select name="status" id="modalStatus" class="elite-form-control">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Financial Section -->
+                    <div class="modal-section">
+                        <div class="section-label"><i class="fas fa-chart-line"></i> Financial Insights</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="elite-form-group">
+                                <label class="elite-form-label">Pending Bills</label>
+                                <input type="number" name="panding_bill_count" id="modalPendingBills"
+                                    class="elite-form-control">
+                            </div>
+                            <div class="elite-form-group">
+                                <label class="elite-form-label">Lifetime Bills</label>
+                                <input type="number" name="all_bill_count" id="modalTotalBills"
+                                    class="elite-form-control">
+                            </div>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Last Settlement Amount (₹)</label>
+                            <input type="number" step="0.01" name="padin_amount_last" id="modalLastPaid"
+                                class="elite-form-control">
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Lifetime Investment (₹)</label>
+                            <input type="number" step="0.01" name="padin_amount_total" id="modalTotalInvested"
+                                class="elite-form-control">
+                        </div>
+
+                        <!-- Unpaid Bills Hook -->
+                        <div id="pendingBillsWrap" style="display: none; margin-top: 10px;">
+                            <div
+                                style="font-size: 0.8rem; font-weight: 850; color: #EF4444; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-exclamation-triangle"></i> ACTIVE OUTSTANDING BALANCES
+                            </div>
+                            <div id="pendingBillsList" class="unpaid-bills-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer-premium">
+                <button type="button" class="elite-btn elite-btn-secondary" onclick="closeEditModal()">Discard
+                    Changes</button>
+                <button type="submit" class="elite-btn elite-btn-primary">Update Account Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
     // Search functionality
+
     document.getElementById('custSearch').addEventListener('input', function () {
         const query = this.value.toLowerCase();
         const rows = document.querySelectorAll('.searchable-row');
+
         rows.forEach(row => {
             const content = row.innerText.toLowerCase();
             row.style.display = content.includes(query) ? '' : 'none';
         });
     });
 
-
-</script>
-
-<style>
-    @media (max-width: 768px) {
-        .hide-on-mobile {
-            display: none !important;
-        }
-
-        .show-on-mobile {
-            display: block !important;
-        }
-
-        .elite-dashboard-header {
-            margin-bottom: 20px !important;
-        }
-
-        .elite-header-title {
-            font-size: 1.5rem !important;
-        }
-    }
-
-    .show-on-mobile {
-        display: none;
-    }
-</style>
-<div id="editCustomerModal"
-    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-    <div
-        style="background: #fff; width: 95%; max-width: 800px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh;">
-
-        <!-- Header -->
-        <div
-            style="background: #6C5DD3; color: #fff; padding: 20px 25px; display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
-            <div>
-                <h2
-                    style="margin: 0; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-user-edit"></i> Customer Details
-                </h2>
-                <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px; font-weight: 600;">Customer ID: <span
-                        id="modalCustIdStr"></span></div>
-            </div>
-            <button type="button" onclick="closeEditModal()"
-                style="background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; padding: 0; line-height: 1;">&times;</button>
-        </div>
-
-        <form id="editCustomerForm" method="POST" action="" style="overflow-y: auto; margin: 0;">
-            <div style="display: flex; flex-wrap: wrap;">
-
-                <!-- Left Column: Personal info -->
-                <div style="flex: 1; min-width: 300px; background: #F8F9FA; padding: 25px;">
-                    <h3
-                        style="font-size: 1.1rem; color: #1F2937; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-weight: 800;">
-                        <i class="fas fa-id-card"></i> Personal Information
-                    </h3>
-
-                    <div style="margin-bottom: 15px;">
-                        <label
-                            style="display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 5px;">Full
-                            Name *</label>
-                        <input type="text" name="name" id="modalName" required
-                            style="width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 0.9rem; background: #fff; outline: none;">
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label
-                            style="display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 5px;">Phone
-                            Number *</label>
-                        <input type="text" name="phone_no" id="modalPhone" required
-                            style="width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 0.9rem; background: #fff; outline: none;">
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label
-                            style="display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 5px;">Address
-                            *</label>
-                        <textarea name="address" id="modalAddress" required rows="3"
-                            style="width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 0.9rem; font-family: inherit; resize: none; background: #fff; outline: none;"></textarea>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label
-                            style="display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 5px;">Account
-                            Status</label>
-                        <select name="status" id="modalStatus"
-                            style="width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 0.9rem; background: #fff; outline: none;">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Right Column: Financials -->
-                <div
-                    style="flex: 1; min-width: 300px; padding: 25px; border-left: 1px solid #E5E7EB; background: #fff;">
-                    <h3
-                        style="font-size: 1.1rem; color: #1F2937; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-weight: 800;">
-                        <i class="fas fa-chart-pie"></i> Credit & Billing Summary
-                    </h3>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                        <div>
-                            <label
-                                style="display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 5px;">Pending
-                                Bills</label>
-                            <input type="number" name="panding_bill_count" id="modalPendingBills"
-                                style="width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 0.9rem; outline: none;">
-                        </div>
-                        <div>
-                            <label
-                                style="display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 5px;">Total
-                                Bills</label>
-                            <input type="number" name="all_bill_count" id="modalTotalBills"
-                                style="width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 0.9rem; outline: none;">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <label
-                            style="display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 5px;">Last
-                            Paid Amount</label>
-                        <div style="position: relative;">
-                            <span
-                                style="position: absolute; left: 10px; top: 10px; color: #6B7280; font-weight: 600;">₹</span>
-                            <input type="number" step="0.01" name="padin_amount_last" id="modalLastPaid"
-                                style="width: 100%; padding: 10px 10px 10px 25px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 0.9rem; outline: none;">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 25px;">
-                        <label
-                            style="display: block; font-size: 0.8rem; font-weight: 700; color: #6B7280; margin-bottom: 5px;">Total
-                            Invested Amount</label>
-                        <div style="position: relative;">
-                            <span
-                                style="position: absolute; left: 10px; top: 10px; color: #6B7280; font-weight: 600;">₹</span>
-                            <input type="number" step="0.01" name="padin_amount_total" id="modalTotalInvested"
-                                style="width: 100%; padding: 10px 10px 10px 25px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 0.9rem; outline: none;">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pending Bills Container -->
-                <div id="pendingBillsWrap" style="margin-bottom: 20px; display: none;">
-                    <label
-                        style="display: block; font-size: 0.8rem; font-weight: 800; color: #DC2626; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;">
-                        <i class="fas fa-exclamation-circle"></i> Unpaid Bills Found
-                    </label>
-                    <div id="pendingBillsList"
-                        style="max-height: 140px; overflow-y: auto; border: 1px solid #FECACA; border-radius: 6px; background: #FEF2F2; padding: 5px;">
-                        <!-- Dynamically populated via JS -->
-                    </div>
-                </div>
-
-                <div
-                    style="background: #FFFBEB; border: 1px dashed #F59E0B; padding: 12px; border-radius: 8px; margin-bottom: 25px; display: flex; align-items: flex-start; gap: 10px;">
-                    <i class="fas fa-info-circle" style="color: #F59E0B; margin-top: 3px;"></i>
-                    <span style="font-size: 0.75rem; color: #92400E; font-weight: 600; line-height: 1.4;">Changes to
-                        financial data directly affect the customer's ledger status. Ensure it is accurate.</span>
-                </div>
-
-                <button type="submit"
-                    style="width: 100%; padding: 14px; border-radius: 8px; background: #F97316; color: #fff; font-size: 1rem; font-weight: 800; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);">
-                    Save Changes <i class="fas fa-check-circle"></i>
-                </button>
-                <!-- Button color mirrors the orange 'Pay Now' button from the design reference, creating an attractive contrast with the purple header -->
-            </div>
-    </div>
-    </form>
-</div>
-</div>
-
-<script>
     function openEditModal(btn) {
         const id = btn.getAttribute('data-id');
         document.getElementById('modalCustIdStr').innerText = id;
 
-        // Update form action with explicit ID, matching the Flask route
         const baseUrl = "{{ url_for('customer.edit_customer', c_id=0) }}";
         document.getElementById('editCustomerForm').action = baseUrl.replace('0', id);
 
-        // Fill form with current data
         document.getElementById('modalName').value = btn.getAttribute('data-name');
         document.getElementById('modalPhone').value = btn.getAttribute('data-phone_no');
         document.getElementById('modalAddress').value = btn.getAttribute('data-address');
@@ -359,11 +289,10 @@
         document.getElementById('modalLastPaid').value = btn.getAttribute('data-last-paid');
         document.getElementById('modalTotalInvested').value = btn.getAttribute('data-total-invested');
 
-        // Fetch Unpaid Bills dynamically
         const pendingWrap = document.getElementById('pendingBillsWrap');
         const pendingList = document.getElementById('pendingBillsList');
         pendingWrap.style.display = 'none';
-        pendingList.innerHTML = '<div style="padding: 10px; text-align: center; color: #6B7280; font-size: 0.8rem;">Loading pending bills...</div>';
+        pendingList.innerHTML = '<div style="padding: 15px; text-align: center; color: #94A3B8; font-weight: 700;">Scanning for debts...</div>';
 
         fetch(`/customer/api/unpaid-bills/${id}`)
             .then(response => response.json())
@@ -371,60 +300,46 @@
                 if (data.status === 'success' && data.bills && data.bills.length > 0) {
                     pendingWrap.style.display = 'block';
                     let billsHtml = '';
+
                     data.bills.forEach(bill => {
-                        const amount = parseFloat(bill.remaining_amount || 0).toFixed(2);
+                        const amount = parseFloat(bill.remaining_amount || 0).toLocaleString('en-IN', {
+                            minimumFractionDigits: 2
+                        });
                         const date = bill.created_at ? bill.created_at.substring(0, 10) : 'N/A';
+
                         billsHtml += `
-                            <div style="background: #fff; border: 1px solid #FCA5A5; border-radius: 4px; padding: 8px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="background: #fff; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                                 <div>
-                                    <div style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">Bill #${bill.bill_id || 'N/A'}</div>
-                                    <div style="font-size: 0.65rem; color: #6B7280;">${date}</div>
+                                    <div style="font-size: 0.85rem; font-weight: 900; color: #1E293B;">Bill #${bill.bill_id || 'N/A'}</div>
+                                    <div style="font-size: 0.72rem; color: #94A3B8; font-weight: 700;">Issued: ${date}</div>
                                 </div>
-                                <div style="font-size: 0.85rem; font-weight: 800; color: #DC2626;">
-                                    ₹${amount}
-                                </div>
+                                <div style="font-size: 1rem; font-weight: 1000; color: #EF4444;">₹${amount}</div>
                             </div>
                         `;
                     });
                     pendingList.innerHTML = billsHtml;
-                } else if (data.status === 'success') {
-                    // No pending bills
-                    pendingWrap.style.display = 'none';
-                } else {
-                    pendingList.innerHTML = `<div style="padding: 10px; text-align: center; color: #DC2626; font-size: 0.8rem;">Failed to load bills.</div>`;
-                    pendingWrap.style.display = 'block';
                 }
-            })
-            .catch(error => {
+
+                else {
+                    pendingWrap.style.display = 'none';
+                }
+
+            }).catch(error => {
                 console.error("Error fetching bills:", error);
-                pendingList.innerHTML = `<div style="padding: 10px; text-align: center; color: #DC2626; font-size: 0.8rem;">Error loading bills.</div>`;
-                pendingWrap.style.display = 'block';
+                pendingWrap.style.display = 'none';
             });
 
-        // Show modal with animation
-        const modal = document.getElementById('editCustomerModal');
-        modal.style.display = 'flex';
-        modal.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.transition = 'opacity 0.2s ease';
-            modal.style.opacity = '1';
-        }, 10);
+        document.getElementById('editCustomerModal').style.display = 'flex';
     }
 
     function closeEditModal() {
-        const modal = document.getElementById('editCustomerModal');
-        modal.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 200);
+        document.getElementById('editCustomerModal').style.display = 'none';
     }
 
-    // Close when clicking outside of the modal content
     window.addEventListener('click', function (event) {
         const modal = document.getElementById('editCustomerModal');
-        if (event.target === modal) {
-            closeEditModal();
-        }
+        if (event.target === modal) closeEditModal();
     });
+
 </script>
 {% endblock %}

@@ -5,23 +5,30 @@
 {% block content %}
 <div class="customer-container">
     <!-- Header Section -->
-    <div class="elite-dashboard-header" style="margin-bottom: 35px;">
-        <div class="elite-header-group">
-            <h1 class="elite-header-title">Approved Customer Bills</h1>
-            <p class="elite-header-subtitle">Overview of completed payments and <strong>settled credit
-                    accounts</strong>.</p>
+    <div class="elite-dashboard-header">
+        <div class="elite-header-group" style="display: flex; flex-direction: row; align-items: center;">
+            <div class="elite-header-accent"></div>
+            <div>
+                <h1 class="elite-header-title">Settlement <span>Archive</span></h1>
+                <p class="elite-header-subtitle">Overview of completed payments and <strong>settled credit
+                        accounts</strong>.</p>
+            </div>
+        </div>
+        <div class="elite-status-badge">
+            <i class="fas fa-check-double" style="color: #10B981;"></i> Audit Ready
         </div>
     </div>
 
     <!-- Stats Summary Row -->
-    <div class="elite-grid" style="margin-bottom: 35px;">
+    <div class="elite-grid">
         <div class="elite-stat-card">
             <div class="elite-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
-                <i class="fas fa-check-double"></i>
+                <i class="fas fa-coins"></i>
             </div>
             <div>
                 <div class="elite-stat-label">Total Settled</div>
-                <div class="elite-stat-value">₹{{ "{:,.2f}".format(stats.total_approved_amount) }}</div>
+                <div class="elite-stat-value" style="color: #10B981;">₹{{ "{:,.0f}".format(stats.total_approved_amount)
+                    }}</div>
             </div>
         </div>
         <div class="elite-stat-card">
@@ -29,69 +36,89 @@
                 <i class="fas fa-history"></i>
             </div>
             <div>
-                <div class="elite-stat-label">Paid Bills</div>
+                <div class="elite-stat-label">Paid Invoices</div>
                 <div class="elite-stat-value">{{ stats.total_approved_bills }}</div>
             </div>
         </div>
         <div class="elite-stat-card">
             <div class="elite-stat-icon" style="background: rgba(255, 159, 0, 0.1); color: var(--elite-orange);">
-                <i class="fas fa-user-check"></i>
+                <i class="fas fa-user-shield"></i>
             </div>
             <div>
-                <div class="elite-stat-label">Secure Customers</div>
+                <div class="elite-stat-label">Reliable Clients</div>
                 <div class="elite-stat-value">{{ customers|length }}</div>
             </div>
         </div>
     </div>
 
     <!-- Approved Bills Table -->
-    <div class="elite-card">
-        <div class="table-responsive">
+    <div class="elite-card" style="padding: 0; overflow: hidden;">
+        <div class="elite-table-wrapper">
             <table class="elite-table">
                 <thead>
                     <tr>
-                        <th style="width: 250px;">Customer Name</th>
-                        <th>Contact Number</th>
-                        <th>Total Paid Amount</th>
-                        <th>Settled Count</th>
-                        <th style="text-align: right;">Action</th>
+                        <th style="width: 300px;">Settled Accounts</th>
+                        <th class="hide-on-mobile">Verification</th>
+                        <th>Cumulative Paid</th>
+                        <th class="hide-on-mobile">Reliability</th>
+                        <th style="text-align: right;">History Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for c in customers %}
-                    <tr>
+                    <tr class="searchable-row">
                         <td>
-                            <div style="font-weight: 800; color: var(--elite-black); font-size: 1rem;">{{ c.name }}
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div
+                                    style="width: 42px; height: 42px; border-radius: 14px; background: #ECFDF5; color: #10B981; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem; flex-shrink: 0; border: 1px solid #D1FAE5;">
+                                    {{ c.name[:1]|upper }}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 850; color: var(--elite-black); font-size: 1.05rem;">{{
+                                        c.name }}</div>
+                                    <div style="font-size: 0.8rem; color: var(--elite-gray-text); font-weight: 700;">{{
+                                        c.phone }}</div>
+                                </div>
                             </div>
                         </td>
-                        <td>
-                            <div style="color: var(--elite-gray-text); font-weight: 600;">{{ c.phone }}</div>
-                        </td>
-                        <td>
-                            <div style="color: #10B981; font-weight: 900; font-size: 1.1rem;">₹{{
-                                "{:,.2f}".format(c.total_paid) }}</div>
-                        </td>
-                        <td>
+                        <td class="hide-on-mobile">
                             <span
-                                style="background: #ECFDF5; color: #10B981; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 0.75rem;">
-                                {{ c.bill_count }} PAID
+                                style="background: #F8FAFC; color: #10B981; padding: 6px 14px; border-radius: 10px; font-weight: 850; font-size: 0.72rem; border: 1px solid #D1FAE5; letter-spacing: 0.5px;">
+                                FULLY PAID <i class="fas fa-shield-check" style="margin-left: 4px;"></i>
                             </span>
+                        </td>
+                        <td>
+                            <div style="color: #10B981; font-weight: 1000; font-size: 1.2rem; letter-spacing: -0.5px;">
+                                ₹{{ "{:,.2f}".format(c.total_paid) }}</div>
+                            <div
+                                style="font-size: 0.72rem; color: #94A3B8; font-weight: 850; text-transform: uppercase; margin-top: 2px;">
+                                {{ c.bill_count }} Bills Settled</div>
+                        </td>
+                        <td class="hide-on-mobile">
+                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--elite-black);">100% Secure
+                            </div>
+                            <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 700;">Zero outstanding</div>
                         </td>
                         <td style="text-align: right;">
                             <button class="elite-btn elite-btn-primary" onclick="openBillsModal(this)"
                                 data-id="{{ c.customer_id }}" data-name="{{ c.name | escape }}"
-                                style="padding: 10px 18px; font-size: 0.8rem; margin-left: auto;">
-                                <i class="fas fa-eye"></i> View All Paid Bills
+                                style="padding: 10px 20px; font-size: 0.8rem;">
+                                <i class="fas fa-history"></i> Payment History
                             </button>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 100px 20px; color: #9CA3AF;">
-                            <i class="fas fa-folder-open"
-                                style="font-size: 4rem; display: block; margin-bottom: 20px; color: #D1D5DB; opacity: 0.3;"></i>
-                            <h3 style="font-weight: 800; color: var(--elite-black);">No Settled Bills Found</h3>
-                            <p>Once customers start paying their balances, records will appear here.</p>
+                        <td colspan="5" style="text-align: center; padding: 120px 20px;">
+                            <div
+                                style="width: 80px; height: 80px; background: #F8FAFC; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;">
+                                <i class="fas fa-folder-open" style="font-size: 2.5rem; color: #CBD5E1;"></i>
+                            </div>
+                            <h3
+                                style="font-weight: 1000; color: var(--elite-black); font-size: 1.5rem; letter-spacing: -0.5px;">
+                                Archive is Empty</h3>
+                            <p style="color: var(--elite-gray-text); font-weight: 700;">No settled bills found. Records
+                                will appear here once credit accounts are paid.</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -101,112 +128,90 @@
     </div>
 </div>
 
-<!-- Paid Bills Modal (Custom Style) -->
-<div id="paidBillsModal"
-    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-    <div
-        style="background: #fff; width: 95%; max-width: 800px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh;">
-
-        <!-- Header -->
-        <div
-            style="background: #10B981; color: #fff; padding: 20px 25px; display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
-            <div>
-                <h2
-                    style="margin: 0; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-check-circle"></i> Payment History
-                </h2>
-                <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px; font-weight: 600;">Customer: <span
-                        id="modalCustomerName"></span></div>
+<!-- Premium Paid Bills Modal -->
+<div id="paidBillsModal" class="elite-modal-overlay" style="display: none;">
+    <div class="elite-modal-content" style="max-width: 850px;">
+        <div class="elite-modal-header-premium" style="background: #10B981;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="modal-icon-accent" style="background: rgba(255,255,255,0.2); color: #fff;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.4rem;">Payment History</h2>
+                    <p style="color: rgba(255,255,255,0.8);">Customer: <span id="modalCustomerName"
+                            style="color: #fff; font-weight: 900;"></span></p>
+                </div>
             </div>
-            <button type="button" onclick="closeBillsModal()"
-                style="background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; padding: 0; line-height: 1;">&times;</button>
+            <button class="modal-close-btn" onclick="closeBillsModal()">&times;</button>
         </div>
 
-        <div style="padding: 25px; overflow-y: auto; background: #F8F9FA;">
-            <div id="billsList" style="display: none;">
+        <div class="modal-body-premium" style="background: #F8FAFC; padding: 30px;">
+            <div id="billsList" class="bills-portfolio-grid">
                 <!-- Appended by JS -->
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    const billsList = document.getElementById('billsList');
-    const modalTitleText = document.getElementById('modalCustomerName');
 
+<script>
     function openBillsModal(btn) {
         const customerId = btn.getAttribute('data-id');
         const name = btn.getAttribute('data-name');
+        document.getElementById('modalCustomerName').innerText = name;
 
-        modalTitleText.innerText = name;
+        const list = document.getElementById('billsList');
+        list.innerHTML = '<div style="text-align: center; padding: 40px; color: #94A3B8; font-weight: 800;"><i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i> Accessing historical ledger...</div>';
 
-        billsList.style.display = 'block';
-        billsList.innerHTML = '<div class="text-center py-5" style="color: var(--elite-gray-text); font-weight: 600;">Fetching historical records...</div>';
-
-        // Native Modal Show with transition
-        const modal = document.getElementById('paidBillsModal');
-        modal.style.display = 'flex';
-        modal.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.transition = 'opacity 0.2s ease';
-            modal.style.opacity = '1';
-        }, 10);
+        document.getElementById('paidBillsModal').style.display = 'flex';
 
         fetch(`/customer/api/paid-bills/${customerId}`)
             .then(res => res.json())
             .then(data => {
-                billsList.innerHTML = '';
-
+                list.innerHTML = '';
                 if (data.status === 'success' && data.bills.length > 0) {
                     data.bills.forEach(bill => {
                         const date = bill.approved_date || new Date(bill.created_at).toLocaleDateString('en-IN', {
                             day: 'numeric', month: 'short', year: 'numeric'
                         });
-                        const time = bill.approved_time || '';
+                        const totalAmount = parseFloat(bill.total_price).toLocaleString('en-IN', { minimumFractionDigits: 2 });
 
                         const html = `
-                            <div style="background: #fff; border: 1px solid #EEF0F6; border-radius: 12px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                            <div style="background: #fff; border: 1.5px solid #EEF2F6; border-radius: 20px; padding: 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: 0.3s;" onmouseover="this.style.borderColor='#10B981'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#EEF2F6'; this.style.transform='translateY(0)'">
                                 <div>
-                                    <div style="font-weight: 900; font-size: 1rem; color: var(--elite-black); margin-bottom: 2px;">BILL #${bill.bill_id || bill.id}</div>
-                                    <div style="font-size: 0.8rem; color: var(--elite-gray-text); font-weight: 600;">Settled on: ${date} ${time}</div>
-                                    <div style="margin-top: 8px; font-weight: 800; color: #10B981; font-size: 0.85rem;"><i class="fas fa-check"></i> FULLY PAID</div>
+                                    <div style="font-weight: 1000; font-size: 1rem; color: var(--elite-black); letter-spacing: 0.5px;">INVOICE #${bill.bill_id || bill.id}</div>
+                                    <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 750; margin-top: 4px;">Settled on: ${date}</div>
+                                    <div style="margin-top: 12px; font-weight: 1000; color: #10B981; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-check-circle"></i> FULLY SETTLED
+                                    </div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <div style="font-weight: 900; font-size: 1.15rem; color: var(--elite-black);">₹${bill.total_price}</div>
-                                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--elite-gray-text); margin-bottom: 10px;">Via: ${bill.payment_method || 'Cash'}</div>
-                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                        <a href="${bill.bill_url || '#'}" target="_blank" class="elite-btn elite-btn-secondary" style="padding: 6px 12px; font-size: 0.75rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
-                                            <i class="fas fa-file-pdf"></i> PDF
+                                    <div style="font-weight: 900; font-size: 1.25rem; color: var(--elite-black);">₹${totalAmount}</div>
+                                    <div style="font-size: 0.78rem; font-weight: 850; color: #94A3B8; margin-bottom: 12px;">Mode: ${bill.payment_method || 'Cash'}</div>
+                                    
+                                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                        <a href="${bill.bill_url || '#'}" target="_blank" class="elite-btn elite-btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;">
+                                            <i class="fas fa-file-pdf"></i> Download PDF
                                         </a>
                                     </div>
                                 </div>
                             </div>
                         `;
-                        billsList.insertAdjacentHTML('beforeend', html);
+                        list.insertAdjacentHTML('beforeend', html);
                     });
                 } else {
-                    billsList.innerHTML = '<div class="text-center py-5" style="color: var(--elite-gray-text); font-weight: 600;">No payment history found.</div>';
+                    list.innerHTML = '<div style="text-align: center; padding: 60px; color: #94A3B8; font-weight: 800;">No payment history records found.</div>';
                 }
             })
             .catch(err => {
-                billsList.innerHTML = '<div class="text-center py-5 text-danger" style="font-weight: 700;">Connection failed. Please refresh and try again.</div>';
+                list.innerHTML = '<div style="text-align: center; padding: 40px; color: #EF4444; font-weight: 800;">Ledger sync failed. Please try again.</div>';
             });
     }
 
-    function closeBillsModal() {
-        const modal = document.getElementById('paidBillsModal');
-        modal.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 200);
-    }
+    function closeBillsModal() { document.getElementById('paidBillsModal').style.display = 'none'; }
 
-    // Close when clicking outside of the modal content
-    window.addEventListener('click', function (event) {
-        const modal = document.getElementById('paidBillsModal');
-        if (event.target === modal) {
-            closeBillsModal();
-        }
+    window.addEventListener('click', function (e) {
+        if (e.target.classList.contains('elite-modal-overlay')) closeBillsModal();
     });
 </script>
 {% endblock %}

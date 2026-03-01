@@ -268,11 +268,12 @@ def make_bill():
                 "subtotal_amount": round(subtotal_amount, 2),
                 "total_tax_amount": round(total_tax_amount, 2),
                 "bill_total": round(bill_total, 2),
-                "payment_status": "Paid" if payment_method != 'Credit' else "Unpaid",
+                "payment_status": "Paid" if payment_method != 'Credit' else "Pending",
                 "bill_status": "Completed" if payment_method != 'Credit' else "Pending",
                 "payment_id": payment_ref if payment_method == 'UPI' else None,
+                "payment_method": payment_method,
                 "customer_name": data.get('customer_name', 'Cash'),
-                "customer_phone": data.get('customer_phone', '-')
+                "customer_phone": data.get('customer_phone') or 'N/A'
             }
             
             bill_resp = supabase.table('bills').insert(new_bill).execute()
@@ -293,14 +294,15 @@ def make_bill():
                     "bill_id": bill_pk,
                     "store_name": "Main Store",
                     "payment_method": payment_method,
-                    "payment_type": "Full",
+                    "payment_type": "Full" if payment_method != 'Credit' else "Partial",
                     "paid_amount": round(bill_total, 2) if payment_method != 'Credit' else 0,
                     "remaining_amount": 0 if payment_method != 'Credit' else round(bill_total, 2),
-                    "payment_status": "Paid" if payment_method != 'Credit' else "Unpaid",
+                    "payment_status": "Paid" if payment_method != 'Credit' else "Pending",
                     "received_by": "Counter",
-                    "payment_reference": f"{payment_method.upper()}-{uuid.uuid4().hex[:6].upper()}",
-                    "transaction_id": f"{payment_method.upper()}-TRANSACTION",
+                    "payment_reference": f"{payment_method.upper()}-{uuid.uuid4().hex[:10].upper()}",
+                    "transaction_id": f"{payment_method.upper()}-AUTO-{uuid.uuid4().hex[:6].upper()}",
                     "is_bill_generated": True,
+                    "notes": f"Initial record for {payment_method} bill",
                     "created_at": datetime.now().isoformat(),
                     "updated_at": datetime.now().isoformat()
                 }
@@ -330,7 +332,7 @@ def make_bill():
             try:
                 pdf_data = new_bill.copy()
                 pdf_data['customer_name'] = data.get('customer_name', 'Cash')
-                pdf_data['customer_phone'] = data.get('customer_phone', '-')
+                pdf_data['customer_phone'] = data.get('customer_phone') or 'N/A'
                 pdf_data['payment_method'] = data.get('payment_method', 'Cash')
                 pdf_data['bill_date'] = datetime.now().strftime("%Y-%m-%d")
                 pdf_data['bill_time'] = datetime.now().strftime("%H:%M:%S")
@@ -360,7 +362,7 @@ def make_bill():
                 pass
                 
             if payment_method == 'Credit':
-                customer_phone = data.get('customer_phone', '-')
+                customer_phone = data.get('customer_phone') or 'N/A'
                 customer_name = data.get('customer_name', 'Cash')
                 
                 cust_res = supabase.table('customer').select('*').eq('phone_no', customer_phone).execute()

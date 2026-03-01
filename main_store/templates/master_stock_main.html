@@ -11,96 +11,86 @@
 {% block content %}
 <div class="holi-dashboard">
     <!-- Header -->
-    <div class="elite-dashboard-header"
-        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-left: 6px solid #6C5DD3; padding-left: 15px; border-radius: 4px;">
+    <div class="elite-dashboard-header">
         <div class="elite-header-group">
-            <h1 class="elite-header-title" style="margin: 0; font-size: 2.2rem; font-weight: 900; color: #3A3663;">
-                Master Stock</h1>
-            <p class="elite-header-subtitle" style="margin: 5px 0 0; color: #8B95A5; font-size: 0.9rem;">Inventory
-                management for: <strong style="color: #FF9F00; text-transform: uppercase;">Main Collection 2026</strong>
-            </p>
+            <div class="elite-header-accent"></div>
+            <div>
+                <h1 class="elite-header-title">Master <span>Stock</span></h1>
+                <p class="elite-header-subtitle">Inventory for: <strong>Main Collection 2026</strong></p>
+            </div>
         </div>
-        <div class="elite-status-badge"
-            style="background: #6C5DD3; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(108, 93, 211, 0.2);">
+        <div class="elite-status-badge">
+            <i class="fas fa-box-open" style="margin-right: 10px;"></i>
             Total Products: {{ products|length }}
         </div>
     </div>
 
     <!-- Tab Navigation -->
-    <div class="tabs-container"
-        style="background: white; padding: 4px; border-radius: 12px; display: inline-flex; gap: 4px; border: 1px solid #EEF0F6; margin-bottom: 28px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-        <button class="tab-btn active" onclick="openTab(event, 'all-products')"
-            style="border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="openTab(event, 'all-products')">
             <i class="fas fa-boxes"></i> All Inventory
         </button>
-        <button class="tab-btn" onclick="openTab(event, 'low-stock')"
-            style="border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
+        <button class="tab-btn" onclick="openTab(event, 'low-stock')">
             <i class="fas fa-exclamation-circle"></i> Low Stock
             {% if low_stock|length > 0 %}
-            <span
-                style="background: #e11d48; color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.65rem; margin-left: 5px;">{{
-                low_stock|length }}</span>
+            <span class="count">{{ low_stock|length }}</span>
             {% endif %}
         </button>
-        <button class="tab-btn" onclick="openTab(event, 'most-sold')"
-            style="border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
+        <button class="tab-btn" onclick="openTab(event, 'most-sold')">
             <i class="fas fa-fire"></i> Top Selling
         </button>
-        <button class="tab-btn" onclick="openTab(event, 'removed-products')"
-            style="border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
-            <i class="fas fa-trash-arrow-up"></i> Removed
+        <button class="tab-btn" onclick="openTab(event, 'removed-products')">
+            <i class="fas fa-trash-can"></i> Removed
             {% if inactive_products|length > 0 %}
-            <span
-                style="background: #8B95A5; color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.65rem; margin-left: 5px;">{{
-                inactive_products|length }}</span>
+            <span class="count">{{ inactive_products|length }}</span>
             {% endif %}
         </button>
-        <a href="{{ url_for('main_store.add_product') }}" class="tab-btn"
-            style="text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 0.85rem;">
+        <a href="{{ url_for('main_store.add_product') }}" class="tab-btn" style="text-decoration: none;">
             <i class="fas fa-plus-circle"></i> Add New
         </a>
     </div>
 
     <!-- 1. All Products Table -->
     <div id="all-products" class="tab-content active fade-in">
-        <div class="elite-card elite-table-wrapper"
-            style="padding: 0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-radius: 12px; border: none;">
-            <table class="elite-table elite-table-responsive" style="margin-top: 0;">
+        <div class="elite-card">
+            <table class="elite-table">
                 <thead>
-                    <tr style="background: white; color: #6B7280; font-size: 0.75rem; letter-spacing: 1px;">
-                        <th style="border-bottom: 2px solid #111827; padding: 20px;">DETAILS</th>
-                        <th style="border-bottom: 2px solid #111827; padding: 20px;">PRICING</th>
-                        <th style="border-bottom: 2px solid #111827; padding: 20px;">INVENTORY</th>
-                        <th style="border-bottom: 2px solid #111827; padding: 20px;">TAX</th>
-                        <th style="border-bottom: 2px solid #111827; padding: 20px;">STATUS</th>
-                        <th style="border-bottom: 2px solid #111827; padding: 20px; text-align: right;">ACTION</th>
+                    <tr>
+                        <th>Details</th>
+                        <th>Pricing</th>
+                        <th>Inventory</th>
+                        <th>Tax</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in products %}
                     <tr>
                         <td data-label="Product">
-                            <div style="font-weight: 800; color: var(--elite-black); font-size: 1rem;">{{ p.product_name
+                            <div style="font-weight: 1000; color: var(--text-main); font-size: 1rem;">{{ p.product_name
                                 }}</div>
-                            <div style="color: var(--elite-gray-text); font-size: 0.8rem; font-weight: 600;">{{
-                                p.category }} | {{ p.brand or 'Generic' }}</div>
+                            <div
+                                style="color: var(--text-muted); font-size: 0.78rem; font-weight: 800; text-transform: uppercase;">
+                                {{ p.category }} • {{ p.brand or 'Generic' }}</div>
                         </td>
                         <td data-label="Pricing">
-                            <span class="price-tag">Cost: <span style="font-weight: 700;">₹{{ p.cost_price or 0
-                                    }}</span></span>
-                            <span class="price-tag" style="color: var(--elite-purple); font-weight: 800;">Sell: ₹{{
+                            <span class="price-tag">Cost: ₹{{ p.cost_price or 0 }}</span>
+                            <span class="price-tag"
+                                style="color: var(--primary-blue); font-size: 1rem; font-weight: 900;">Sell: ₹{{
                                 p.sell_price or 0 }}</span>
                         </td>
                         <td data-label="Stock">
                             <div class="stock-badge {% if p.stock <= 10 %}stock-low{% else %}stock-ok{% endif %}">
+                                <i class="fas {{ 'fa-warning' if p.stock <= 10 else 'fa-check' }}"></i>
                                 {{ p.stock }} {{ p.product_unit }}
                             </div>
                             <div
-                                style="font-size: 0.75rem; color: var(--elite-gray-text); margin-top: 4px; font-weight: 600;">
+                                style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; font-weight: 800;">
                                 Sold: {{ p.sold_stock or 0 }}</div>
                         </td>
-                        <td data-label="Tax" style="font-weight: 700; color: var(--elite-gray-text);">{{ p.tax_percent
-                            or 0 }}%</td>
+                        <td data-label="Tax" style="font-weight: 900; color: var(--text-main);">{{ p.tax_percent or 0
+                            }}%</td>
                         <td data-label="Status">
                             <span
                                 class="elite-status-pill {{ 'pill-active' if p.product_status == 'Active' else 'pill-inactive' }}">
@@ -111,9 +101,8 @@
                             <form action="{{ url_for('main_store.delete_product', product_id=p.product_id) }}"
                                 method="POST" onsubmit="return confirm('Delete {{ p.product_name }}?');"
                                 style="display: inline-block;">
-                                <button type="submit"
-                                    style="background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; padding: 8px; border-radius: 8px; cursor: pointer; transition: 0.2s;">
-                                    <i class="fas fa-trash-alt"></i>
+                                <button type="submit" class="btn-action btn-delete">
+                                    <i class="fas fa-trash-can"></i>
                                 </button>
                             </form>
                         </td>
@@ -122,10 +111,11 @@
                 </tbody>
             </table>
             {% if not products %}
-            <div style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
+            <div style="text-align: center; padding: 100px 30px; color: var(--text-muted);">
                 <i class="fas fa-box-open"
-                    style="font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
-                No products found in inventory.
+                    style="font-size: 4rem; opacity: 0.1; margin-bottom: 20px; display: block;"></i>
+                <p style="font-weight: 900; font-size: 1.2rem;">No products found</p>
+                <small>Get started by adding your first product!</small>
             </div>
             {% endif %}
         </div>
@@ -133,38 +123,44 @@
 
     <!-- 2. Low Stock Table -->
     <div id="low-stock" class="tab-content fade-in" style="display: none;">
-        <div class="elite-card elite-table-wrapper" style="padding: 0;">
-            <table class="elite-table elite-table-responsive">
+        <div class="elite-card">
+            <table class="elite-table">
                 <thead>
                     <tr>
                         <th>Product</th>
                         <th>Current Stock</th>
                         <th>Brand</th>
-                        <th>Action</th>
+                        <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in low_stock %}
                     <tr>
-                        <td data-label="Product" style="font-weight: 800; color: var(--elite-black);">{{ p.product_name
-                            or p.name }}</td>
+                        <td data-label="Product" style="font-weight: 950; color: var(--text-main);">{{ p.product_name or
+                            p.name }}</td>
                         <td data-label="Stock">
-                            <div class="stock-badge stock-low">{{ p.stock }} units</div>
+                            <div class="stock-badge stock-low"><i class="fas fa-warning"></i> {{ p.stock }} units</div>
                         </td>
-                        <td data-label="Brand">{{ p.brand or '-' }}</td>
-                        <td data-label="Action">
-                            <a href="{{ url_for('main_store.add_product') }}"
-                                style="color: var(--elite-purple); font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                        <td data-label="Brand" style="font-weight: 800; color: var(--text-muted);">{{ p.brand or '-' }}
+                        </td>
+                        <td data-label="Action" style="text-align: right;">
+                            <a href="{{ url_for('main_store.add_product') }}" class="btn-restore"
+                                style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 900; font-size: 0.85rem;">
                                 <i class="fas fa-plus-circle"></i> Restock
                             </a>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
-                            <i class="fas fa-check-circle"
-                                style="color: #16a34a; font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
-                            All inventory levels are healthy.
+                        <td colspan="4" style="text-align: center; padding: 100px 30px; color: var(--text-muted);">
+                            <div
+                                style="background: #ecfdf5; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                                <i class="fas fa-check-circle" style="color: #10b981; font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 style="font-weight: 1000; color: var(--text-main); font-size: 1.2rem;">Stock Levels
+                                Healthy</h4>
+                            <p style="font-weight: 700;">All your inventory levels are currently above the threshold.
+                            </p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -175,30 +171,30 @@
 
     <!-- 3. Most Sold Table -->
     <div id="most-sold" class="tab-content fade-in" style="display: none;">
-        <div class="elite-card elite-table-wrapper" style="padding: 0;">
-            <table class="elite-table elite-table-responsive">
+        <div class="elite-card">
+            <table class="elite-table">
                 <thead>
                     <tr>
                         <th>Rank</th>
                         <th>Product</th>
-                        <th>Sold</th>
-                        <th>Rev. Est.</th>
+                        <th>Units Sold</th>
+                        <th style="text-align: right;">Est. Revenue</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for p in most_sold[:10] %}
                     <tr>
-                        <td data-label="Rank" style="font-weight: 900; color: var(--elite-purple);">#{{ loop.index }}
-                        </td>
-                        <td data-label="Product" style="font-weight: 800;">{{ p.product_name or p.name }}</td>
-                        <td data-label="Sold" style="font-weight: 800; color: #16a34a;">{{ p.sales }} units</td>
-                        <td data-label="Revenue" style="font-weight: 800;">₹{{ (p.sell_price or p.base_price or 0) *
-                            p.sales }}</td>
+                        <td data-label="Rank" style="font-weight: 1000; color: var(--primary-blue); font-size: 1.1rem;">
+                            #{{ loop.index }}</td>
+                        <td data-label="Product" style="font-weight: 900;">{{ p.product_name or p.name }}</td>
+                        <td data-label="Sold" style="font-weight: 1000; color: var(--success);">{{ p.sales }} units</td>
+                        <td data-label="Revenue" style="font-weight: 1000; text-align: right; font-size: 1.1rem;">₹{{
+                            (p.sell_price or p.base_price or 0) * p.sales }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
-                            No sales data available yet.
+                        <td colspan="4" style="text-align: center; padding: 100px 30px; color: var(--text-muted);">
+                            <p style="font-weight: 900;">No sales data available yet.</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -209,12 +205,12 @@
 
     <!-- 4. Removed Products Table -->
     <div id="removed-products" class="tab-content fade-in" style="display: none;">
-        <div class="elite-card elite-table-wrapper" style="padding: 0;">
-            <table class="elite-table elite-table-responsive">
+        <div class="elite-card">
+            <table class="elite-table">
                 <thead>
                     <tr>
                         <th>Details</th>
-                        <th>Inventory</th>
+                        <th>Final Inventory</th>
                         <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
@@ -222,22 +218,23 @@
                     {% for p in inactive_products %}
                     <tr>
                         <td data-label="Product">
-                            <div style="font-weight: 800; color: #8B95A5; font-size: 1rem;">{{ p.product_name }}</div>
-                            <div style="color: var(--elite-gray-text); font-size: 0.8rem; font-weight: 600;">{{
-                                p.category }} | {{ p.brand or 'Generic' }}</div>
+                            <div
+                                style="font-weight: 900; color: #94a3b8; font-size: 1rem; text-decoration: line-through;">
+                                {{ p.product_name }}</div>
+                            <div style="color: var(--text-muted); font-size: 0.78rem; font-weight: 800;">{{ p.category
+                                }} • {{ p.brand or 'Generic' }}</div>
                         </td>
                         <td data-label="Stock">
-                            <div class="stock-badge" style="background: #F3F4F6; color: #6B7280;">
-                                {{ p.stock }} {{ p.product_unit }}
+                            <div class="stock-badge" style="background: #f1f5f9; color: #94a3b8;">
+                                <i class="fas fa-box-archive"></i> {{ p.stock }} {{ p.product_unit }}
                             </div>
                         </td>
                         <td data-label="Action" style="text-align: right;">
                             <form action="{{ url_for('main_store.restore_product', product_id=p.product_id) }}"
                                 method="POST" onsubmit="return confirm('Restore {{ p.product_name }} to Active?');"
                                 style="display: inline-block;">
-                                <button type="submit"
-                                    style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 8px 15px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 0.8rem;">
-                                    <i class="fas fa-undo"></i> Restore
+                                <button type="submit" class="btn-action btn-restore" style="height: 40px;">
+                                    <i class="fas fa-rotate-left" style="margin-right: 8px;"></i> Restore
                                 </button>
                             </form>
                         </td>
@@ -246,10 +243,10 @@
                 </tbody>
             </table>
             {% if not inactive_products %}
-            <div style="text-align: center; padding: 60px; color: var(--elite-gray-text);">
-                <i class="fas fa-trash-arrow-up"
-                    style="font-size: 3rem; opacity: 0.2; margin-bottom: 15px; display: block;"></i>
-                No removed products.
+            <div style="text-align: center; padding: 100px 30px; color: var(--text-muted);">
+                <i class="fas fa-trash-can"
+                    style="font-size: 4rem; opacity: 0.1; margin-bottom: 20px; display: block;"></i>
+                <p style="font-weight: 900;">Trash is empty</p>
             </div>
             {% endif %}
         </div>

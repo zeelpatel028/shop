@@ -15,11 +15,11 @@
     <!-- ── Header ── -->
     <div class="elite-dashboard-header">
         <div class="elite-header-group">
-            <h1 class="elite-header-title">Dashboard</h1>
-            <p class="elite-header-subtitle">Welcome back! Here's your <strong>live overview</strong>.</p>
+            <h1 class="elite-header-title">Elite <span>Dashboard</span></h1>
+            <p class="elite-header-subtitle">Welcome back! Here's your <strong>live business overview</strong>.</p>
         </div>
-        <div class="elite-status-badge" style="background: var(--elite-purple); color: white;">
-            <i class="fas fa-circle" style="font-size: 0.5rem; margin-right: 6px; animation: pulse 2s infinite;"></i>
+        <div class="elite-status-badge">
+            <i class="fas fa-circle clr-ok" style="font-size: 0.5rem; animation: pulse 2s infinite;"></i>
             Live: Main Store 2026
         </div>
     </div>
@@ -27,47 +27,48 @@
     <!-- ── Hero Stats ── -->
     <div class="hero-stats">
         <div class="hero-card">
-            <div class="hc-glow" style="background: #6C5DD3;"></div>
-            <div class="hc-icon" style="background: #F0EEFF; color: #6C5DD3;">
+            <div class="hc-glow" style="background: var(--primary-blue);"></div>
+            <div class="hc-icon" style="background: rgba(108, 93, 211, 0.1); color: var(--primary-blue);">
                 <i class="fas fa-chart-line"></i>
             </div>
             <div class="hc-label">Total Revenue</div>
-            <div class="hc-value" style="color: #6C5DD3;">₹{{ "{:,.0f}".format(revenue|default(0)|float) }}</div>
-            <div class="hc-sub" style="color: #10B981;">
+            <div class="hc-value" style="color: var(--primary-blue);">₹{{ "{:,.0f}".format(revenue|default(0)|float) }}
+            </div>
+            <div class="hc-sub clr-ok">
                 <i class="fas fa-arrow-up" style="font-size: 0.65rem;"></i>
                 {{ "{:.1f}".format(profit_pct|default(0)|float) }}% margin
             </div>
         </div>
 
         <div class="hero-card">
-            <div class="hc-glow" style="background: #10B981;"></div>
-            <div class="hc-icon" style="background: #ECFDF5; color: #10B981;">
+            <div class="hc-glow" style="background: var(--primary-green, #10B981);"></div>
+            <div class="hc-icon" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
                 <i class="fas fa-wallet"></i>
             </div>
             <div class="hc-label">Net Profit</div>
             <div class="hc-value" style="color: #10B981;">₹{{ "{:,.0f}".format(total_profit|default(0)|float) }}</div>
-            <div class="hc-sub" style="color: #6B7280;">
+            <div class="hc-sub" style="color: var(--text-muted);">
                 <i class="fas fa-check-circle" style="font-size: 0.65rem;"></i>
                 After all costs
             </div>
         </div>
 
         <div class="hero-card">
-            <div class="hc-glow" style="background: #FF9F00;"></div>
-            <div class="hc-icon" style="background: #FFF4E5; color: #FF9F00;">
+            <div class="hc-glow" style="background: var(--primary-orange);"></div>
+            <div class="hc-icon" style="background: rgba(249, 115, 22, 0.1); color: var(--primary-orange);">
                 <i class="fas fa-receipt"></i>
             </div>
             <div class="hc-label">Total Bills</div>
             <div class="hc-value">{{ bill_count|default(0) }}</div>
-            <div class="hc-sub" style="color: #6B7280;">
+            <div class="hc-sub" style="color: var(--text-muted);">
                 <i class="fas fa-calculator" style="font-size: 0.65rem;"></i>
                 Avg ₹{{ "{:,.0f}".format(avg_order|default(0)|float) }}/order
             </div>
         </div>
 
         <div class="hero-card">
-            <div class="hc-glow" style="background: #111827;"></div>
-            <div class="hc-icon" style="background: #F3F4F6; color: #111827;">
+            <div class="hc-glow" style="background: var(--dark-bg);"></div>
+            <div class="hc-icon" style="background: rgba(17, 24, 39, 0.1); color: var(--dark-bg);">
                 <i class="fas fa-boxes-stacked"></i>
             </div>
             <div class="hc-label">Active Products</div>
@@ -109,11 +110,10 @@
         <div class="dash-card">
             <div class="dash-card-header">
                 <div class="dash-card-title">
-                    <i class="fas fa-bolt"></i> Recent Activity
+                    <i class="fas fa-bolt"></i> Recent Orders
                 </div>
-                <a href="{{ url_for('main_store.ledger') }}" class="card-badge"
-                    style="background: #F0EEFF; color: #6C5DD3; text-decoration: none;">
-                    View All →
+                <a href="{{ url_for('main_store.ledger') }}" class="card-badge avatar-purple">
+                    View Ledger →
                 </a>
             </div>
 
@@ -142,10 +142,10 @@
         <div class="dash-card">
             <div class="dash-card-header">
                 <div class="dash-card-title">
-                    <i class="fas fa-trophy"></i> Top Products
+                    <i class="fas fa-trophy"></i> Best Sellers
                 </div>
-                <span class="card-badge" style="background: #FFF4E5; color: #FF9F00;">
-                    By Quantity
+                <span class="card-badge avatar-orange">
+                    High Demand
                 </span>
             </div>
 
@@ -181,13 +181,13 @@
         <div class="dash-card">
             <div class="dash-card-header">
                 <div class="dash-card-title">
-                    <i class="fas fa-exclamation-triangle" style="color: #F97316;"></i> Stock Alerts
+                    <i class="fas fa-exclamation-triangle clr-warn"></i> Critical Alerts
                 </div>
                 <span class="card-badge {{ 'badge-warn' if (low_stock|default([]))|length > 0 else 'badge-ok' }}">
                     {% if (low_stock|default([]))|length > 0 %}
                     {{ (low_stock|default([]))|length }} Warning{{ 's' if (low_stock|default([]))|length > 1 else '' }}
                     {% else %}
-                    All Good ✓
+                    Stock Stable ✓
                     {% endif %}
                 </span>
             </div>
@@ -212,7 +212,7 @@
         <div class="dash-card">
             <div class="dash-card-header">
                 <div class="dash-card-title">
-                    <i class="fas fa-rocket" style="color: #FF9F00;"></i> Quick Actions
+                    <i class="fas fa-rocket clr-ok"></i> Quick Actions
                 </div>
             </div>
             <div class="qa-grid">

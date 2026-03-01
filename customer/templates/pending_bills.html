@@ -5,23 +5,30 @@
 {% block content %}
 <div class="customer-container">
     <!-- Header Section -->
-    <div class="elite-dashboard-header" style="margin-bottom: 35px;">
-        <div class="elite-header-group">
-            <h1 class="elite-header-title">Pending Customer Bills</h1>
-            <p class="elite-header-subtitle">Overview of customers with <strong>outstanding credit balances</strong>.
-            </p>
+    <div class="elite-dashboard-header">
+        <div class="elite-header-group" style="display: flex; flex-direction: row; align-items: center;">
+            <div class="elite-header-accent"></div>
+            <div>
+                <h1 class="elite-header-title">Outstanding <span>Balances</span></h1>
+                <p class="elite-header-subtitle">Overview of customers with <strong>active credit settlements</strong>
+                    pending.</p>
+            </div>
+        </div>
+        <div class="elite-status-badge">
+            <i class="fas fa-exclamation-triangle" style="color: #EF4444;"></i> Collection Mode Active
         </div>
     </div>
 
     <!-- Stats Summary Row -->
-    <div class="elite-grid" style="margin-bottom: 35px;">
+    <div class="elite-grid">
         <div class="elite-stat-card">
             <div class="elite-stat-icon" style="background: rgba(239, 68, 68, 0.1); color: #EF4444;">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-rupee-sign"></i>
             </div>
             <div>
                 <div class="elite-stat-label">Total Outstanding</div>
-                <div class="elite-stat-value">₹{{ "{:,.2f}".format(stats.total_pending_amount) }}</div>
+                <div class="elite-stat-value" style="color: #EF4444;">₹{{ "{:,.0f}".format(stats.total_pending_amount)
+                    }}</div>
             </div>
         </div>
         <div class="elite-stat-card">
@@ -29,69 +36,90 @@
                 <i class="fas fa-file-invoice"></i>
             </div>
             <div>
-                <div class="elite-stat-label">Unpaid Bills</div>
+                <div class="elite-stat-label">Unpaid Invoices</div>
                 <div class="elite-stat-value">{{ stats.total_pending_bills }}</div>
             </div>
         </div>
         <div class="elite-stat-card">
             <div class="elite-stat-icon" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
-                <i class="fas fa-user-check"></i>
+                <i class="fas fa-user-clock"></i>
             </div>
             <div>
-                <div class="elite-stat-label">Affected Customers</div>
+                <div class="elite-stat-label">Debtor Volume</div>
                 <div class="elite-stat-value">{{ customers|length }}</div>
             </div>
         </div>
     </div>
 
     <!-- Pending Bills Table -->
-    <div class="elite-card">
-        <div class="table-responsive">
+    <div class="elite-card" style="padding: 0; overflow: hidden;">
+        <div class="elite-table-wrapper">
             <table class="elite-table">
                 <thead>
                     <tr>
-                        <th style="width: 250px;">Customer Name</th>
-                        <th>Contact Number</th>
-                        <th>Outstanding Amount</th>
-                        <th>Pending Count</th>
-                        <th style="text-align: right;">Action</th>
+                        <th style="width: 300px;">Customer Profile</th>
+                        <th class="hide-on-mobile">Verification Status</th>
+                        <th>Outstanding Balance</th>
+                        <th class="hide-on-mobile">Ageing</th>
+                        <th style="text-align: right;">Collection Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for c in customers %}
-                    <tr>
+                    <tr class="searchable-row">
                         <td>
-                            <div style="font-weight: 800; color: var(--elite-black); font-size: 1rem;">{{ c.name }}
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div
+                                    style="width: 42px; height: 42px; border-radius: 14px; background: #FEF2F2; color: #EF4444; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem; flex-shrink: 0; border: 1px solid #FEE2E2;">
+                                    {{ c.name[:1]|upper }}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 850; color: var(--elite-black); font-size: 1.05rem;">{{
+                                        c.name }}</div>
+                                    <div style="font-size: 0.8rem; color: var(--elite-gray-text); font-weight: 700;">{{
+                                        c.phone }}</div>
+                                </div>
                             </div>
                         </td>
-                        <td>
-                            <div style="color: var(--elite-gray-text); font-weight: 600;">{{ c.phone }}</div>
-                        </td>
-                        <td>
-                            <div style="color: #EF4444; font-weight: 900; font-size: 1.1rem;">₹{{
-                                "{:,.2f}".format(c.unpaid_amount) }}</div>
-                        </td>
-                        <td>
+                        <td class="hide-on-mobile">
                             <span
-                                style="background: #FEF2F2; color: #EF4444; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 0.75rem;">
-                                {{ c.bill_count }} BILLS
+                                style="background: #F8FAFC; color: #64748B; padding: 6px 14px; border-radius: 10px; font-weight: 850; font-size: 0.72rem; border: 1px solid #F1F5F9; letter-spacing: 0.5px;">
+                                VERIFIED <i class="fas fa-check-circle" style="color: #10B981; margin-left: 4px;"></i>
                             </span>
+                        </td>
+                        <td>
+                            <div style="color: #EF4444; font-weight: 1000; font-size: 1.2rem; letter-spacing: -0.5px;">
+                                ₹{{ "{:,.2f}".format(c.unpaid_amount) }}</div>
+                            <div
+                                style="font-size: 0.72rem; color: #94A3B8; font-weight: 850; text-transform: uppercase; margin-top: 2px;">
+                                {{ c.bill_count }} Overdue Bills</div>
+                        </td>
+                        <td class="hide-on-mobile">
+                            <div style="font-size: 0.85rem; font-weight: 800; color: var(--elite-black);">Active Credit
+                            </div>
+                            <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 700;">Lifecycle Tracking On
+                            </div>
                         </td>
                         <td style="text-align: right;">
                             <button class="elite-btn elite-btn-primary" onclick="openBillsModal(this)"
                                 data-id="{{ c.customer_id }}" data-name="{{ c.name | escape }}"
-                                style="padding: 10px 18px; font-size: 0.8rem; margin-left: auto;">
-                                <i class="fas fa-eye"></i> View All Unpaid Bills
+                                style="padding: 10px 20px; font-size: 0.8rem;">
+                                <i class="fas fa-layer-group"></i> Manage Invoices
                             </button>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 100px 20px; color: #9CA3AF;">
-                            <i class="fas fa-check-double"
-                                style="font-size: 4rem; display: block; margin-bottom: 20px; color: #10B981; opacity: 0.2;"></i>
-                            <h3 style="font-weight: 800; color: var(--elite-black);">No Pending Bills</h3>
-                            <p>All customers are currently up to date with their payments.</p>
+                        <td colspan="5" style="text-align: center; padding: 120px 20px;">
+                            <div
+                                style="width: 80px; height: 80px; background: #ECFDF5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;">
+                                <i class="fas fa-check-double" style="font-size: 2.5rem; color: #10B981;"></i>
+                            </div>
+                            <h3
+                                style="font-weight: 1000; color: var(--elite-black); font-size: 1.5rem; letter-spacing: -0.5px;">
+                                All Accounts Cleared</h3>
+                            <p style="color: var(--elite-gray-text); font-weight: 700;">Great job! There are no
+                                outstanding customer balances at the moment.</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -101,230 +129,165 @@
     </div>
 </div>
 
-<!-- Unpaid Bills Modal (Custom Style) -->
-<div id="unpaidBillsModal"
-    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-    <div
-        style="background: #fff; width: 95%; max-width: 800px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; max-height: 90vh;">
-
-        <!-- Header -->
-        <div
-            style="background: #6C5DD3; color: #fff; padding: 20px 25px; display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
-            <div>
-                <h2
-                    style="margin: 0; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-receipt"></i> Pending Bills
-                </h2>
-                <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px; font-weight: 600;">Customer: <span
-                        id="modalCustomerName"></span></div>
+<!-- Premium Bills Overview Modal -->
+<div id="unpaidBillsModal" class="elite-modal-overlay" style="display: none;">
+    <div class="elite-modal-content" style="max-width: 850px;">
+        <div class="elite-modal-header-premium" style="background: var(--elite-purple);">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="modal-icon-accent" style="background: rgba(255,255,255,0.2); color: #fff;">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.4rem;">Invoice Portfolio</h2>
+                    <p style="color: rgba(255,255,255,0.8);">Customer: <span id="modalCustomerName"
+                            style="color: #fff; font-weight: 900;"></span></p>
+                </div>
             </div>
-            <button type="button" onclick="closeBillsModal()"
-                style="background: none; border: none; color: #fff; font-size: 1.8rem; cursor: pointer; padding: 0; line-height: 1;">&times;</button>
+            <button class="modal-close-btn" onclick="closeBillsModal()">&times;</button>
         </div>
 
-        <div style="padding: 25px; overflow-y: auto; background: #F8F9FA;">
-            <div id="billsList" style="display: none;">
+        <div class="modal-body-premium" style="background: #F8FAFC; padding: 30px;">
+            <div id="billsList" class="bills-portfolio-grid">
                 <!-- Appended by JS -->
             </div>
         </div>
     </div>
 </div>
 
-<!-- NEW: Settlement Confirmation Modal (Security Layer) -->
-<div id="settlementModal"
-    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1100; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
-    <div
-        style="background: #fff; width: 90%; max-width: 400px; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.3); animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
-        <div style="background: #10B981; color: #fff; padding: 25px; text-align: center;">
+<!-- NEW: Premium Settlement Confirmation Modal -->
+<div id="settlementModal" class="elite-modal-overlay" style="display: none; z-index: 2500;">
+    <div class="elite-modal-content" style="max-width: 450px; border-radius: 40px; text-align: center;">
+        <div style="padding: 40px; background: linear-gradient(180deg, #10B981 0%, #059669 100%); color: #fff;">
             <div
-                style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 1.5rem;">
-                <i class="fas fa-shield-alt"></i>
+                style="width: 70px; height: 70px; background: rgba(255,255,255,0.2); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+                <i class="fas fa-lock"></i>
             </div>
-            <h3 style="margin: 0; font-weight: 800; font-size: 1.25rem;">Secure Settlement</h3>
-            <p style="margin: 5px 0 0; opacity: 0.9; font-size: 0.85rem; font-weight: 600;">Confirming payment for Bill
+            <h3 style="margin: 0; font-weight: 1000; font-size: 1.6rem; letter-spacing: -0.5px;">Secure Settlement</h3>
+            <p style="margin: 8px 0 0; opacity: 0.9; font-size: 0.9rem; font-weight: 700;">Authorizing Payment for Bill
                 #<span id="settleBillIdHeader"></span></p>
         </div>
 
-        <div style="padding: 30px;">
-            <div style="margin-bottom: 20px;">
-                <label
-                    style="display: block; font-size: 0.75rem; font-weight: 800; color: #8B95A5; text-transform: uppercase; margin-bottom: 8px;">Amount
-                    to Pay (₹)</label>
+        <div style="padding: 40px;">
+            <div class="elite-form-group" style="text-align: left;">
+                <label class="elite-form-label">Incoming Amount (₹)</label>
                 <div style="position: relative;">
                     <span
-                        style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-weight: 800; color: #4B5563;">₹</span>
-                    <input type="number" id="settleAmountInput"
-                        style="width: 100%; padding: 12px 15px 12px 35px; border: 2px solid #F3F4F6; border-radius: 12px; font-weight: 800; font-size: 1.1rem; color: #111827; outline: none; transition: 0.2s;"
-                        onfocus="this.style.borderColor='#10B981'" onblur="this.style.borderColor='#F3F4F6'">
+                        style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-weight: 1000; color: var(--elite-black); font-size: 1.1rem;">₹</span>
+                    <input type="number" id="settleAmountInput" class="elite-form-control"
+                        style="padding-left: 45px; font-size: 1.3rem; font-weight: 1000; border-radius: 20px; background: #F1F5F9; border-color: #E2E8F0;">
                 </div>
-                <div id="maxAmountHint" style="font-size: 0.7rem; color: #6B7280; margin-top: 5px; font-weight: 600;">
+                <div id="maxAmountHint"
+                    style="font-size: 0.8rem; color: #10B981; margin-top: 10px; font-weight: 850; text-align: center; background: #ECFDF5; padding: 8px; border-radius: 10px;">
                     Full balance: ₹0.00</div>
             </div>
 
-            <div style="margin-bottom: 25px;">
-                <label
-                    style="display: block; font-size: 0.75rem; font-weight: 800; color: #8B95A5; text-transform: uppercase; margin-bottom: 8px;">Security
-                    Password</label>
-                <input type="password" id="settlePasswordInput" placeholder="Enter Access Code"
-                    style="width: 100%; padding: 12px 15px; border: 2px solid #F3F4F6; border-radius: 12px; font-weight: 700; outline: none; transition: 0.2s; background: #F9FAFB;"
-                    onfocus="this.style.borderColor='#10B981'; this.style.background='#fff'"
-                    onblur="this.style.borderColor='#F3F4F6'; this.style.background='#F9FAFB'">
+            <div class="elite-form-group" style="text-align: left; margin-bottom: 35px;">
+                <label class="elite-form-label">Authorization Code</label>
+                <input type="password" id="settlePasswordInput" class="elite-form-control" placeholder="••••"
+                    style="text-align: center; letter-spacing: 5px; font-size: 1.2rem; border-radius: 20px;">
             </div>
 
-            <div style="display: flex; gap: 12px;">
-                <button onclick="closeSettlementModal()"
-                    style="flex: 1; padding: 14px; border-radius: 12px; border: 1px solid #E5E7EB; background: #fff; color: #4B5563; font-weight: 700; cursor: pointer; transition: 0.2s;">Cancel</button>
-                <button onclick="submitSettlement()" id="finalizeSettleBtn"
-                    style="flex: 2; padding: 14px; border-radius: 12px; border: none; background: #10B981; color: #fff; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">Confirm
+            <div style="display: flex; gap: 15px;">
+                <button onclick="closeSettlementModal()" class="elite-btn elite-btn-secondary"
+                    style="flex: 1; border-radius: 20px;">Cancel</button>
+                <button onclick="submitSettlement()" id="finalizeSettleBtn" class="elite-btn elite-btn-primary"
+                    style="flex: 1.5; border-radius: 20px; background: #10B981; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25);">Finalize
                     Pay</button>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    @keyframes scaleUp {
-        from {
-            opacity: 0;
-            transform: scale(0.9);
-        }
-
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-</style>
 
 <script>
-    const billsList = document.getElementById('billsList');
-    const modalTitleText = document.getElementById('modalCustomerName');
     let currentActiveCustomerId = null;
+    let pendingSettleBillId = null;
+    let pendingSettleMaxAmount = 0;
 
     function openBillsModal(btn) {
         const customerId = btn.getAttribute('data-id');
         const name = btn.getAttribute('data-name');
-
         currentActiveCustomerId = customerId;
-        modalTitleText.innerText = name;
+        document.getElementById('modalCustomerName').innerText = name;
 
-        billsList.style.display = 'block';
-        billsList.innerHTML = '<div class="text-center py-5" style="color: var(--elite-gray-text); font-weight: 600;">Data is loading...</div>';
+        const list = document.getElementById('billsList');
+        list.innerHTML = '<div style="text-align: center; padding: 40px; color: #94A3B8; font-weight: 800;"><i class="fas fa-spinner fa-spin" style="margin-right: 10px;"></i> Retrieving overdue ledger...</div>';
 
-        // Native Modal Show with transition
-        const modal = document.getElementById('unpaidBillsModal');
-        modal.style.display = 'flex';
-        modal.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.transition = 'opacity 0.2s ease';
-            modal.style.opacity = '1';
-        }, 10);
+        document.getElementById('unpaidBillsModal').style.display = 'flex';
 
         fetch(`/customer/api/unpaid-bills/${customerId}`)
             .then(res => res.json())
             .then(data => {
-                billsList.innerHTML = '';
-
+                list.innerHTML = '';
                 if (data.status === 'success' && data.bills.length > 0) {
                     data.bills.forEach(bill => {
                         const date = bill.created_date || new Date(bill.created_at).toLocaleDateString('en-IN', {
                             day: 'numeric', month: 'short', year: 'numeric'
                         });
-                        const time = bill.created_time || '';
+                        const remAmount = parseFloat(bill.remaining_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                        const totalAmount = parseFloat(bill.total_price).toLocaleString('en-IN', { minimumFractionDigits: 2 });
 
                         const html = `
-                            <div style="background: #fff; border: 1px solid #EEF0F6; border-radius: 12px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                            <div style="background: #fff; border: 1.5px solid #EEF2F6; border-radius: 20px; padding: 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: 0.3s;" onmouseover="this.style.borderColor='var(--elite-purple)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#EEF2F6'; this.style.transform='translateY(0)'">
                                 <div>
-                                    <div style="font-weight: 900; font-size: 1rem; color: var(--elite-black); margin-bottom: 2px;">BILL #${bill.bill_id || bill.id}</div>
-                                    <div style="font-size: 0.8rem; color: var(--elite-gray-text); font-weight: 600;">Created on: ${date} ${time}</div>
-                                    <div style="margin-top: 8px; font-weight: 800; color: #EF4444; font-size: 0.9rem;"><i class="fas fa-exclamation-circle"></i> Remaining: ₹${bill.remaining_amount}</div>
+                                    <div style="font-weight: 1000; font-size: 1rem; color: var(--elite-black); letter-spacing: 0.5px;">INVOICE #${bill.bill_id || bill.id}</div>
+                                    <div style="font-size: 0.8rem; color: #94A3B8; font-weight: 750; margin-top: 4px;">Created: ${date}</div>
+                                    <div style="margin-top: 12px; font-weight: 1000; color: #EF4444; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fas fa-clock"></i> ₹${remAmount} <span style="font-size: 0.7rem; font-weight: 850; background: #FEF2F2; padding: 4px 8px; border-radius: 6px;">PENDING</span>
+                                    </div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <div style="font-weight: 900; font-size: 1.15rem; color: var(--elite-black);">₹${bill.total_price}</div>
-                                    <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 10px;">Paid: ₹${bill.paid_amount}</div>
+                                    <div style="font-weight: 900; font-size: 1.25rem; color: var(--elite-black);">₹${totalAmount}</div>
+                                    <div style="font-size: 0.78rem; font-weight: 850; color: #10B981; margin-bottom: 15px;">Settled: ₹${parseFloat(bill.paid_amount).toFixed(2)}</div>
                                     
-                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                        <a href="${bill.bill_url || '#'}" target="_blank" class="elite-btn elite-btn-secondary" style="padding: 6px 12px; font-size: 0.75rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
-                                            <i class="fas fa-file-pdf"></i> PDF
+                                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                        <a href="${bill.bill_url || '#'}" target="_blank" class="elite-btn elite-btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;">
+                                            <i class="fas fa-file-pdf"></i> View Slip
                                         </a>
-                                        <button onclick="approveSingleBill('${bill.id}', '${bill.remaining_amount}')" class="elite-btn" style="padding: 6px 12px; font-size: 0.75rem; background: #10B981; color: #fff; border: none; display: inline-flex; align-items: center; gap: 5px;">
-                                            <i class="fas fa-check-circle"></i> Approve
+                                        <button onclick="approveSingleBill('${bill.id}', '${bill.remaining_amount}')" class="elite-btn" style="padding: 8px 16px; font-size: 0.8rem; background: #10B981; color: #fff;">
+                                            <i class="fas fa-check-circle"></i> Settle
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         `;
-                        billsList.insertAdjacentHTML('beforeend', html);
+                        list.insertAdjacentHTML('beforeend', html);
                     });
                 } else {
-                    billsList.innerHTML = '<div class="text-center py-5" style="color: var(--elite-gray-text); font-weight: 600;">No unpaid records found.</div>';
+                    list.innerHTML = '<div style="text-align: center; padding: 60px; color: #94A3B8; font-weight: 800;">No unpaid records found in archive.</div>';
                 }
             })
             .catch(err => {
-                billsList.innerHTML = '<div class="text-center py-5 text-danger" style="font-weight: 700;">Connection failed. Please refresh and try again.</div>';
+                list.innerHTML = '<div style="text-align: center; padding: 40px; color: #EF4444; font-weight: 800;">Ledger sync failed. Please try again.</div>';
             });
     }
 
-    function closeBillsModal() {
-        const modal = document.getElementById('unpaidBillsModal');
-        modal.style.opacity = '0';
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 200);
-    }
-
-    // Close when clicking outside of the modal content
-    window.addEventListener('click', function (event) {
-        const modal = document.getElementById('unpaidBillsModal');
-        if (event.target === modal) {
-            closeBillsModal();
-        }
-    });
-
-    let pendingSettleBillId = null;
-    let pendingSettleMaxAmount = 0;
+    function closeBillsModal() { document.getElementById('unpaidBillsModal').style.display = 'none'; }
+    function closeSettlementModal() { document.getElementById('settlementModal').style.display = 'none'; }
 
     function approveSingleBill(bill_id, remainingAmount) {
         pendingSettleBillId = bill_id;
         pendingSettleMaxAmount = parseFloat(remainingAmount);
-
         document.getElementById('settleBillIdHeader').innerText = bill_id;
         document.getElementById('settleAmountInput').value = remainingAmount;
-        document.getElementById('maxAmountHint').innerText = `Full balance: ₹${parseFloat(remainingAmount).toFixed(2)}`;
+        document.getElementById('maxAmountHint').innerText = `Full balance: ₹${parseFloat(remainingAmount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
         document.getElementById('settlePasswordInput').value = '';
-
-        const modal = document.getElementById('settlementModal');
-        modal.style.display = 'flex';
-    }
-
-    function closeSettlementModal() {
-        document.getElementById('settlementModal').style.display = 'none';
+        document.getElementById('settlementModal').style.display = 'flex';
     }
 
     function submitSettlement() {
-        const amountStr = document.getElementById('settleAmountInput').value;
+        const amount = parseFloat(document.getElementById('settleAmountInput').value);
         const password = document.getElementById('settlePasswordInput').value;
-        const amount = parseFloat(amountStr);
 
-        if (!amount || amount <= 0) {
-            alert('Please enter a valid amount.');
-            return;
+        if (!amount || amount <= 0 || amount > pendingSettleMaxAmount) {
+            alert('Invalid settlement amount.'); return;
         }
-
-        if (amount > pendingSettleMaxAmount) {
-            alert(`Amount cannot exceed the remaining balance of ₹${pendingSettleMaxAmount}.`);
-            return;
-        }
-
         if (password !== '9933') {
-            alert('Incorrect security password. Please try again.');
-            document.getElementById('settlePasswordInput').style.borderColor = '#EF4444';
-            return;
+            alert('Authorization failed: Incorrect Security Code.'); return;
         }
 
         const btn = document.getElementById('finalizeSettleBtn');
-        btn.disabled = true;
-        btn.innerText = 'Processing...';
+        btn.disabled = true; btn.innerText = 'Authorizing...';
 
         fetch(`/customer/api/approve-bill/${pendingSettleBillId}`, {
             method: 'POST',
@@ -333,32 +296,19 @@
         })
             .then(res => res.json())
             .then(data => {
-                btn.disabled = false;
-                btn.innerText = 'Confirm Pay';
-
+                btn.disabled = false; btn.innerText = 'Finalize Pay';
                 if (data.status === 'success') {
                     closeSettlementModal();
-
-                    // 1. Refresh the modal data
-                    const btnSimulate = {
-                        getAttribute: (attr) => attr === 'data-id' ? currentActiveCustomerId : modalTitleText.innerText
-                    };
-                    openBillsModal(btnSimulate);
-
-                    // 2. Refresh the background page to update total outstanding sums
-                    setTimeout(() => {
-                        location.reload();
-                    }, 800);
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(err => {
-                btn.disabled = false;
-                btn.innerText = 'Confirm Pay';
-                console.error(err);
-                alert('Connection failed while approving bill.');
+                    openBillsModal({ getAttribute: (a) => a === 'data-id' ? currentActiveCustomerId : modalCustomerName.innerText });
+                    setTimeout(() => { location.reload(); }, 800);
+                } else { alert('Settlement Error: ' + data.message); }
             });
     }
+
+    window.addEventListener('click', function (e) {
+        if (e.target.classList.contains('elite-modal-overlay')) {
+            closeBillsModal(); closeSettlementModal();
+        }
+    });
 </script>
 {% endblock %}

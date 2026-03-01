@@ -14,11 +14,20 @@
 {% block content %}
 <div class="add-product-container">
     <form action="{{ url_for('main_store.add_product') }}" method="POST">
-        <div class="page-header">
-            <h1 class="page-title">Add Product</h1>
+        <div class="elite-dashboard-header">
+            <div class="elite-header-group">
+                <div class="elite-header-accent"></div>
+                <div>
+                    <h1 class="elite-header-title">Add <span>Product</span></h1>
+                </div>
+            </div>
             <div class="header-actions">
-                <a href="{{ url_for('main_store.master_stock') }}" class="btn btn-secondary">Discard</a>
-                <button type="submit" class="btn btn-primary">Add Product</button>
+                <a href="{{ url_for('main_store.master_stock') }}" class="btn btn-secondary">
+                    <i class="fas fa-rotate-left"></i> Discard
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-cloud-upload"></i> Create Product
+                </button>
             </div>
         </div>
 
@@ -28,52 +37,51 @@
                 <!-- General Info -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fas fa-info-circle"></i> General Information
+                        <i class="fas fa-file-lines"></i> Basic Information
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Product Name</label>
+                        <label class="form-label">Full Product Name</label>
                         <input type="text" name="product_name" class="form-control"
-                            placeholder="e.g. Organic Holi Colors Pack" required>
+                            placeholder="Enter descriptive product name" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Brand</label>
-                        <input type="text" name="brand" class="form-control" placeholder="e.g. Festiv Brand">
+                        <label class="form-label">Manufacturer / Brand</label>
+                        <input type="text" name="brand" class="form-control" placeholder="e.g. Premium Brand">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Store Name</label>
+                        <label class="form-label">Display Store</label>
                         <input type="text" name="store_name" class="form-control" value="Main Store"
-                            placeholder="e.g. Main Store">
+                            placeholder="Store where this will be visible">
                     </div>
                 </div>
 
                 <!-- Organization & Status -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fas fa-layer-group"></i> Organization & Status
+                        <i class="fas fa-tags"></i> Classification
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Category</label>
-                        <select name="category" class="form-control category-select">
-                            <option value="Colors">Colors</option>
-                            <option value="Fersan">Fersan</option>
-                            <option value="Pichkari">Pichkari</option>
-                        </select>
+                        <label class="form-label">Department / Category</label>
+                        <input type="text" name="category" class="form-control" placeholder="Enter category name"
+                            required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Product Status</label>
-                        <select name="product_status" class="form-control category-select">
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                            <option value="Draft">Draft</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Stock Status</label>
-                        <select name="stock_status" class="form-control category-select">
-                            <option value="In Stock">In Stock</option>
-                            <option value="Low Stock">Low Stock</option>
-                            <option value="Out of Stock">Out of Stock</option>
-                        </select>
+                    <div class="pricing-grid">
+                        <div class="form-group">
+                            <label class="form-label">Visibility Status</label>
+                            <select name="product_status" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Draft">Draft</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Stock Status Flag</label>
+                            <select name="stock_status" class="form-control">
+                                <option value="In Stock">In Stock</option>
+                                <option value="Low Stock">Low Stock</option>
+                                <option value="Out of Stock">Out of Stock</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -83,36 +91,39 @@
                 <!-- Pricing -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fas fa-hand-holding-usd"></i> Pricing & Tax
+                        <i class="fas fa-circle-dollar-to-slot"></i> Commercial Details
                     </div>
                     <div class="pricing-grid">
                         <div class="form-group">
-                            <label class="form-label">Cost Price</label>
+                            <label class="form-label">Cost Price (₹)</label>
                             <input type="number" name="cost_price" step="0.01" class="form-control" placeholder="0.00"
                                 id="cost_price">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Base Price</label>
+                            <label class="form-label">Base Price (₹)</label>
                             <input type="number" name="base_price" step="0.01" class="form-control" placeholder="0.00"
                                 id="base_price" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Tax (%)</label>
+                            <label class="form-label">GST Tax (%)</label>
                             <input type="number" name="tax_percent" step="0.01" class="form-control" placeholder="0"
                                 id="tax_percent">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Tax Amount</label>
+                            <label class="form-label">Tax Amount (₹)</label>
                             <input type="number" name="tax_amount" step="0.01" class="form-control" placeholder="0.00"
                                 id="tax_amount" readonly>
                         </div>
+                    </div>
+                    <div class="pricing-grid"
+                        style="margin-top: 10px; padding-top: 15px; border-top: 2px dashed #f1f5f9;">
                         <div class="form-group">
-                            <label class="form-label">Profit Margin</label>
+                            <label class="form-label">Margin (₹)</label>
                             <input type="number" name="profit_margin" step="0.01" class="form-control"
-                                placeholder="0.00" id="profit_margin" readonly>
+                                placeholder="Profit" id="profit_margin" readonly>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Sell Price</label>
+                            <label class="form-label">Final Sell Price (₹)</label>
                             <input type="number" name="sell_price" step="0.01" class="form-control" placeholder="0.00"
                                 id="sell_price" required>
                         </div>
@@ -122,19 +133,21 @@
                 <!-- Inventory -->
                 <div class="card">
                     <div class="card-header">
-                        <i class="fas fa-warehouse"></i> Inventory
+                        <i class="fas fa-warehouse"></i> Warehouse Data
+                    </div>
+                    <div class="pricing-grid">
+                        <div class="form-group">
+                            <label class="form-label">Initial Stock</label>
+                            <input type="number" name="stock" class="form-control" placeholder="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sold Base</label>
+                            <input type="number" name="sold_stock" class="form-control" placeholder="0" value="0">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Stock Quantity</label>
-                        <input type="number" name="stock" class="form-control" placeholder="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Sold Stock</label>
-                        <input type="number" name="sold_stock" class="form-control" placeholder="0" value="0">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Unit</label>
-                        <select name="product_unit" class="form-control category-select">
+                        <label class="form-label">Measurement Unit</label>
+                        <select name="product_unit" class="form-control">
                             <option value="kg">kg</option>
                             <option value="g">g</option>
                             <option value="ltr">ltr</option>
@@ -143,8 +156,9 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Price Unit Description</label>
-                        <input type="text" name="price_quantity" class="form-control" placeholder="e.g. per 1 kg">
+                        <label class="form-label">Unit Description</label>
+                        <input type="text" name="price_quantity" class="form-control"
+                            placeholder="e.g. per 1 kg bundle">
                     </div>
                 </div>
             </div>

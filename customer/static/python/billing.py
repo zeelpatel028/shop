@@ -169,7 +169,7 @@ def approve_single_bill(bill_id):
         
         # Determine status
         is_fully_paid = (new_remaining <= 0)
-        new_payment_status = 'Paid' if is_fully_paid else 'Unpaid'
+        new_payment_status = 'Paid' if is_fully_paid else 'Pending'
         new_bill_status = 'Completed' if is_fully_paid else 'Pending'
 
         # 2. Update credit_bill
@@ -192,14 +192,28 @@ def approve_single_bill(bill_id):
             }
             supabase.table('bills').update(bill_update).eq('bill_id', main_bill_id).execute()
             
-            # 4. Update payments table (Sync with Payments Dashboard)
-            pay_update = {
-                'payment_status': new_payment_status,
-                'paid_amount': new_paid,
+            # 4. Insert NEW payment record for history (Sync with Payments Dashboard)
+            new_payment = {
+                'bill_id': main_bill_id,
+                'store_name': 'Main Store', # Credit bills usually from Main Store
+                'payment_method': 'Cash', # Settlements are usually cash
+                'payment_type': 'Partial' if not is_fully_paid else 'Full',
+                'paid_amount': payment_amount,
                 'remaining_amount': new_remaining,
+                'payment_status': 'Paid', # This specific transaction is Paid
+                'received_by': 'Counter',
+                'payment_reference': f"SETTLE-{uuid.uuid4().hex[:10].upper()}",
+                'transaction_id': f"SETTLE-{bill_id}-{uuid.uuid4().hex[:6].upper()}",
+                'notes': f"Settlement payment for Credit Bill #{bill_id}",
+                'is_bill_generated': True,
+                'created_at': datetime.now().isoformat(),
                 'updated_at': datetime.now().isoformat()
             }
-            supabase.table('payments').update(pay_update).eq('bill_id', main_bill_id).execute()
+            import uuid
+            supabase.table('payments').insert(new_payment).execute()
+            
+            # Also update any previous 'Pending' records for this bill to reflect new remaining
+            supabase.table('payments').update({'remaining_amount': new_remaining, 'updated_at': datetime.now().isoformat()}).eq('bill_id', main_bill_id).eq('payment_status', 'Pending').execute()
             
         # 5. Update customer stats
         if customer_id:

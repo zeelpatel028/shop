@@ -1,7 +1,9 @@
-from flask import render_template, request
+from flask import render_template, request, jsonify
 from .. import main_store_bp
 from database.db import supabase
 from datetime import datetime, timedelta
+from ..utils.payment_service import PaymentService
+import uuid
 
 def safe_float(value, default=0.0):
     try:
@@ -100,3 +102,16 @@ def payments():
                          cash_count=cash_count,
                          upi_count=upi_count,
                          active_period=period)
+
+@main_store_bp.route('/api/check-payment-status/<payment_ref>')
+def check_payment_status(payment_ref):
+    status = PaymentService.check_status(supabase, payment_ref)
+    return jsonify({'status': status})
+
+@main_store_bp.route('/api/verify-upi-payment/<payment_ref>', methods=['POST'])
+def verify_upi_payment(payment_ref):
+    try:
+        success = PaymentService.mark_as_paid(supabase, payment_ref, f"MAN-{uuid.uuid4().hex[:10].upper()}")
+        return jsonify({'success': success, 'message': 'Payment confirmed successfully' if success else 'Reference not found'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f"Server error: {str(e)}"})

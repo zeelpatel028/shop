@@ -28,8 +28,24 @@ function setupPaymentMethodListener() {
             } else {
                 checkoutBtnSpan.innerText = 'Generate Bill';
             }
+            updateCartPricesByMethod();
         });
     }
+}
+
+function updateCartPricesByMethod() {
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    cart.forEach(item => {
+        if (item.base_price === undefined) item.base_price = item.price;
+        if (item.normal_sell_price === undefined) item.normal_sell_price = item.final_price;
+
+        if (paymentMethod === 'Wholesale') {
+            item.final_price = item.base_price;
+        } else {
+            item.final_price = item.normal_sell_price;
+        }
+    });
+    renderCart();
 }
 
 // --- Core Functions ---
@@ -152,8 +168,11 @@ function renderCart() {
     if (cart.length === 0) {
         container.innerHTML = `
             <div class="empty-cart-message">
-                <i class="fas fa-basket-shopping" style="font-size: 30px; color: #ddd; margin-bottom: 10px;"></i>
-                <p style="color: #999;">Cart is empty</p>
+                <div style="background: #f8fafc; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);">
+                    <i class="fas fa-basket-shopping" style="font-size: 3rem; color: #cbd5e1;"></i>
+                </div>
+                <h4 style="font-weight: 1000; color: #1e293b; margin: 0; font-size: 1.4rem; letter-spacing: -0.5px;">Your cart is empty</h4>
+                <p style="color: #94a3b8; font-weight: 750; margin-top: 10px; font-size: 1rem;">Select products from the right to add items</p>
             </div>`;
         updateTotals();
         return;
@@ -162,14 +181,12 @@ function renderCart() {
     let html = '';
     cart.forEach((item, index) => {
         const total = Math.round(item.final_price * item.quantity);
-        // Clean display formatting for floats
         const cleanQty = Number.isInteger(item.quantity) ? item.quantity : item.quantity.toFixed(3).replace(/\.?0+$/, '');
 
-        // Calculate item tax
         const taxRate = item.tax_percent || 0;
         const baseTotal = total / (1 + (taxRate / 100));
         const taxAmount = Math.round(total - baseTotal);
-        const taxDisplay = taxRate > 0 ? `<span style="font-size: 11px; margin-left: 5px; color: #ff9f43; font-weight: 500;">(Inc. Tax ${taxRate}%: ₹${taxAmount})</span>` : '';
+        const taxDisplay = taxRate > 0 ? `<span style="font-size: 11px; margin-left: 8px; color: #f59e0b; font-weight: 800; background: rgba(245, 158, 11, 0.1); padding: 2px 8px; border-radius: 6px;">Inc. ${taxRate}% Tax</span>` : '';
 
         const displayParts = (item.displayQty || `${cleanQty} ${item.product_unit}`).split(' ');
         const currentDisplayQty = parseFloat(displayParts[0]);
@@ -179,7 +196,6 @@ function renderCart() {
         const possibleUnits = ['kg', 'g', 'ltr', 'ml', 'pcs'];
         let displayUnitFound = false;
 
-        // Build unit options based on selected unit
         possibleUnits.forEach(u => {
             const isSelected = u.toLowerCase() === currentDisplayUnit.toLowerCase();
             if (isSelected) displayUnitFound = true;
@@ -193,30 +209,40 @@ function renderCart() {
         const paymentMethod = document.getElementById('paymentMethod').value;
         let priceDisplayHTML = '';
         if (paymentMethod === 'Credit' || paymentMethod === 'Wholesale') {
-            priceDisplayHTML = `₹<input type="number" class="price-input-inline" value="${Math.round(item.final_price)}" step="1" 
-                onchange="updateItemPrice(${index}, this.value)" 
-                style="width: 60px; text-align: center; border: 1px solid var(--border-color); border-radius: 4px; padding: 2px; font-weight: 600; font-size: 13px; outline: none; background: #fff; color: var(--text-main);">/unit ${taxDisplay}`;
+            priceDisplayHTML = `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-weight: 800; color: var(--text-muted); font-size: 0.85rem;">₹</span>
+                    <input type="number" class="price-input-inline" value="${Math.round(item.final_price)}" step="1" 
+                        onchange="updateItemPrice(${index}, this.value)" 
+                        style="width: 70px; text-align: center; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 4px; font-weight: 800; font-size: 0.9rem; outline: none; background: #fff; color: var(--primary-blue); transition: all 0.2s;">
+                    <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700;">/unit</span>
+                    ${taxDisplay}
+                </div>`;
         } else {
-            priceDisplayHTML = `₹${Math.round(item.final_price)}/unit ${taxDisplay}`;
+            priceDisplayHTML = `<span style="font-weight: 800; font-size: 0.95rem;">₹${Math.round(item.final_price)}</span> <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 700;">/unit</span> ${taxDisplay}`;
         }
 
         html += `
         <div class="cart-item">
             <div class="cart-item-info">
                 <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-subtext">${item.brand} | ${item.displayQty || (cleanQty + ' ' + item.product_unit)}</div>
+                <div class="cart-item-subtext">${item.brand} • ${item.displayQty || (cleanQty + ' ' + item.product_unit)}</div>
                 <div class="cart-item-price">${priceDisplayHTML}</div>
             </div>
-            <div class="cart-controls" style="display: flex; gap: 8px; align-items: center;">
-                <input type="number" id="qty-input-${index}" class="qty-input-inline" value="${currentDisplayQty}" min="0.1" step="0.1" 
-                    onchange="setSpecificQtyWithUnit(${index})" 
-                    style="width: 50px; text-align: center; border: 1px solid var(--border-color); border-radius: 6px; padding: 4px; font-weight: 600; font-size: 13px; outline: none; background: #fff; color: var(--text-main);">
-                <select id="unit-select-${index}" onchange="setSpecificQtyWithUnit(${index})" 
-                    style="border: 1px solid var(--border-color); border-radius: 6px; padding: 4px; font-size: 13px; outline: none; background: #fff; color: var(--text-main); cursor: pointer; min-width: 50px;">
-                    ${unitOptions}
-                </select>
-                <div class="item-total-price" style="margin-left: 10px;">₹${total}</div>
-                <i class="fas fa-trash-alt remove-item-btn" onclick="removeFromCart(${index})" title="Remove"></i>
+            <div class="cart-controls">
+                <div style="display: flex; align-items: center; background: #f8fafc; padding: 1px 2px; border-radius: 6px; border: 1px solid #f1f5f9;">
+                    <input type="number" id="qty-input-${index}" class="qty-input-inline" value="${currentDisplayQty}" min="0.1" step="0.1" 
+                        onchange="setSpecificQtyWithUnit(${index})" 
+                        style="width: 32px; text-align: center; border: none; background: transparent; font-weight: 900; font-size: 0.78rem; outline: none; color: var(--text-main);">
+                    <select id="unit-select-${index}" onchange="setSpecificQtyWithUnit(${index})" 
+                        style="border: none; background: transparent; padding-right: 1px; font-weight: 800; font-size: 0.68rem; outline: none; color: var(--text-muted); cursor: pointer;">
+                        ${unitOptions}
+                    </select>
+                </div>
+                <div class="item-total-price">₹${total}</div>
+                <div class="remove-item-btn" onclick="removeFromCart(${index})" title="Remove Item">
+                    <i class="fas fa-trash-can"></i>
+                </div>
             </div>
         </div>`;
     });
@@ -298,51 +324,18 @@ document.getElementById('productSearch').addEventListener('input', function (e) 
 });
 
 // --- Customer Dropdown Logic ---
-function toggleCustomerInput() {
-    const paymentMethod = document.getElementById('paymentMethod').value;
-    const regularInput = document.getElementById('regularCustomerInput');
-    const creditInput = document.getElementById('creditCustomerInput');
-
-    if (paymentMethod === 'Credit') {
-        regularInput.style.display = 'none';
-        creditInput.style.display = 'block';
-    } else {
-        regularInput.style.display = 'block';
-        creditInput.style.display = 'none';
-
-        // Hide dropdown if open
-        document.getElementById('customerDropdown').style.display = 'none';
-    }
-
-    // Update cart prices based on selected method
-    cart.forEach(item => {
-        // Ensure missing fields are populated from old cart items if any
-        if (item.base_price === undefined) item.base_price = item.price;
-        if (item.normal_sell_price === undefined) item.normal_sell_price = item.final_price;
-
-        if (paymentMethod === 'Wholesale') {
-            item.final_price = item.base_price;
-        } else {
-            item.final_price = item.normal_sell_price;
-        }
-    });
-
-    // Re-render cart to show/hide editable prices based on payment method
-    renderCart();
-}
-
 function showCustomerDropdown() {
     document.getElementById('customerDropdown').style.display = 'block';
 }
 
 function selectCustomer(name, phone) {
-    document.getElementById('creditCustomerSearch').value = name;
+    document.getElementById('customerName').value = name;
     document.getElementById('customerPhone').value = phone;
     document.getElementById('customerDropdown').style.display = 'none';
 }
 
 function filterCustomers() {
-    const searchTerm = document.getElementById('creditCustomerSearch').value.toLowerCase();
+    const searchTerm = document.getElementById('customerName').value.toLowerCase();
     const options = document.querySelectorAll('#customerDropdown .customer-option:not(:last-child)'); // exclude "add new"
 
     options.forEach(opt => {
@@ -370,9 +363,9 @@ function openAddCustomerModal() {
 
 // Close dropdown if clicked outside
 document.addEventListener('click', function (event) {
-    const creditInput = document.getElementById('creditCustomerInput');
+    const customerInputContainer = document.querySelector('.customer-details .form-row > div');
     const dropdown = document.getElementById('customerDropdown');
-    if (creditInput && !creditInput.contains(event.target)) {
+    if (customerInputContainer && !customerInputContainer.contains(event.target)) {
         if (dropdown) dropdown.style.display = 'none';
     }
 });
@@ -385,14 +378,7 @@ function processCheckout() {
 }
 
 function executeCheckout(action = 'finalize') {
-    const paymentMethod = document.getElementById('paymentMethod').value;
-    let customerName = '';
-
-    if (paymentMethod === 'Credit') {
-        customerName = document.getElementById('creditCustomerSearch').value;
-    } else {
-        customerName = document.getElementById('customerName').value;
-    }
+    const customerName = document.getElementById('customerName').value;
 
     const customerPhone = document.getElementById('customerPhone').value;
     const btn = document.getElementById('checkoutBtn');
@@ -554,7 +540,7 @@ function startPaymentPolling(paymentRef) {
             return;
         }
 
-        fetch(`/main_store/holi/api/check-payment-status/${paymentRef}`)
+        fetch(`/main_store/api/check-payment-status/${paymentRef}`)
             .then(res => res.json())
             .then(data => {
                 console.log("Payment Status:", data.status);
@@ -621,7 +607,7 @@ function confirmUpiPayment() {
         confirmBtn.disabled = true;
 
         updatePaymentStatusUI("Confirming Receipt...", "warning");
-        fetch(`/main_store/holi/api/verify-upi-payment/${window.currentPaymentRef}`, { method: 'POST' })
+        fetch(`/main_store/api/verify-upi-payment/${window.currentPaymentRef}`, { method: 'POST' })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
