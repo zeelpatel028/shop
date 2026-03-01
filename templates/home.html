@@ -1,38 +1,196 @@
 {% extends 'base.html' %}
 
-{% block title %}Coming Soon{% endblock %}
-{% block page_title %}Coming Soon...{% endblock %}
+{% block title %}Master Dashboard - Shop{% endblock %}
+{% block page_title %}{% endblock %}
+
+{% block extra_css %}
+<!-- Reuse the elite styling from customer module -->
+<link rel="stylesheet" href="{{ url_for('customer.static', filename='css/customer.css') }}">
+<style>
+    .elite-dashboard-header {
+        margin-top: -20px;
+    }
+
+    .module-card {
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s;
+    }
+
+    .module-card:hover {
+        transform: translateY(-8px) scale(1.03);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div
-    style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center;">
-    <div style="width: 120px; height: 120px; margin-bottom: 30px; animation: pulse 2s infinite;">
-        <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Logo"
-            style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px; box-shadow: 0 0 30px rgba(142, 45, 226, 0.3);">
+<div class="customer-dashboard" style="padding-top: 20px;">
+    <!-- Elite Header -->
+    <div class="elite-dashboard-header">
+        <div class="elite-header-group" style="display: flex; flex-direction: row; align-items: center;">
+            <div class="elite-header-accent"
+                style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+            </div>
+            <div>
+                <h1 class="elite-header-title">Master <span>Dashboard</span></h1>
+                <p class="elite-header-subtitle">Your entire business ecosystem at a <strong>global scale</strong>.</p>
+            </div>
+        </div>
+        <div class="elite-status-badge"
+            style="background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid #D1FAE5;">
+            <i class="fas fa-satellite-dish"></i> All Systems Online
+        </div>
     </div>
-    <h1 class="brand-name" style="font-size: 3.5rem; font-weight: 900; margin-bottom: 10px; color: var(--dark-black);">
-        Coming Soon</h1>
-    <p style="font-size: 1.2rem; color: var(--text-grey); max-width: 500px;">We are currently architecturalizing our
-        main
-        dashboard for an elite experience. Stay tuned for the revolution.</p>
 
-    <style>
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
+    <!-- Global Stats Grid -->
+    <div class="elite-grid">
+        <div class="elite-stat-card">
+            <div class="elite-stat-icon" style="background: rgba(108, 93, 211, 0.1); color: var(--elite-purple);">
+                <i class="fas fa-globe"></i>
+            </div>
+            <div>
+                <div class="elite-stat-label">Global Revenue</div>
+                <div class="elite-stat-value" style="font-size: 1.8rem;">₹{{ "{:,.0f}".format(global_revenue|default(0))
+                    }}</div>
+            </div>
+        </div>
+        <div class="elite-stat-card">
+            <div class="elite-stat-icon" style="background: rgba(255, 159, 0, 0.1); color: var(--elite-orange);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <div class="elite-stat-label">Total Customers</div>
+                <div class="elite-stat-value" style="font-size: 1.8rem;">{{ total_customers|default(0) }}</div>
+            </div>
+        </div>
+        <div class="elite-stat-card">
+            <div class="elite-stat-icon" style="background: rgba(239, 68, 68, 0.1); color: #EF4444;">
+                <i class="fas fa-hand-holding-usd"></i>
+            </div>
+            <div>
+                <div class="elite-stat-label">Active Credit Accounts</div>
+                <div class="elite-stat-value" style="font-size: 1.8rem;">{{ credit_customers|default(0) }}</div>
+            </div>
+        </div>
+    </div>
 
-            50% {
-                transform: scale(1.05);
-                opacity: 0.8;
-            }
+    <!-- Main Content Grid -->
+    <div class="dashboard-main-row">
 
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-    </style>
+        <!-- App Ecosystem Navigator -->
+        <div class="elite-card" style="padding: 30px;">
+            <div class="elite-card-header" style="margin-bottom: 25px; display: flex; align-items: center; gap: 12px;">
+                <div class="elite-card-header-icon"
+                    style="width: 45px; height: 45px; border-radius: 12px; background: rgba(108, 93, 211, 0.1); color: var(--elite-purple); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3 style="font-weight: 900; color: var(--elite-black); font-size: 1.25rem;">Project Ecosystem</h3>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+
+                <!-- Main Store -->
+                <a href="{{ url_for('main_store.index') }}" class="module-card"
+                    style="display: block; background: #fff; border: 1.5px solid var(--elite-border); border-radius: 20px; padding: 25px; text-decoration: none; position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -15px; right: -15px; width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border-radius: 50%;">
+                    </div>
+                    <i class="fas fa-store"
+                        style="font-size: 2rem; color: #10B981; margin-bottom: 15px; display: block;"></i>
+                    <h4 style="font-size: 1.2rem; font-weight: 850; color: var(--elite-black); margin-bottom: 5px;">Main
+                        Store</h4>
+                    <p style="font-size: 0.85rem; color: var(--elite-gray-text); font-weight: 600;">Core retail
+                        operations & inventory management.</p>
+                </a>
+
+                <!-- Festiv Store -->
+                <a href="{{ url_for('festiv_store.index') }}" class="module-card"
+                    style="display: block; background: #fff; border: 1.5px solid var(--elite-border); border-radius: 20px; padding: 25px; text-decoration: none; position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -15px; right: -15px; width: 60px; height: 60px; background: rgba(255, 159, 0, 0.1); border-radius: 50%;">
+                    </div>
+                    <i class="fas fa-gifts"
+                        style="font-size: 2rem; color: var(--elite-orange); margin-bottom: 15px; display: block;"></i>
+                    <h4 style="font-size: 1.2rem; font-weight: 850; color: var(--elite-black); margin-bottom: 5px;">
+                        Festiv Store</h4>
+                    <p style="font-size: 0.85rem; color: var(--elite-gray-text); font-weight: 600;">Seasonal kits,
+                        dynamic pricing, and special bundles.</p>
+                </a>
+
+                <!-- Customer CRM -->
+                <a href="{{ url_for('customer.dashboard') }}" class="module-card"
+                    style="display: block; background: #fff; border: 1.5px solid var(--elite-border); border-radius: 20px; padding: 25px; text-decoration: none; position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -15px; right: -15px; width: 60px; height: 60px; background: rgba(108, 93, 211, 0.1); border-radius: 50%;">
+                    </div>
+                    <i class="fas fa-users-cog"
+                        style="font-size: 2rem; color: var(--elite-purple); margin-bottom: 15px; display: block;"></i>
+                    <h4 style="font-size: 1.2rem; font-weight: 850; color: var(--elite-black); margin-bottom: 5px;">
+                        Customer CRM</h4>
+                    <p style="font-size: 0.85rem; color: var(--elite-gray-text); font-weight: 600;">Credit lifecycle,
+                        analytics, and master registry.</p>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- System Activity (Cross-Project Feed) -->
+        <div class="elite-card"
+            style="background: var(--elite-black) !important; color: #fff; border: none; padding: 30px;">
+            <div class="elite-card-header"
+                style="border: none; margin-bottom: 25px; display: flex; align-items: center; gap: 12px;">
+                <div class="elite-card-header-icon"
+                    style="width: 45px; height: 45px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #10B981; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                    <i class="fas fa-satellite"></i>
+                </div>
+                <h3 style="color: #fff; font-weight: 900; font-size: 1.25rem;">Global Feed</h3>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                {% if recent_activity %}
+                {% for activity in recent_activity %}
+                <div
+                    style="display: flex; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <div
+                        style="min-width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #fff;">
+                        <i
+                            class="fas {% if activity.payment_status == 'Paid' %}fa-check text-success{% else %}fa-clock text-warning{% endif %}"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="font-size: 0.95rem; font-weight: 800; color: #fff;">Bill #{{ activity.bill_id }}
+                                Generated</div>
+                            <div style="font-size: 0.95rem; font-weight: 900; color: #10B981;">₹{{
+                                "{:,.0f}".format(activity.bill_total|default(0)|float) }}</div>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                            <span
+                                style="font-size: 0.75rem; color: #94A3B8; font-weight: 700; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px;">{{
+                                activity.store_name }}</span>
+                            <span style="font-size: 0.75rem; color: #64748B; font-weight: 600;">{{
+                                (activity.created_at|string)[:16] }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div style="text-align: center; padding: 20px 0;">
+                    <i class="fas fa-inbox" style="font-size: 2rem; color: #64748B; margin-bottom: 10px;"></i>
+                    <p style="color: #94A3B8; font-size: 0.85rem; font-weight: 600;">No recent activity mapped</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div
+                style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div
+                        style="font-size: 0.75rem; color: #64748B; font-weight: 850; text-transform: uppercase; letter-spacing: 1px;">
+                        Ecosystem Status</div>
+                    <div style="font-size: 1rem; font-weight: 950; color: #10B981; margin-top: 2px;">{{ active_modules
+                        }} Modules Active</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

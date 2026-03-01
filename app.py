@@ -90,7 +90,37 @@ def index():
 
 @app.route('/home')
 def home():
-    return render_template('home.html')
+    try:
+        # Calculate Global Revenue (Only Paid Bills)
+        bills_res = supabase.table('bills').select('*').order('created_at', desc=True).execute()
+        all_bills = bills_res.data or []
+        paid_bills = [b for b in all_bills if b.get('payment_status') == 'Paid']
+        global_revenue = sum(float(b.get('bill_total') or 0) for b in paid_bills)
+        
+        # Calculate Customers Stats
+        cust_res = supabase.table('customer').select('*').execute()
+        customers = cust_res.data or []
+        total_customers = len(customers)
+        credit_customers = sum(1 for c in customers if int(c.get('panding_bill_count') or 0) > 0)
+        
+        # Determine active modules based on stores used
+        stores_active = set(b.get('store_name') for b in all_bills if b.get('store_name'))
+        active_modules = len(stores_active) if stores_active else 2 # default assuming Main & Festiv
+        
+        # Cross-store Recent Bills
+        recent_activity = all_bills[:5]
+        
+    except Exception as e:
+        logger.error(f"Error fetching global analytics: {e}")
+        global_revenue = total_customers = credit_customers = active_modules = 0
+        recent_activity = []
+
+    return render_template('home.html', 
+                         global_revenue=global_revenue,
+                         total_customers=total_customers,
+                         credit_customers=credit_customers,
+                         active_modules=active_modules,
+                         recent_activity=recent_activity)
 
 @app.route('/logout')
 def logout():
