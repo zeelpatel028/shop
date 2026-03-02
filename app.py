@@ -152,8 +152,8 @@ def start_keep_alive():
         # Priority: RENDER_EXTERNAL_URL > local URL
         url = os.environ.get('RENDER_EXTERNAL_URL')
         if not url:
-            port = int(os.environ.get("PORT", 5000))
-            url = f"http://localhost:{port}"
+            port = int(os.environ.get("PORT", 10000))
+            url = f"http://127.0.0.1:{port}"
         
         ping_url = f"{url.rstrip('/')}/ping"
         logger.info(f"Keep-alive thread active. Target: {ping_url}")
@@ -185,6 +185,6 @@ if __name__ == '__main__':
         start_keep_alive()
 
     # Render environment provides PORT variable
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
 

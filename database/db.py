@@ -52,25 +52,24 @@ class DatabaseManager:
                         database_url
                     )
                 else:
-                    # Priority 2: Individual variables (Local Dev)
-                    host = os.environ.get('DB_HOST', 'dpg-d6g1fqlm5p6s7393ra9g-a.singapore-postgres.render.com')
-                    port = os.environ.get('DB_PORT', '5432')
+                    # Priority 2: Individual variables
+                    host = os.environ.get('DB_HOST')
+                    port = int(os.environ.get('DB_PORT', 5432))
                     
-                    # FORCE 'disable' for Localhost/127.0.0.1 to avoid common SSL errors on Windows
-                    if host in ['127.0.0.1', 'localhost']:
-                        ssl_mode = "disable"
-                    else:
-                        ssl_mode = os.environ.get("DB_SSL_MODE", "require")
+                    if not host:
+                        raise ValueError("Database configuration missing: Provide DATABASE_URL or DB_HOST environment variables")
                     
-                    print("--- ENVIRONMENT: LOCAL DEVELOPMENT ---")
+                    ssl_mode = os.environ.get("DB_SSL_MODE", "require")
+                    
+                    print("--- ENVIRONMENT: CUSTOM CLOUD DB ---")
                     print(f"Connecting to {host}:{port} (Forced SSL: {ssl_mode})")
                     cls._pool = pool.ThreadedConnectionPool(
                         int(os.environ.get("DB_MIN_CONN", 1)),
                         int(os.environ.get("DB_MAX_CONN", 10)),
                         host=host,
-                        database=os.environ.get("DB_NAME", "shopdb_w6wu"),
-                        user=os.environ.get("DB_USER", "shopdb"),
-                        password=os.environ.get("DB_PASSWORD", "i8LGMATvuBiZ9qK7FRJT0HuncOmgMQVx"),
+                        database=os.environ.get("DB_NAME"),
+                        user=os.environ.get("DB_USER"),
+                        password=os.environ.get("DB_PASSWORD"),
                         port=port,
                         sslmode=ssl_mode
                     )
