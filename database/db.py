@@ -18,7 +18,9 @@ TABLE_PRIMARY_KEYS = {
     'bill_items': 'bill_item_id',
     'payments': 'payment_id',
     'customer': 'id',
-    'credit_bill': 'id'
+    'credit_bill': 'id',
+    'seller': 'id',
+    'orders': 'id'
 }
 
 class DatabaseConnectionError(Exception):
@@ -233,7 +235,11 @@ class QueryBuilder:
                     
                     return Response()
             except Exception as e:
-                print(f"Database error: {e}")
+                import traceback
+                print(f"Database error in execute(): {e}")
+                traceback.print_exc()
+                if hasattr(self, '_insert_data') and self._insert_data:
+                    print(f"Failed INSERT data: {self._insert_data}")
                 conn.rollback()
                 return Response()
 
@@ -248,19 +254,14 @@ def init_schema():
     try:
         with DatabaseManager.get_connection() as conn:
             with conn.cursor() as cur:
-                # Create products table
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS products (
-                        product_id SERIAL PRIMARY KEY,
-                        product_name TEXT NOT NULL,
-                        brand TEXT,
-                        category TEXT,
-                        sell_price DECIMAL(12, 2),
-                        stock INT DEFAULT 0,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    );
-                """)
-                # Create other tables as needed...
+                # Execute the full schema.sql file instead of hardcoded strings
+                schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
+                if os.path.exists(schema_path):
+                    with open(schema_path, 'r') as f:
+                        cur.execute(f.read())
+                    print("Schema initialized from schema.sql successfully.")
+                else:
+                    print("WARNING: schema.sql not found!")
                 conn.commit()
                 print("Schema initialization complete.")
     except Exception as e:

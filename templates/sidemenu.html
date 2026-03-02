@@ -277,7 +277,48 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-
+            <li class="{% if request.endpoint == 'seller.add_seller' %}active{% endif %}">
+                <a href="{{ url_for('seller.add_seller') }}"
+                    class="{% if request.endpoint == 'seller.add_seller' %}active-link{% endif %}">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Add Seller</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'seller.all_sellers' %}active{% endif %}">
+                <a href="{{ url_for('seller.all_sellers') }}"
+                    class="{% if request.endpoint == 'seller.all_sellers' %}active-link{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>All Sellers</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'seller.orders' %}active{% endif %}">
+                <a href="{{ url_for('seller.orders') }}"
+                    class="{% if request.endpoint == 'seller.orders' %}active-link{% endif %}">
+                    <i class="fas fa-box-open"></i>
+                    <span>Orders</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'seller.pending_orders' %}active{% endif %}">
+                <a href="{{ url_for('seller.pending_orders') }}"
+                    class="{% if request.endpoint == 'seller.pending_orders' %}active-link{% endif %}">
+                    <i class="fas fa-clock"></i>
+                    <span>Pending Orders</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'seller.complete_orders' %}active{% endif %}">
+                <a href="{{ url_for('seller.complete_orders') }}"
+                    class="{% if request.endpoint == 'seller.complete_orders' %}active-link{% endif %}">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Complete Orders</span>
+                </a>
+            </li>
+            <li class="{% if request.endpoint == 'seller.return_orders' %}active{% endif %}">
+                <a href="{{ url_for('seller.return_orders') }}"
+                    class="{% if request.endpoint == 'seller.return_orders' %}active-link{% endif %}">
+                    <i class="fas fa-undo-alt"></i>
+                    <span>Return Orders</span>
+                </a>
+            </li>
             {% elif request.blueprint == 'employee' %}
             <!-- EMPLOYEE MODULE LINKS -->
             <li class="{% if request.endpoint == 'employee.index' %}active{% endif %}">

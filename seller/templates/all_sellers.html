@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Seller Dashboard - Tulshi Shop{% endblock %}
+{% block title %}All Sellers - Tulshi Shop{% endblock %}
 
 {% block extra_css %}
 {{ super() }}
-<link rel="stylesheet" href="{{ url_for('seller.static', filename='css/seller_dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('seller.static', filename='css/all_sellers.css') }}">
 {% endblock %}
 
-{% block page_title %}Seller Portal{% endblock %}
+{% block page_title %}All Sellers{% endblock %}
 
 {% block content %}
-<div
+<div class="seller-container"
     style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center;">
     <div style="width: 120px; height: 120px; margin-bottom: 30px; animation: pulse 2s infinite;">
         <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Logo"

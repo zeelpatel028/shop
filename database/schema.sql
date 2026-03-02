@@ -1,7 +1,7 @@
 -- SQL Schema for Shop Project (Production PostgreSQL)
 
 -- 2. Products Table
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     product_id SERIAL PRIMARY KEY,
     store_name TEXT DEFAULT 'Holi Store',
     product_name TEXT NOT NULL,
@@ -23,8 +23,8 @@ CREATE TABLE products (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_products_name ON products(product_name);
-CREATE INDEX idx_products_category ON products(category);
+CREATE INDEX IF NOT EXISTS idx_products_name ON products(product_name);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 
 -- 3. Bills Table
 CREATE TABLE IF NOT EXISTS bills (
@@ -46,8 +46,8 @@ CREATE TABLE IF NOT EXISTS bills (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_bill_date ON bills(created_at);
-CREATE INDEX idx_bill_customer_phone ON bills(customer_phone);
+CREATE INDEX IF NOT EXISTS idx_bill_date ON bills(created_at);
+CREATE INDEX IF NOT EXISTS idx_bill_customer_phone ON bills(customer_phone);
 
 -- 4. Bill Items Table (Normalised structure)
 CREATE TABLE IF NOT EXISTS bill_items (
@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS bill_items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_bill_items_bill_id ON bill_items(bill_id);
-CREATE INDEX idx_bill_items_product_id ON bill_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_bill_items_bill_id ON bill_items(bill_id);
+CREATE INDEX IF NOT EXISTS idx_bill_items_product_id ON bill_items(product_id);
 
 -- 5. Payments Table
 CREATE TABLE IF NOT EXISTS payments (
@@ -89,8 +89,8 @@ CREATE TABLE IF NOT EXISTS payments (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_payment_ref ON payments(payment_reference);
-CREATE INDEX idx_payment_bill_id ON payments(bill_id);
+CREATE INDEX IF NOT EXISTS idx_payment_ref ON payments(payment_reference);
+CREATE INDEX IF NOT EXISTS idx_payment_bill_id ON payments(bill_id);
  
 -- 6. Customer Table
 CREATE TABLE IF NOT EXISTS customer (
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS customer (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_customer_phone ON customer(phone_no);
+CREATE INDEX IF NOT EXISTS idx_customer_phone ON customer(phone_no);
 
 -- 7. Credit Bill Table
 CREATE TABLE IF NOT EXISTS credit_bill (
@@ -133,5 +133,54 @@ CREATE TABLE IF NOT EXISTS credit_bill (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_credit_bill_cid ON credit_bill(c_id);
-CREATE INDEX idx_credit_bill_id ON credit_bill(bill_id);
+CREATE INDEX IF NOT EXISTS idx_credit_bill_cid ON credit_bill(c_id);
+CREATE INDEX IF NOT EXISTS idx_credit_bill_id ON credit_bill(bill_id);
+
+-- 8. Seller Table
+CREATE TABLE IF NOT EXISTS seller (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    shope_name TEXT,
+    gst_no TEXT,
+    email TEXT,
+    phone TEXT UNIQUE NOT NULL,
+    pan_no TEXT,
+    address TEXT,
+    city TEXT,
+    total_products INT DEFAULT 0,
+    total_orders INT DEFAULT 0,
+    pending_orders INT DEFAULT 0,
+    return_total INT DEFAULT 0,
+    complete_orders INT DEFAULT 0,
+    bank_account_holder_name TEXT,
+    bank_account_number TEXT,
+    ifsc_code TEXT,
+    upi_id TEXT,
+    account_status TEXT DEFAULT 'Active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_seller_phone ON seller(phone);
+
+-- 9. Orders Table
+CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    bill_item_id INT REFERENCES bill_items(bill_item_id) ON DELETE SET NULL,
+    seller_id INT REFERENCES seller(id) ON DELETE CASCADE,
+    store_name TEXT,
+    total_product INT,
+    total_quantity INT,
+    subtotal_amount DECIMAL(12, 2),
+    total_tax_amount DECIMAL(12, 2),
+    bill_total DECIMAL(12, 2),
+    payment_status TEXT,
+    bill_status TEXT DEFAULT 'Final',
+    payment_id TEXT UNIQUE, -- Stores payment_reference, unique to prevent duplicate bills
+    payment_method TEXT,
+    bill_url TEXT, -- Link to generated PDF bill
+    order_status TEXT DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_seller_id ON orders(seller_id);

@@ -4,4 +4,4 @@ seller_bp = Blueprint('seller', __name__,
                      template_folder='templates',
                      static_folder='static')
 
-from . import routes
+from .routes import *
