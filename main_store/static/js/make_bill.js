@@ -381,6 +381,7 @@ function executeCheckout(action = 'finalize') {
     const customerName = document.getElementById('customerName').value;
 
     const customerPhone = document.getElementById('customerPhone').value;
+    const paymentMethod = document.getElementById('paymentMethod').value;
     const btn = document.getElementById('checkoutBtn');
 
     // Loading state for finalization

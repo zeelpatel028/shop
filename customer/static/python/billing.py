@@ -2,6 +2,7 @@ from flask import render_template
 from ... import customer_bp
 from database.db import supabase
 from datetime import datetime
+import uuid
 
 @customer_bp.route('/pending-bills')
 def pending_bills():
@@ -209,7 +210,6 @@ def approve_single_bill(bill_id):
                 'created_at': datetime.now().isoformat(),
                 'updated_at': datetime.now().isoformat()
             }
-            import uuid
             supabase.table('payments').insert(new_payment).execute()
             
             # Also update any previous 'Pending' records for this bill to reflect new remaining

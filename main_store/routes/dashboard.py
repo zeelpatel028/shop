@@ -34,7 +34,7 @@ def index():
         total_revenue = sum(safe_float(bill.get('bill_total')) for bill in paid_bills)
         
         # Calculate Profit
-        items_res = supabase.table('bill_items').select('product_id, product_name, quantity, bill_id').execute()
+        items_res = supabase.table('bill_items').select('product_id, product_name, quantity, bill_id, profit_margin').execute()
         bill_items = items_res.data or []
         
         product_profits = {p['product_id']: safe_float(p.get('profit_margin')) for p in all_products}
@@ -48,8 +48,11 @@ def index():
             if item.get('bill_id') in main_paid_bill_ids:
                 p_id = item.get('product_id')
                 qty = safe_float(item.get('quantity'))
-                margin = product_profits.get(p_id, 0)
-                total_profit += (qty * margin)
+                
+                item_profit_margin = item.get('profit_margin')
+                margin = safe_float(item_profit_margin) if item_profit_margin is not None else product_profits.get(p_id, 0)
+                total_profit += (qty * margin) if item_profit_margin is None else margin
+                
                 product_sales[item.get('product_name', 'Unknown')] += qty
 
         avg_order = total_revenue / bill_count if bill_count else 0

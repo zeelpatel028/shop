@@ -80,7 +80,7 @@ def ledger():
         # FILTER ONLY ON PAID BILLS FOR REVENUE AND PROFIT CALCULATION
         bills = [b for b in all_bills if b.get('payment_status') == 'Paid']
         
-        all_items_res = supabase.table('bill_items').select('bill_id, product_id, quantity').execute()
+        all_items_res = supabase.table('bill_items').select('bill_id, product_id, quantity, profit_margin').execute()
         all_items = all_items_res.data or []
         
         prods_res = supabase.table('products').select('product_id, profit_margin').execute()
@@ -98,8 +98,11 @@ def ledger():
             for item in items_by_bill.get(b_id, []):
                 p_id = item.get('product_id')
                 qty = safe_float(item.get('quantity'))
-                margin = product_profits.get(p_id, 0)
-                b_profit += (qty * margin)
+                
+                item_profit_margin = item.get('profit_margin')
+                margin = safe_float(item_profit_margin) if item_profit_margin is not None else product_profits.get(p_id, 0)
+                
+                b_profit += (qty * margin) if item_profit_margin is None else margin
             
             b['bill_profit'] = b_profit
             total_revenue += safe_float(b.get('bill_total'))

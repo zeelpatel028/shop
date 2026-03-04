@@ -20,11 +20,16 @@ CREATE TABLE IF NOT EXISTS products (
     stock_status TEXT,
     product_status TEXT DEFAULT 'Active',
     last_updated_quantity INT,
+    seller_name TEXT,
+    name TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_products_name ON products(product_name);
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+
+ALTER TABLE products ADD COLUMN IF NOT EXISTS seller_name TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS name TEXT;
 
 -- 3. Bills Table
 CREATE TABLE IF NOT EXISTS bills (
@@ -64,6 +69,8 @@ CREATE TABLE IF NOT EXISTS bill_items (
     total_price DECIMAL(12, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE bill_items ADD COLUMN IF NOT EXISTS profit_margin DECIMAL(12, 2);
 
 CREATE INDEX IF NOT EXISTS idx_bill_items_bill_id ON bill_items(bill_id);
 CREATE INDEX IF NOT EXISTS idx_bill_items_product_id ON bill_items(product_id);

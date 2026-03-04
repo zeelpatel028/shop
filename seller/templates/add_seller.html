@@ -10,34 +10,161 @@
 {% block page_title %}Add Seller{% endblock %}
 
 {% block content %}
-<div class="seller-container"
-    style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center;">
-    <div style="width: 120px; height: 120px; margin-bottom: 30px; animation: pulse 2s infinite;">
-        <img src="{{ url_for('static', filename='images/1770743257917.png') }}" alt="Logo"
-            style="width: 100%; height: 100%; object-fit: cover; border-radius: 20px; box-shadow: 0 0 30px rgba(255, 159, 0, 0.3);">
-    </div>
-    <h1 class="brand-name" style="font-size: 3.5rem; font-weight: 900; margin-bottom: 10px; color: var(--dark-black);">
-        Coming Soon</h1>
-    <p style="font-size: 1.2rem; color: var(--text-grey); max-width: 500px;">We are currently architecturalizing our
-        Seller portal for an elite experience. Stay tuned for the revolution.</p>
+<div class="seller-container">
+    <form action="{{ url_for('seller.add_seller') }}" method="POST">
+        <!-- Header Section -->
+        <div class="elite-dashboard-header">
+            <div class="elite-header-group" style="display: flex; flex-direction: row; align-items: center;">
+                <div class="elite-header-accent"></div>
+                <div>
+                    <h1 class="elite-header-title">Register <span>Seller</span></h1>
+                    <p class="elite-header-subtitle">Onboard a new seller to the <strong>Shop ecosystem</strong>.</p>
+                </div>
+            </div>
 
-    <style>
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
+            <div class="elite-header-actions" style="display: flex; gap: 15px;">
+                <a href="{{ url_for('seller.index') }}" class="elite-btn elite-btn-secondary"
+                    style="background: var(--elite-black-light); color: #fff; border: none;">Discard</a>
+                <button type="submit" class="elite-btn elite-btn-primary">
+                    <i class="fas fa-store"></i> Register Seller
+                </button>
+            </div>
+        </div>
 
-            50% {
-                transform: scale(1.05);
-                opacity: 0.8;
-            }
+        <div class="elite-form-grid">
+            <!-- Main Content Area -->
+            <div style="display: flex; flex-direction: column; gap: 40px;">
+                <!-- Identity Section -->
+                <div class="elite-card" style="padding: 40px;">
+                    <div
+                        style="font-size: 1.1rem; font-weight: 1000; color: var(--elite-black); margin-bottom: 35px; display: flex; align-items: center; gap: 12px;">
+                        <div
+                            style="width: 36px; height: 36px; border-radius: 12px; background: rgba(108, 93, 211, 0.1); color: var(--elite-purple); display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        Business & Persona Identity
+                    </div>
 
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-    </style>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Seller Full Name <span
+                                    style="color: #EF4444;">*</span></label>
+                            <input type="text" name="name" class="elite-form-control" placeholder="e.g. Rahul Sharma" required>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Shop/Business Name</label>
+                            <input type="text" name="shope_name" class="elite-form-control"
+                                placeholder="e.g. Tulshi Electronics">
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Phone Number <span style="color: #EF4444;">*</span></label>
+                            <input type="text" name="phone" class="elite-form-control"
+                                placeholder="10-digit mobile number" required>
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Email Address</label>
+                            <input type="email" name="email" class="elite-form-control"
+                                placeholder="seller@example.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KYC & Tax Information Section -->
+                <div class="elite-card" style="padding: 40px;">
+                    <div
+                        style="font-size: 1.1rem; font-weight: 1000; color: var(--elite-black); margin-bottom: 35px; display: flex; align-items: center; gap: 12px;">
+                        <div
+                            style="width: 36px; height: 36px; border-radius: 12px; background: rgba(245, 158, 11, 0.1); color: var(--elite-orange); display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        Compliance & Tax Setup
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">GST Number</label>
+                            <input type="text" name="gst_no" class="elite-form-control" placeholder="15-digit GSTIN">
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">PAN Number</label>
+                            <input type="text" name="pan_no" class="elite-form-control" placeholder="10-character PAN">
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-top: 25px;">
+                        <div class="elite-form-group" style="margin-bottom: 0;">
+                            <label class="elite-form-label">Business Address</label>
+                            <textarea name="address" class="elite-form-control" rows="3"
+                                placeholder="Complete registered address..." style="resize: none;"></textarea>
+                        </div>
+                        <div class="elite-form-group" style="margin-bottom: 0;">
+                            <label class="elite-form-label">City/Region</label>
+                            <input type="text" name="city" class="elite-form-control" placeholder="e.g. Surat" style="height: 100%;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Financial Information Section -->
+                <div class="elite-card" style="padding: 40px;">
+                    <div
+                        style="font-size: 1.1rem; font-weight: 1000; color: var(--elite-black); margin-bottom: 35px; display: flex; align-items: center; gap: 12px;">
+                        <div
+                            style="width: 36px; height: 36px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10B981; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        Financial Directives
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Account Holder Name</label>
+                            <input type="text" name="bank_account_holder_name" class="elite-form-control" placeholder="As per bank records">
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">Account Number</label>
+                            <input type="text" name="bank_account_number" class="elite-form-control" placeholder="Enter Account No.">
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">IFSC Code</label>
+                            <input type="text" name="ifsc_code" class="elite-form-control" placeholder="e.g. SBIN000XXXX">
+                        </div>
+                        <div class="elite-form-group">
+                            <label class="elite-form-label">UPI ID Virtual Addr.</label>
+                            <input type="text" name="upi_id" class="elite-form-control" placeholder="merchant@upi">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                <div class="elite-card"
+                    style="background: var(--elite-black) !important; color: #fff; border: none; padding: 35px;">
+                    <div
+                        style="font-size: 1rem; font-weight: 950; color: #fff; margin-bottom: 30px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-shield-alt" style="color: var(--elite-orange);"></i> System Placement
+                    </div>
+
+                    <div class="elite-form-group">
+                        <label class="elite-form-label" style="color: #94A3B8;">Seller Status <span style="color: #EF4444;">*</span></label>
+                        <select name="account_status" class="elite-form-control"
+                            style="background: #1E293B; border-color: #334155; color: #fff; font-weight: 700;">
+                            <option value="Active">Active (Operations Live)</option>
+                            <option value="Pending">Pending Validation</option>
+                            <option value="Suspended">Suspended / Frozen</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-top: 40px; text-align: center;">
+                        <div
+                            style="width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <i class="fas fa-server" style="font-size: 3rem; color: rgba(255,255,255,0.1);"></i>
+                        </div>
+                        <p style="font-size: 0.8rem; color: #64748B; font-weight: 700;">Zero configuration needed for statistics. Order and product counts will self-initialize across regions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}

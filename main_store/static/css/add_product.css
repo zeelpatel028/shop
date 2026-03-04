@@ -233,6 +233,110 @@
     box-shadow: 0 15px 30px rgba(108, 93, 211, 0.3);
 }
 
+/* ─── Operation Selector ─── */
+.operation-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+    animation: slideUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.op-card {
+    background: white;
+    border: 2px solid #f1f5f9;
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.op-card input {
+    display: none;
+}
+
+.op-card:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.op-card.active {
+    border-color: var(--primary-blue);
+    background: linear-gradient(135deg, rgba(108, 93, 211, 0.05) 0%, rgba(142, 130, 239, 0.05) 100%);
+    box-shadow: 0 10px 20px rgba(108, 93, 211, 0.1);
+}
+
+.op-icon {
+    width: 45px;
+    height: 45px;
+    background: #f1f5f9;
+    color: var(--text-muted);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    transition: all 0.3s;
+}
+
+.op-card.active .op-icon {
+    background: var(--primary-blue);
+    color: white;
+}
+
+.op-text h4 {
+    margin: 0 0 4px 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.op-text p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* ─── Footer Actions (Moved from Header) ─── */
+.form-actions-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+.form-actions-footer .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 16px;
+    font-size: 1.05rem;
+}
+
+@media (min-width: 641px) {
+    .form-actions-footer {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .form-actions-footer .btn {
+        width: auto;
+        padding: 14px 28px;
+    }
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 1024px) {
     .main-grid {
@@ -251,6 +355,10 @@
 }
 
 @media (max-width: 640px) {
+    .operation-selector {
+        grid-template-columns: 1fr;
+    }
+
     .add-product-container {
         padding: 0 16px 40px;
     }

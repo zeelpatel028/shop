@@ -322,53 +322,166 @@ def add_product():
         stock_qty = safe_int(request.form.get('stock'))
         sold_stock = safe_int(request.form.get('sold_stock', 0))
 
-        # 2. Secure Backend Calculations
-        cost_price = safe_float(request.form.get('cost_price'))
-        sell_price = safe_float(request.form.get('sell_price'))
-        tax_amount = (base_price * tax_percent) / 100
+        operation_type = request.form.get('operation_type', 'add_new')
 
-        # If sell_price was not explicitly sent or is 0, default to base + tax
-        if not sell_price:
-            sell_price = base_price + tax_amount
+        if operation_type == 'add_new':
+            # 2. Secure Backend Calculations
+            cost_price = safe_float(request.form.get('cost_price'))
+            sell_price = safe_float(request.form.get('sell_price'))
+            tax_amount = (base_price * tax_percent) / 100
 
-        # Calculate profit as per new formula: Sell Price - Cost Price
-        profit_margin = sell_price - cost_price
+            # If sell_price was not explicitly sent or is 0, default to base + tax
+            if not sell_price:
+                sell_price = base_price + tax_amount
 
-        # 3. Construct Product Payload
-        new_product = {
-            "store_name": request.form.get('store_name'),
-            "product_name": request.form.get('product_name'),
-            "brand": request.form.get('brand'),
-            "category": request.form.get('category'),
-            "price_quantity": request.form.get('price_quantity'),
-            "product_unit": request.form.get('product_unit'),
-            "cost_price": cost_price,
-            "base_price": base_price,
-            "tax_percent": tax_percent,
-            "tax_amount": tax_amount,
-            "profit_margin": profit_margin,
-            "sell_price": sell_price,
-            "stock": stock_qty,
-            "sold_stock": sold_stock,
-            "stock_status": request.form.get('stock_status', 'In Stock'),
-            "product_status": request.form.get('product_status', 'Active'),
-            "last_updated_quantity": stock_qty,
-            "created_at": datetime.now().isoformat()
-        }
+            # Calculate profit as per new formula: Sell Price - Cost Price
+            profit_margin = sell_price - cost_price
 
-        # 4. Database Insertion
-        # Supabase Python client handles parameterization internally
-        supabase.table('products').insert(new_product).execute()
+            # 3. Construct Product Payload
+            new_product = {
+                "store_name": request.form.get('store_name'),
+                "product_name": request.form.get('product_name'),
+                "brand": request.form.get('brand'),
+                "category": request.form.get('category'),
+                "price_quantity": request.form.get('price_quantity'),
+                "product_unit": request.form.get('product_unit'),
+                "cost_price": cost_price,
+                "base_price": base_price,
+                "tax_percent": tax_percent,
+                "tax_amount": tax_amount,
+                "profit_margin": profit_margin,
+                "sell_price": sell_price,
+                "stock": stock_qty,
+                "sold_stock": sold_stock,
+                "stock_status": request.form.get('stock_status', 'In Stock'),
+                "product_status": request.form.get('product_status', 'Active'),
+                "last_updated_quantity": stock_qty,
+                "seller_name": request.form.get('seller_name'),
+                "name": request.form.get('name'),
+                "created_at": datetime.now().isoformat()
+            }
 
-        flash('Product added successfully!', 'success')
+            # 4. Database Insertion
+            supabase.table('products').insert(new_product).execute()
+            flash('Product added successfully to Holi Hub!', 'success')
+
+        elif operation_type == 'add_stock':
+            existing_product_id = request.form.get('existing_product_id')
+            qty_to_add = safe_int(request.form.get('stock'))
+            
+            if not existing_product_id or qty_to_add <= 0:
+                flash('Valid product and quantity required for Add Stock', 'error')
+                return redirect(url_for('festiv_store.add_product'))
+                
+            res = supabase.table('products').select('stock').eq('product_id', existing_product_id).execute()
+            if not res.data:
+                flash('Product not found', 'error')
+                return redirect(url_for('festiv_store.add_product'))
+                
+            current_stock = safe_int(res.data[0].get('stock', 0))
+            new_stock = current_stock + qty_to_add
+            
+            supabase.table('products').update({
+                'stock': new_stock, 
+                'last_updated_quantity': qty_to_add,
+                'stock_status': 'In Stock' if new_stock > 0 else 'Out of Stock'
+            }).eq('product_id', existing_product_id).execute()
+            
+            flash(f'Successfully added {qty_to_add} to stock!', 'success')
+
+        elif operation_type == 'return_product':
+            existing_product_id = request.form.get('existing_product_id')
+            return_bill_id = request.form.get('return_bill_id')
+            return_bill_product_id = request.form.get('return_bill_product_id')
+            qty_to_return = safe_int(request.form.get('stock'))
+            
+            if not existing_product_id or not return_bill_id or qty_to_return <= 0:
+                flash('Valid product, bill, and quantity required for Return', 'error')
+                return redirect(url_for('festiv_store.add_product'))
+                
+            res = supabase.table('products').select('stock, sold_stock').eq('product_id', existing_product_id).execute()
+            if res.data:
+                current_stock = safe_int(res.data[0].get('stock', 0))
+                current_sold = safe_int(res.data[0].get('sold_stock', 0))
+                
+                supabase.table('products').update({
+                    'stock': current_stock + qty_to_return,
+                    'sold_stock': max(0, current_sold - qty_to_return),
+                    'stock_status': 'In Stock'
+                }).eq('product_id', existing_product_id).execute()
+
+            if return_bill_product_id:
+                item_res = supabase.table('bill_items').select('*').eq('bill_item_id', return_bill_product_id).execute()
+                if item_res.data:
+                    item = item_res.data[0]
+                    new_qty = safe_int(item.get('quantity', 0)) - qty_to_return
+                    
+                    if new_qty <= 0:
+                        supabase.table('bill_items').delete().eq('bill_item_id', return_bill_product_id).execute()
+                    else:
+                        base = safe_float(item.get('base_price'))
+                        tax_p = safe_float(item.get('tax_percent'))
+                        sell = safe_float(item.get('final_price'))
+                        
+                        new_line_total = sell * new_qty
+                        new_base_total = new_line_total / (1 + (tax_p/100))
+                        new_tax_amount = new_line_total - new_base_total
+                        
+                        supabase.table('bill_items').update({
+                            'quantity': new_qty,
+                            'tax_amount': new_tax_amount,
+                            'total_price': new_line_total
+                        }).eq('bill_item_id', return_bill_product_id).execute()
+            
+            flash(f'Successfully processed return for {qty_to_return} items!', 'success')
+
         return redirect(url_for('festiv_store.master_stock'))
 
     except Exception as e:
-        print(f"DEBUG: Error adding product: {str(e)}")
+        print(f"DEBUG: Error processing request: {str(e)}")
         import traceback
         traceback.print_exc()
-        flash(f'Error adding product: {str(e)}', 'error')
+        flash(f'Error processing request: {str(e)}', 'error')
         return redirect(url_for('festiv_store.add_product'))
+
+# ================= AJax Endpoints for UI Dropdowns (Holi Store) =================
+from flask import jsonify
+
+@festiv_store_bp.route('/holi/api/products')
+def api_products():
+    res = supabase.table('products').select('product_id, product_name, stock').eq('store_name', 'Holi Store').eq('product_status', 'Active').execute()
+    return jsonify({'success': True, 'data': res.data or []})
+
+@festiv_store_bp.route('/holi/api/sellers')
+def api_sellers():
+    term = request.args.get('q', '').lower()
+    query = supabase.table('seller').select('id, name')
+    res = query.execute()
+    data = [s for s in (res.data or []) if term in str(s.get('name', '')).lower()]
+    return jsonify({'success': True, 'data': data})
+
+@festiv_store_bp.route('/holi/api/customers')
+def api_customers():
+    term = request.args.get('q', '').lower()
+    query = supabase.table('customer').select('id, name, phone_no')
+    res = query.execute()
+    data = [c for c in (res.data or []) if term in str(c.get('name', '')).lower() or term in str(c.get('phone_no', '')).lower()]
+    return jsonify({'success': True, 'data': data})
+
+@festiv_store_bp.route('/holi/api/bills/customer/<path:name>')
+def api_bills_by_customer(name):
+    res = supabase.table('bills').select('bill_id, bill_no, bill_total, created_at').eq('store_name', 'Holi Store').ilike('customer_name', f'%{name}%').order('created_at', desc=True).limit(10).execute()
+    return jsonify({'success': True, 'data': res.data or []})
+
+@festiv_store_bp.route('/holi/api/bills/seller/<int:seller_id>')
+def api_bills_by_seller(seller_id):
+    res = supabase.table('orders').select('id, bill_total, created_at, bill_id:id').eq('seller_id', seller_id).eq('store_name', 'Holi Store').order('created_at', desc=True).limit(10).execute()
+    return jsonify({'success': True, 'data': res.data or []})
+
+@festiv_store_bp.route('/holi/api/bill_items/<int:bill_id>')
+def api_bill_items(bill_id):
+    res = supabase.table('bill_items').select('bill_item_id, product_id, product_name, quantity, final_price').eq('bill_id', bill_id).execute()
+    return jsonify({'success': True, 'data': res.data or []})
 
 @festiv_store_bp.route('/holi/ledger')
 def ledger():
@@ -401,10 +514,10 @@ def ledger():
         bills = bills_response.data or []
         
         # To calculate profit per bill, we need bill_items and product margins
-        all_items_res = supabase.table('bill_items').select('bill_id, product_id, quantity').execute()
+        all_items_res = supabase.table('bill_items').select('bill_id, product_id, quantity, profit_margin').execute()
         all_items = all_items_res.data or []
         
-        # Fetch product margins
+        # Fetch product margins (as fallback)
         prods_res = supabase.table('products').select('product_id, profit_margin').eq('store_name', 'Holi Store').execute()
         product_profits = {p['product_id']: safe_float(p.get('profit_margin')) for p in prods_res.data} if prods_res.data else {}
         
@@ -422,8 +535,12 @@ def ledger():
             for item in items_by_bill.get(b_id, []):
                 p_id = item.get('product_id')
                 qty = safe_float(item.get('quantity'))
-                margin = product_profits.get(p_id, 0)
-                b_profit += (qty * margin)
+                
+                # Use stored transaction profit if available, otherwise calculate from product base
+                item_profit_margin = item.get('profit_margin')
+                margin = safe_float(item_profit_margin) if item_profit_margin is not None else product_profits.get(p_id, 0)
+                
+                b_profit += (qty * margin) if item_profit_margin is None else margin
             
             b['bill_profit'] = b_profit
             total_revenue += safe_float(b.get('bill_total'))
@@ -542,10 +659,20 @@ def make_bill():
                     p_sell_price = safe_float(prod.get('sell_price', 0))
                     p_tax_pct = safe_float(prod.get('tax_percent', 0))
                     p_sold_stock = safe_float(prod.get('sold_stock', 0))
+                    p_cost_price = safe_float(prod.get('cost_price', 0))
+                    p_profit_margin = safe_float(prod.get('profit_margin', 0))
                     
                     if p_stock < p_qty:
                          return jsonify({'success': False, 'message': f"Insufficient stock for {p_name} (Available: {p_stock})"})
                     
+                    # Accept custom final price from frontend for Credit/Wholesale bills, otherwise use DB price
+                    payment_method = data.get('payment_method', 'Cash')
+                    if payment_method in ['Credit', 'Wholesale']:
+                        custom_price = item.get('final_price')
+                        if custom_price is not None:
+                            p_sell_price = safe_float(custom_price)
+                            p_profit_margin = p_sell_price - p_cost_price
+
                     line_total = p_sell_price * p_qty
                     base_price = line_total / (1 + (p_tax_pct/100))
                     tax_amount = line_total - base_price
@@ -564,6 +691,7 @@ def make_bill():
                         "tax_amount": tax_amount,
                         "tax_percent": p_tax_pct,
                         "final_price": p_sell_price,
+                        "profit_margin": p_profit_margin,
                         "line_total": line_total,
                         "stock_after": p_stock - p_qty,
                         "sold_stock_after": p_sold_stock + p_qty
@@ -722,6 +850,7 @@ def make_bill():
                     "tax_percent": v_item['tax_percent'],
                     "tax_amount": v_item['tax_amount'],
                     "final_price": v_item['final_price'],
+                    "profit_margin": v_item['profit_margin'],
                     "total_price": v_item['line_total']
                 }
                 supabase.table('bill_items').insert(item_data).execute()

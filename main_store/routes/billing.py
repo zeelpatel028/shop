@@ -153,14 +153,21 @@ def make_bill():
                     p_sell_price = safe_float(prod.get('sell_price', 0))
                     p_tax_pct = safe_float(prod.get('tax_percent', 0))
                     p_sold_stock = safe_float(prod.get('sold_stock', 0))
+                    p_cost_price = safe_float(prod.get('cost_price', 0))
+                    p_profit_margin = safe_float(prod.get('profit_margin', 0))
                     
                     if p_stock < p_qty:
                          return jsonify({'success': False, 'message': f"Insufficient stock for {p_name} (Available: {p_stock})"})
                     
                     # Accept custom final price from frontend for Credit bills, otherwise use DB price
                     payment_method = data.get('payment_method', 'Cash')
-                    if payment_method == 'Credit':
-                        p_sell_price = safe_float(item.get('final_price', p_sell_price))
+                    if payment_method in ['Credit', 'Wholesale']:
+                        custom_price = item.get('final_price')
+                        if custom_price is not None:
+                            p_sell_price = safe_float(custom_price)
+                            # Custom profit margin for credit/wholesale bills
+                            p_profit_margin = p_sell_price - p_cost_price
+
                     
                     line_total = round(p_sell_price * p_qty)
                     base_price = line_total / (1 + (p_tax_pct/100))
@@ -180,6 +187,7 @@ def make_bill():
                         "tax_amount": tax_amount,
                         "tax_percent": p_tax_pct,
                         "final_price": p_sell_price,
+                        "profit_margin": p_profit_margin,
                         "line_total": line_total,
                         "stock_after": p_stock - p_qty,
                         "sold_stock_after": p_sold_stock + p_qty
@@ -319,6 +327,7 @@ def make_bill():
                     "tax_percent": v_item['tax_percent'],
                     "tax_amount": v_item['tax_amount'],
                     "final_price": v_item['final_price'],
+                    "profit_margin": v_item['profit_margin'],
                     "total_price": v_item['line_total']
                 }
                 supabase.table('bill_items').insert(item_data).execute()

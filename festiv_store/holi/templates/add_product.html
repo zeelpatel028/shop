@@ -75,23 +75,115 @@
     <form action="{{ url_for('festiv_store.add_product') }}" method="POST">
         <div class="page-header">
             <h1 class="page-title">Add Product</h1>
-            <div class="header-actions">
-                <a href="{{ url_for('festiv_store.master_stock') }}" class="btn btn-secondary">Discard</a>
-                <button type="submit" class="btn btn-primary">Add Product</button>
-            </div>
+        </div>
+
+        <!-- Operation Selector -->
+        <div class="operation-selector">
+            <label class="op-card active">
+                <input type="radio" name="operation_type" value="add_new" checked>
+                <div class="op-icon"><i class="fas fa-box-open"></i></div>
+                <div class="op-text">
+                    <h4>Add New Product</h4>
+                    <p>Register a completely new item</p>
+                </div>
+            </label>
+            <label class="op-card">
+                <input type="radio" name="operation_type" value="add_stock">
+                <div class="op-icon"><i class="fas fa-layer-group"></i></div>
+                <div class="op-text">
+                    <h4>Add Stock</h4>
+                    <p>Update inventory for existing</p>
+                </div>
+            </label>
+            <label class="op-card">
+                <input type="radio" name="operation_type" value="return_product">
+                <div class="op-icon"><i class="fas fa-arrow-rotate-left"></i></div>
+                <div class="op-text">
+                    <h4>Return Product</h4>
+                    <p>Process a customer return</p>
+                </div>
+            </label>
         </div>
 
         <div class="main-grid">
             <!-- Main Column -->
             <div class="main-column">
+
+                <!-- Existing Product Selector (Hidden by default) -->
+                <div class="card" id="existing_product_card" style="display: none;">
+                    <div class="card-header">
+                        <i class="fas fa-search"></i> <span id="existing_product_header">Select Product & Details</span>
+                    </div>
+                    <div class="form-group" id="generic_product_select_div">
+                        <label class="form-label">Search / Select Product</label>
+                        <select name="existing_product_id" class="form-control" id="existing_product_id">
+                            <option value="">-- Choose an existing product --</option>
+                        </select>
+                        <small style="color: var(--text-muted); margin-top: 5px; display: block;">Select the product to
+                            update stock.</small>
+                    </div>
+
+                    <!-- Flow: Add Stock Additional Fields -->
+                    <div id="add_stock_fields"
+                        style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #e2e8f0;">
+                        <div class="form-group">
+                            <label class="form-label">Select Seller Name</label>
+                            <input type="text" name="stock_seller_name" class="form-control"
+                                placeholder="Search or Enter Seller Name">
+                        </div>
+                    </div>
+
+                    <!-- Flow: Return Product Additional Fields -->
+                    <div id="return_product_fields"
+                        style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #e2e8f0;">
+                        <div class="form-group">
+                            <label class="form-label">Return From</label>
+                            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                                <label
+                                    style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--text-main); font-weight: 600;">
+                                    <input type="radio" name="return_entity_type" value="customer" checked
+                                        onchange="toggleReturnEntity()"> Customer
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--text-main); font-weight: 600;">
+                                    <input type="radio" name="return_entity_type" value="seller"
+                                        onchange="toggleReturnEntity()"> Seller
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group" id="return_customer_div">
+                            <label class="form-label">Select Customer</label>
+                            <input type="text" name="return_customer_name" class="form-control"
+                                placeholder="Search Customer Name/Phone">
+                        </div>
+                        <div class="form-group" id="return_seller_div" style="display: none;">
+                            <label class="form-label">Select Seller</label>
+                            <input type="text" name="return_seller_name" class="form-control"
+                                placeholder="Search Seller Name">
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label class="form-label">Select Bill</label>
+                            <select name="return_bill_id" class="form-control" id="return_bill_id">
+                                <option value="">-- Choose a Bill --</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label class="form-label">Select Product from Bill</label>
+                            <select name="return_bill_product_id" class="form-control" id="return_bill_product_id">
+                                <option value="">-- Choose Product to Return --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- General Info -->
-                <div class="card">
+                <div class="card" id="basic_info_card">
                     <div class="card-header">
                         <i class="fas fa-info-circle"></i> General Information
                     </div>
                     <div class="form-group">
                         <label class="form-label">Product Name</label>
-                        <input type="text" name="product_name" class="form-control"
+                        <input type="text" name="product_name" class="form-control req-for-new"
                             placeholder="e.g. Organic Holi Colors Pack" required>
                     </div>
                     <div class="form-group">
@@ -106,7 +198,7 @@
                 </div>
 
                 <!-- Organization & Status -->
-                <div class="card">
+                <div class="card" id="classification_card">
                     <div class="card-header">
                         <i class="fas fa-layer-group"></i> Organization & Status
                     </div>
@@ -140,7 +232,7 @@
             <!-- Details Column -->
             <div class="details-column">
                 <!-- Pricing -->
-                <div class="card">
+                <div class="card" id="commercial_card">
                     <div class="card-header">
                         <i class="fas fa-hand-holding-usd"></i> Pricing & Tax
                     </div>
@@ -152,8 +244,8 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Base Price</label>
-                            <input type="number" name="base_price" step="0.01" class="form-control" placeholder="0.00"
-                                id="base_price" required>
+                            <input type="number" name="base_price" step="0.01" class="form-control req-for-new"
+                                placeholder="0.00" id="base_price" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Tax (%)</label>
@@ -172,8 +264,8 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Sell Price</label>
-                            <input type="number" name="sell_price" step="0.01" class="form-control" placeholder="0.00"
-                                id="sell_price" required>
+                            <input type="number" name="sell_price" step="0.01" class="form-control req-for-new"
+                                placeholder="0.00" id="sell_price" required>
                         </div>
                     </div>
                 </div>
@@ -184,7 +276,7 @@
                         <i class="fas fa-warehouse"></i> Inventory
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Stock Quantity</label>
+                        <label class="form-label" id="stock_label">Initial Stock</label>
                         <input type="number" name="stock" class="form-control" placeholder="0" required>
                     </div>
                     <div class="form-group">
@@ -207,6 +299,17 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Sticky Bottom Actions -->
+        <div class="form-actions-footer"
+            style="display: flex; gap: 15px; margin-top: 30px; background: white; padding: 20px; border-radius: 20px; justify-content: flex-end; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);">
+            <a href="{{ url_for('festiv_store.master_stock') }}" class="btn btn-secondary" style="padding: 14px 28px;">
+                <i class="fas fa-rotate-left"></i> Discard
+            </a>
+            <button type="submit" class="btn btn-primary" style="padding: 14px 28px;">
+                <i class="fas fa-cloud-upload"></i> Create Product
+            </button>
         </div>
     </form>
 </div>
@@ -246,5 +349,202 @@
     [sellPrice, costPrice].forEach(el => {
         el.addEventListener('input', calculateProfit);
     });
+
+    // ==========================================
+    // Operation Selector UI Logic
+    // ==========================================
+    const opRadios = document.querySelectorAll('input[name="operation_type"]');
+    const opCards = document.querySelectorAll('.op-card');
+
+    const basicInfoCard = document.getElementById('basic_info_card');
+    const classificationCard = document.getElementById('classification_card');
+    const commercialCard = document.getElementById('commercial_card');
+    const existingProductCard = document.getElementById('existing_product_card');
+
+    // Sub-flow specific fields
+    const addStockFields = document.getElementById('add_stock_fields');
+    const returnProductFields = document.getElementById('return_product_fields');
+
+    const stockLabel = document.getElementById('stock_label');
+    const requiredForNew = document.querySelectorAll('.req-for-new');
+    const existingProductSelect = document.getElementById('existing_product_id');
+
+    window.toggleReturnEntity = function () {
+        const entity = document.querySelector('input[name="return_entity_type"]:checked').value;
+        document.getElementById('return_customer_div').style.display = entity === 'customer' ? 'block' : 'none';
+        document.getElementById('return_seller_div').style.display = entity === 'seller' ? 'block' : 'none';
+
+        // Handle required attributes for validation
+        const custInput = document.querySelector('input[name="return_customer_name"]');
+        const sellInput = document.querySelector('input[name="return_seller_name"]');
+
+        if (entity === 'customer') {
+            custInput.setAttribute('required', 'true');
+            sellInput.removeAttribute('required');
+        } else {
+            sellInput.setAttribute('required', 'true');
+            custInput.removeAttribute('required');
+        }
+    };
+
+    function updateUI(operation) {
+        opCards.forEach(card => card.classList.remove('active'));
+        const activeRadio = document.querySelector(`input[value="${operation}"]`);
+        if (activeRadio) activeRadio.closest('.op-card').classList.add('active');
+
+        // Reset nested hidden fields
+        addStockFields.style.display = 'none';
+        returnProductFields.style.display = 'none';
+        document.getElementById('generic_product_select_div').style.display = 'none';
+
+        // Clear dynamic required fields from returning forms
+        document.querySelector('input[name="stock_seller_name"]').removeAttribute('required');
+        document.querySelector('input[name="return_customer_name"]').removeAttribute('required');
+        document.querySelector('input[name="return_seller_name"]').removeAttribute('required');
+        document.getElementById('return_bill_id').removeAttribute('required');
+        document.getElementById('return_bill_product_id').removeAttribute('required');
+
+        if (operation === 'add_new') {
+            basicInfoCard.style.display = 'block';
+            classificationCard.style.display = 'block';
+            commercialCard.style.display = 'block';
+            existingProductCard.style.display = 'none';
+            existingProductSelect.removeAttribute('required');
+
+            stockLabel.innerText = "Initial Stock";
+            requiredForNew.forEach(el => el.setAttribute('required', 'true'));
+        } else {
+            basicInfoCard.style.display = 'none';
+            classificationCard.style.display = 'none';
+            commercialCard.style.display = 'none';
+            existingProductCard.style.display = 'block';
+
+            if (operation === 'add_stock') {
+                document.getElementById('existing_product_header').innerText = "Add Stock Details";
+                document.getElementById('generic_product_select_div').style.display = 'block';
+                existingProductSelect.setAttribute('required', 'true');
+
+                stockLabel.innerText = "Quantity to Add";
+                addStockFields.style.display = 'block';
+                document.querySelector('input[name="stock_seller_name"]').setAttribute('required', 'true');
+            } else if (operation === 'return_product') {
+                document.getElementById('existing_product_header').innerText = "Process Return";
+                existingProductSelect.removeAttribute('required');
+
+                stockLabel.innerText = "Quantity to Return";
+                returnProductFields.style.display = 'block';
+                toggleReturnEntity(); // Enable correct required field inside return block
+
+                document.getElementById('return_bill_id').setAttribute('required', 'true');
+                document.getElementById('return_bill_product_id').setAttribute('required', 'true');
+            }
+
+            requiredForNew.forEach(el => el.removeAttribute('required'));
+        }
+    }
+
+    opRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            updateUI(e.target.value);
+        });
+    });
+
+    // ==========================================
+    // AJAX Dynamic Dropdown Logic
+    // ==========================================
+
+    // Load existing products on page load (Holi Store specific endpoint needed)
+    async function loadProducts() {
+        try {
+            const res = await fetch("{{ url_for('festiv_store.api_products') }}");
+            const json = await res.json();
+            if (json.success && json.data) {
+                const select = document.getElementById('existing_product_id');
+                select.innerHTML = '<option value="">-- Choose an existing product --</option>';
+                json.data.forEach(p => {
+                    select.innerHTML += `<option value="${p.product_id}">${p.product_name} (Stock: ${p.stock})</option>`;
+                });
+            }
+        } catch (e) { console.error('Error loading products', e); }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProducts();
+    });
+
+    // Detect Customer/Seller input to fetch Bills
+    let billDebounceTimer;
+    function handleEntitySearch(e) {
+        clearTimeout(billDebounceTimer);
+        const term = e.target.value;
+        const type = document.querySelector('input[name="return_entity_type"]:checked').value;
+
+        if (term.length < 3) return;
+
+        billDebounceTimer = setTimeout(async () => {
+            const billSelect = document.getElementById('return_bill_id');
+            billSelect.innerHTML = '<option value="">Loading bills...</option>';
+
+            try {
+                if (type === 'customer') {
+                    const res = await fetch(`{{ url_for('festiv_store.api_bills_by_customer', name='') }}${encodeURIComponent(term)}`);
+                    const json = await res.json();
+                    billSelect.innerHTML = '<option value="">-- Choose a Bill --</option>';
+                    if (json.success && json.data.length > 0) {
+                        json.data.forEach(b => {
+                            billSelect.innerHTML += `<option value="${b.bill_id}">Invoice #${b.bill_no || b.bill_id} - ₹${b.bill_total}</option>`;
+                        });
+                    } else {
+                        billSelect.innerHTML = '<option value="">No bills found</option>';
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching bills', err);
+                billSelect.innerHTML = '<option value="">Error loading</option>';
+            }
+        }, 500);
+    }
+
+    document.querySelector('input[name="return_customer_name"]').addEventListener('input', handleEntitySearch);
+
+    // Detect Bill Selection to fetch items
+    document.getElementById('return_bill_id').addEventListener('change', async function (e) {
+        const billId = e.target.value;
+        const prodSelect = document.getElementById('return_bill_product_id');
+
+        if (!billId) {
+            prodSelect.innerHTML = '<option value="">-- Choose Product to Return --</option>';
+            return;
+        }
+
+        prodSelect.innerHTML = '<option value="">Loading products...</option>';
+        try {
+            const res = await fetch(`/festiv_store/holi/api/bill_items/${billId}`);
+            const json = await res.json();
+            prodSelect.innerHTML = '<option value="">-- Choose Product to Return --</option>';
+
+            if (json.success && json.data) {
+                json.data.forEach(item => {
+                    prodSelect.innerHTML += `<option value="${item.bill_item_id}" data-product-id="${item.product_id}">${item.product_name} (Qty: ${item.quantity}) - ₹${item.final_price}</option>`;
+                });
+            }
+        } catch (err) { console.error('Error loading items', err); }
+    });
+
+    // Sync main hidden product ID when bill product is selected
+    document.getElementById('return_bill_product_id').addEventListener('change', function (e) {
+        const option = this.options[this.selectedIndex];
+        const prodId = option.getAttribute('data-product-id');
+
+        if (prodId) {
+            let genericSelect = document.getElementById('existing_product_id');
+            let exists = Array.from(genericSelect.options).some(o => o.value == prodId);
+            if (!exists) {
+                genericSelect.innerHTML += `<option value="${prodId}">Hidden Temp Select</option>`;
+            }
+            genericSelect.value = prodId;
+        }
+    });
+
 </script>
 {% endblock %}
